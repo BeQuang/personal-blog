@@ -1,0 +1,85 @@
+import type { EventItem } from "@/types";
+
+export const events: readonly EventItem[] = [
+  {
+    id: "event-001",
+    title: "Livestream giải đáp về xây kênh video ngắn",
+    slug: "livestream-giai-dap-xay-kenh-video-ngan",
+    description:
+      "Buổi trò chuyện trực tiếp về chọn chủ đề, lịch đăng và cách đọc số liệu trong giai đoạn đầu.",
+    banner: "/images/events/livestream-video-ngan.jpg",
+    type: "livestream",
+    status: "upcoming",
+    startAt: "2026-08-02T13:00:00.000Z",
+    endAt: "2026-08-02T14:30:00.000Z",
+    platform: "YouTube Live",
+    externalUrl: "https://www.youtube.com/@quangofficial",
+    schedule: [
+      { time: "20:00", title: "Chào khán giả và giới thiệu chủ đề" },
+      { time: "20:15", title: "Chia sẻ quy trình xây kênh" },
+      { time: "20:50", title: "Hỏi đáp trực tiếp" },
+    ],
+    featured: true,
+  },
+  {
+    id: "event-002",
+    title: "Workshop kể chuyện bằng video 60 giây",
+    slug: "workshop-ke-chuyen-bang-video-60-giay",
+    description:
+      "Workshop thực hành dành cho người mới, tập trung vào cấu trúc mở đầu, cao trào và kết thúc.",
+    banner: "/images/events/workshop-video-60-giay.jpg",
+    type: "workshop",
+    status: "upcoming",
+    startAt: "2026-08-22T02:00:00.000Z",
+    endAt: "2026-08-22T05:00:00.000Z",
+    location: "The Workshop, Quận 1, TP. Hồ Chí Minh",
+    schedule: [
+      { time: "09:00", title: "Đón khách" },
+      { time: "09:30", title: "Phân tích cấu trúc video ngắn" },
+      { time: "10:30", title: "Thực hành theo nhóm" },
+    ],
+    featured: true,
+  },
+  {
+    id: "event-003",
+    title: "Công chiếu vlog: Một Đà Lạt thật chậm",
+    slug: "cong-chieu-vlog-mot-da-lat-that-cham",
+    description:
+      "Cùng xem vlog mới và trò chuyện về những câu chuyện phía sau chuyến đi.",
+    banner: "/images/events/cong-chieu-vlog-da-lat.jpg",
+    type: "premiere",
+    status: "upcoming",
+    startAt: "2026-07-25T13:00:00.000Z",
+    endAt: "2026-07-25T14:00:00.000Z",
+    platform: "YouTube Premiere",
+    externalUrl: "https://www.youtube.com/@quangofficial",
+    featured: false,
+  },
+  {
+    id: "event-004",
+    title: "Fan meeting Cảm ơn 250K",
+    slug: "fan-meeting-cam-on-250k",
+    description:
+      "Buổi gặp gỡ nhỏ để trò chuyện, chụp ảnh và nhìn lại những cột mốc đáng nhớ.",
+    banner: "/images/events/fan-meeting-250k.jpg",
+    type: "fan-meeting",
+    status: "ended",
+    startAt: "2026-05-10T07:00:00.000Z",
+    endAt: "2026-05-10T10:00:00.000Z",
+    location: "Nhà Văn hóa Thanh niên, TP. Hồ Chí Minh",
+    featured: false,
+  },
+  {
+    id: "event-005",
+    title: "Giveaway bộ micro dành cho người mới",
+    slug: "giveaway-bo-micro-danh-cho-nguoi-moi",
+    description:
+      "Sự kiện trực tuyến chia sẻ kinh nghiệm thu âm và công bố người nhận bộ micro.",
+    banner: "/images/events/giveaway-micro.jpg",
+    type: "giveaway",
+    status: "cancelled",
+    startAt: "2026-06-12T13:00:00.000Z",
+    platform: "Facebook Live",
+    featured: false,
+  },
+];
