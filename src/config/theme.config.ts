@@ -1,5 +1,7 @@
 import type { ThemeSettings } from "@/types";
 
+export const themeStorageKey = "creator-blog-theme";
+
 export const defaultTheme: ThemeSettings = {
   mode: "dark",
   layout: "creator",
