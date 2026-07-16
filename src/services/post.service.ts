@@ -28,3 +28,27 @@ export function getPostsByCategory(category: string): BlogPost[] {
     (post) => post.category.toLocaleLowerCase("vi-VN") === normalizedCategory,
   );
 }
+
+export function getRelatedPosts(post: BlogPost, limit = 3): BlogPost[] {
+  const postTags = new Set(
+    post.tags.map((tag) => tag.toLocaleLowerCase("vi-VN")),
+  );
+
+  const rankedPosts = getPublishedPosts()
+    .filter((candidate) => candidate.id !== post.id)
+    .map((candidate) => {
+      const sameCategory = candidate.category === post.category ? 2 : 0;
+      const sharedTags = candidate.tags.filter((tag) =>
+        postTags.has(tag.toLocaleLowerCase("vi-VN")),
+      ).length;
+
+      return { candidate, score: sameCategory + sharedTags };
+    })
+    .sort((left, right) => right.score - left.score);
+  const directlyRelated = rankedPosts.filter(({ score }) => score > 0);
+  const latestFallback = rankedPosts.filter(({ score }) => score === 0);
+
+  return [...directlyRelated, ...latestFallback]
+    .slice(0, Math.max(0, limit))
+    .map(({ candidate }) => candidate);
+}
