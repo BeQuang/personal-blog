@@ -4,9 +4,10 @@ import { Container } from "@/components/common/Container";
 import { FeaturedVideo } from "@/components/videos/FeaturedVideo";
 import { VideoExplorer } from "@/components/videos/VideoExplorer";
 import { siteConfig } from "@/config/site.config";
+import { withSocialMetadata } from "@/lib/metadata";
 import { getFeaturedVideos, getVideos } from "@/services/video.service";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocialMetadata({
   title: "Video",
   description:
     "Khám phá video mới của Quang trên YouTube, TikTok, Instagram và Facebook.",
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
     url: "/videos",
     images: [{ url: siteConfig.coverImage, alt: `Video của ${siteConfig.creatorName}` }],
   },
-};
+});
 
 export default function VideosPage() {
   const videos = getVideos().filter((video) => video.platform !== "internal");

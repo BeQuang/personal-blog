@@ -9,6 +9,7 @@ import { CampaignParticipation } from "@/components/campaigns/CampaignParticipat
 import { LinkButton } from "@/components/common/Button";
 import { Container } from "@/components/common/Container";
 import { campaignStatusLabels } from "@/config/campaign.config";
+import { withSocialMetadata } from "@/lib/metadata";
 import {
   getEffectiveCampaignStatus,
   getPublicCampaignBySlug,
@@ -35,17 +36,24 @@ export async function generateMetadata({
   }
 
   const canonical = `/campaigns/${campaign.slug}`;
-  return {
+  return withSocialMetadata({
     title: campaign.title,
     description: campaign.description,
     alternates: { canonical },
     openGraph: {
+      type: "website",
       title: campaign.title,
       description: campaign.description,
       url: canonical,
       images: [{ url: campaign.banner, alt: `Banner chiến dịch ${campaign.title}` }],
     },
-  };
+    twitter: {
+      card: "summary_large_image",
+      title: campaign.title,
+      description: campaign.description,
+      images: [campaign.banner],
+    },
+  });
 }
 
 export default async function CampaignDetailPage({ params }: CampaignPageProps) {
@@ -187,7 +195,7 @@ export default async function CampaignDetailPage({ params }: CampaignPageProps) 
           ) : (
             <a
               href="#registration"
-              className="mt-6 inline-flex min-h-12 items-center justify-center rounded-[var(--radius-lg)] bg-[linear-gradient(135deg,var(--primary),var(--secondary))] px-5 font-bold text-white outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2"
+              className="mt-6 inline-flex min-h-12 items-center justify-center rounded-[var(--radius-lg)] bg-[linear-gradient(135deg,var(--action-primary),var(--action-secondary))] px-5 font-bold text-white outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2"
             >
               Đi đến biểu mẫu
             </a>

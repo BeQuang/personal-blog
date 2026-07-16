@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 
 import { LegalDocument, type LegalSection } from "@/components/legal/LegalDocument";
 import { siteConfig } from "@/config/site.config";
+import { withSocialMetadata } from "@/lib/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocialMetadata({
   title: "Điều khoản sử dụng",
   description: "Điều khoản sử dụng mẫu cho nội dung và tính năng public của Quang Official.",
   alternates: { canonical: "/terms" },
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
     url: "/terms",
     images: [{ url: siteConfig.coverImage, alt: "Điều khoản sử dụng" }],
   },
-};
+});
 
 const sections: readonly LegalSection[] = [
   {

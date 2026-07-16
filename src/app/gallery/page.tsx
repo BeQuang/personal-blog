@@ -3,9 +3,10 @@ import type { Metadata } from "next";
 import { Container } from "@/components/common/Container";
 import { GalleryExplorer } from "@/components/gallery/GalleryExplorer";
 import { siteConfig } from "@/config/site.config";
+import { withSocialMetadata } from "@/lib/metadata";
 import { getGalleryItems } from "@/services/gallery.service";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocialMetadata({
   title: "Hình ảnh",
   description:
     "Khám phá những khoảnh khắc đời sống, hậu trường, sự kiện và du lịch của Quang.",
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
     url: "/gallery",
     images: [{ url: siteConfig.coverImage, alt: `Hình ảnh của ${siteConfig.creatorName}` }],
   },
-};
+});
 
 export default function GalleryPage() {
   const items = getGalleryItems();

@@ -3,10 +3,11 @@ import type { Metadata } from "next";
 import { Container } from "@/components/common/Container";
 import { EventExplorer } from "@/components/events/EventExplorer";
 import { siteConfig } from "@/config/site.config";
+import { withSocialMetadata } from "@/lib/metadata";
 import { getEvents } from "@/services/event.service";
 import type { EventType } from "@/types";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocialMetadata({
   title: "Sự kiện",
   description:
     "Theo dõi lịch livestream, workshop, công chiếu và các hoạt động cộng đồng của Quang.",
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
     url: "/events",
     images: [{ url: siteConfig.coverImage, alt: `Sự kiện của ${siteConfig.creatorName}` }],
   },
-};
+});
 
 export default function EventsPage() {
   const events = getEvents();

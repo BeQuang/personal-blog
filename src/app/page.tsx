@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import {
   CollaborationSection,
   FeaturedContentSection,
@@ -17,6 +19,10 @@ import { getGalleryPreview } from "@/services/gallery.service";
 import { getFeaturedPosts, getPublishedPosts } from "@/services/post.service";
 import { getEnabledSocialLinks } from "@/services/social.service";
 import { getVideos } from "@/services/video.service";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default function Home() {
   const sections = siteConfig.homepageSections;

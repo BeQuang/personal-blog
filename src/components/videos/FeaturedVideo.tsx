@@ -72,7 +72,7 @@ export function FeaturedVideo({ video }: FeaturedVideoProps) {
           href={video.videoUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-lg)] bg-[linear-gradient(135deg,var(--primary),var(--secondary))] px-5 font-bold text-white outline-none transition-transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
+          className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-lg)] bg-[linear-gradient(135deg,var(--action-primary),var(--action-secondary))] px-5 font-bold text-white outline-none transition-transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
         >
           Xem video <ArrowUpRight size={18} aria-hidden="true" />
           <span className="sr-only">(mở trong tab mới)</span>

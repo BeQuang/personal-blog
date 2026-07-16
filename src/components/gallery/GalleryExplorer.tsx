@@ -59,7 +59,7 @@ export function GalleryExplorer({ items, categories }: GalleryExplorerProps) {
               onClick={() => setCategory(item)}
               className={`min-h-11 rounded-full border px-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] ${
                 isActive
-                  ? "border-transparent bg-[var(--primary)] text-white"
+                  ? "border-transparent bg-[var(--action-primary)] text-white"
                   : "border-[var(--border)] bg-[var(--background)] text-[var(--text-secondary)] hover:border-[var(--border-strong)] hover:text-[var(--text-primary)]"
               }`}
             >

@@ -5,9 +5,10 @@ import { FeaturedPost } from "@/components/blog/FeaturedPost";
 import type { PostCardPost } from "@/components/blog/PostCard";
 import { Container } from "@/components/common/Container";
 import { siteConfig } from "@/config/site.config";
+import { withSocialMetadata } from "@/lib/metadata";
 import { getFeaturedPosts, getPublishedPosts } from "@/services/post.service";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocialMetadata({
   title: "Bài viết",
   description:
     "Khám phá các bài viết mới về sáng tạo nội dung, công nghệ, đời sống và những câu chuyện hậu trường của Quang.",
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
     url: "/blog",
     images: [{ url: siteConfig.coverImage, alt: `Bài viết của ${siteConfig.creatorName}` }],
   },
-};
+});
 
 export default function BlogPage() {
   const posts = getPublishedPosts();

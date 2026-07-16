@@ -4,12 +4,13 @@ import { connection } from "next/server";
 import { CampaignGroup } from "@/components/campaigns/CampaignGroup";
 import { Container } from "@/components/common/Container";
 import { siteConfig } from "@/config/site.config";
+import { withSocialMetadata } from "@/lib/metadata";
 import {
   getEffectiveCampaignStatus,
   getPublicCampaigns,
 } from "@/services/campaign.service";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocialMetadata({
   title: "Chiến dịch",
   description:
     "Khám phá giveaway, thử thách sáng tạo và các chiến dịch cộng đồng của Quang.",
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
     url: "/campaigns",
     images: [{ url: siteConfig.coverImage, alt: `Chiến dịch của ${siteConfig.creatorName}` }],
   },
-};
+});
 
 export default async function CampaignsPage() {
   await connection();

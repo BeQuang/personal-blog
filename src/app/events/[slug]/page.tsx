@@ -9,6 +9,7 @@ import { Container } from "@/components/common/Container";
 import { EventShareButtons } from "@/components/events/EventShareButtons";
 import { eventStatusLabels, eventTypeLabels } from "@/config/event.config";
 import { siteConfig } from "@/config/site.config";
+import { withSocialMetadata } from "@/lib/metadata";
 import { getEventBySlug, getEvents } from "@/services/event.service";
 import { formatDate, formatTime } from "@/utils/date";
 
@@ -29,17 +30,24 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
   }
 
   const canonical = `/events/${event.slug}`;
-  return {
+  return withSocialMetadata({
     title: event.title,
     description: event.description,
     alternates: { canonical },
     openGraph: {
+      type: "website",
       title: event.title,
       description: event.description,
       url: canonical,
       images: [{ url: event.banner, alt: `Banner sự kiện ${event.title}` }],
     },
-  };
+    twitter: {
+      card: "summary_large_image",
+      title: event.title,
+      description: event.description,
+      images: [event.banner],
+    },
+  });
 }
 
 export default async function EventDetailPage({ params }: EventPageProps) {
@@ -165,7 +173,7 @@ export default async function EventDetailPage({ params }: EventPageProps) {
                 href={event.externalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-lg)] bg-[linear-gradient(135deg,var(--primary),var(--secondary))] px-5 font-bold text-white outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2"
+                className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-lg)] bg-[linear-gradient(135deg,var(--action-primary),var(--action-secondary))] px-5 font-bold text-white outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2"
               >
                 Mở trang sự kiện <ArrowUpRight size={18} aria-hidden="true" />
               </a>

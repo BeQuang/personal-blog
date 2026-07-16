@@ -25,7 +25,49 @@ export const metadata: Metadata = {
   },
   description: siteConfig.siteDescription,
   authors: [{ name: siteConfig.creatorName }],
+  creator: siteConfig.creatorName,
+  publisher: siteConfig.siteName,
   applicationName: siteConfig.siteName,
+  keywords: [
+    "Quang Official",
+    "sáng tạo nội dung",
+    "công nghệ",
+    "đời sống",
+    "blog cá nhân",
+  ],
+  category: "Personal blog",
+  openGraph: {
+    type: "website",
+    locale: "vi_VN",
+    url: "/",
+    siteName: siteConfig.siteName,
+    title: siteConfig.siteName,
+    description: siteConfig.siteDescription,
+    images: [
+      {
+        url: siteConfig.coverImage,
+        alt: `Ảnh giới thiệu ${siteConfig.creatorName}`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.siteName,
+    description: siteConfig.siteDescription,
+    creator: siteConfig.username,
+    images: [siteConfig.coverImage],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
 };
 
 const themeInitializationScript = `
@@ -54,7 +96,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className={beVietnamPro.variable} suppressHydrationWarning>
+    <html
+      lang="vi"
+      className={beVietnamPro.variable}
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitializationScript }} />
       </head>

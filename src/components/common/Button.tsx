@@ -11,7 +11,7 @@ const baseClasses =
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "border border-transparent bg-[linear-gradient(135deg,var(--primary),var(--secondary))] text-white shadow-[0_10px_30px_color-mix(in_srgb,var(--primary)_22%,transparent)] hover:-translate-y-0.5 hover:shadow-[0_14px_34px_color-mix(in_srgb,var(--primary)_30%,transparent)]",
+    "border border-transparent bg-[linear-gradient(135deg,var(--action-primary),var(--action-secondary))] text-white shadow-[0_10px_30px_color-mix(in_srgb,var(--primary)_22%,transparent)] hover:-translate-y-0.5 hover:shadow-[0_14px_34px_color-mix(in_srgb,var(--primary)_30%,transparent)]",
   secondary:
     "border border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] hover:border-[var(--border-strong)] hover:bg-[var(--surface-hover)]",
   outline:

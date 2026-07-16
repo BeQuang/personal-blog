@@ -10,6 +10,7 @@ import { ShareButtons } from "@/components/blog/ShareButtons";
 import { LinkButton } from "@/components/common/Button";
 import { Container } from "@/components/common/Container";
 import { siteConfig } from "@/config/site.config";
+import { withSocialMetadata } from "@/lib/metadata";
 import {
   getPostBySlug,
   getPublishedPosts,
@@ -37,7 +38,7 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
   const canonical = `/blog/${post.slug}`;
   const image = post.coverImage ?? post.thumbnail;
 
-  return {
+  return withSocialMetadata({
     title: post.title,
     description: post.excerpt,
     alternates: { canonical },
@@ -51,8 +52,15 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
       authors: [post.author.name],
       tags: [...post.tags],
       ...(post.publishedAt ? { publishedTime: post.publishedAt } : {}),
+      modifiedTime: post.updatedAt,
     },
-  };
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt,
+      images: [image],
+    },
+  });
 }
 
 export default async function PostPage({ params }: PostPageProps) {

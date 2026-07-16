@@ -6,10 +6,11 @@ import { SocialIcon } from "@/components/common/SocialIcon";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { expectedResponseTime } from "@/config/contact.config";
 import { siteConfig } from "@/config/site.config";
+import { withSocialMetadata } from "@/lib/metadata";
 import { getEnabledSocialLinks } from "@/services/social.service";
 import { formatViewCount } from "@/utils/format";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocialMetadata({
   title: "Liên hệ hợp tác",
   description:
     "Liên hệ Quang Official cho booking quảng cáo, review sản phẩm, sự kiện và các dự án truyền thông.",
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
     url: "/contact",
     images: [{ url: siteConfig.coverImage, alt: `Liên hệ ${siteConfig.creatorName}` }],
   },
-};
+});
 
 export default function ContactPage() {
   const socialLinks = getEnabledSocialLinks().filter((link) => link.platform !== "email");

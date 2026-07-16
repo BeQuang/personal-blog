@@ -20,10 +20,11 @@ import { SocialIcon } from "@/components/common/SocialIcon";
 import { AnalyticsLink } from "@/components/home/AnalyticsLink";
 import { homepageConfig } from "@/config/homepage.config";
 import { siteConfig } from "@/config/site.config";
+import { withSocialMetadata } from "@/lib/metadata";
 import { getEnabledSocialLinks } from "@/services/social.service";
 import { formatViewCount } from "@/utils/format";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withSocialMetadata({
   title: "Giới thiệu",
   description:
     "Tìm hiểu hành trình sáng tạo nội dung, chủ đề, giá trị và những cột mốc của Quang Official.",
@@ -34,7 +35,7 @@ export const metadata: Metadata = {
     url: "/about",
     images: [{ url: siteConfig.coverImage, alt: `Giới thiệu ${siteConfig.creatorName}` }],
   },
-};
+});
 
 const achievements = [
   { value: "250K+", label: "Người theo dõi", icon: Users },
@@ -79,7 +80,7 @@ export default function AboutPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   analytics={{ type: "social", id: followLink.platform }}
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-lg)] bg-[linear-gradient(135deg,var(--primary),var(--secondary))] px-5 font-semibold text-white shadow-[0_10px_30px_color-mix(in_srgb,var(--primary)_22%,transparent)] outline-none transition hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-lg)] bg-[linear-gradient(135deg,var(--action-primary),var(--action-secondary))] px-5 font-semibold text-white shadow-[0_10px_30px_color-mix(in_srgb,var(--primary)_22%,transparent)] outline-none transition hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2"
                 >
                   Theo dõi trên {followLink.label} <ExternalLink size={18} aria-hidden="true" />
                 </AnalyticsLink>

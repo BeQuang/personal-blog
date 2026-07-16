@@ -179,7 +179,7 @@ export function LatestPostsSection({ posts }: LatestPostsSectionProps) {
           eyebrow={config.eyebrow}
           title={config.title}
           description={config.description}
-          action={<LinkButton href="/blog" variant="outline">Xem tất cả <ArrowRight size={17} /></LinkButton>}
+          action={<LinkButton href="/blog" variant="outline">Xem tất cả <ArrowRight size={17} aria-hidden="true" /></LinkButton>}
         />
         <div className="post-grid">
           {posts.map((post) => (
@@ -192,9 +192,9 @@ export function LatestPostsSection({ posts }: LatestPostsSectionProps) {
                 <h3><Link href={`/blog/${post.slug}`}>{post.title}</Link></h3>
                 <p>{post.excerpt}</p>
                 <div className="post-card-footer">
-                  <span><Clock3 size={15} /> {post.readingTime} phút</span>
-                  {post.viewCount ? <span><Eye size={15} /> {formatViewCount(post.viewCount)}</span> : null}
-                  <Link href={`/blog/${post.slug}`} aria-label={`Đọc: ${post.title}`}><ArrowRight size={18} /></Link>
+                  <span><Clock3 size={15} aria-hidden="true" /> {post.readingTime} phút</span>
+                  {post.viewCount ? <span><Eye size={15} aria-hidden="true" /> {formatViewCount(post.viewCount)}</span> : null}
+                  <Link href={`/blog/${post.slug}`} aria-label={`Đọc: ${post.title}`}><ArrowRight size={18} aria-hidden="true" /></Link>
                 </div>
               </div>
             </article>
@@ -220,7 +220,7 @@ export function LatestVideosSection({ videos }: LatestVideosSectionProps) {
           eyebrow={config.eyebrow}
           title={config.title}
           description={config.description}
-          action={<LinkButton href="/videos" variant="outline">Xem tất cả <ArrowRight size={17} /></LinkButton>}
+          action={<LinkButton href="/videos" variant="outline">Xem tất cả <ArrowRight size={17} aria-hidden="true" /></LinkButton>}
         />
         <div className="video-grid">
           {videos.map((video) => (
@@ -266,7 +266,7 @@ export function GalleryPreviewSection({ items }: GalleryPreviewSectionProps) {
           eyebrow={config.eyebrow}
           title={config.title}
           description={config.description}
-          action={<LinkButton href="/gallery" variant="outline">Mở thư viện <ArrowRight size={17} /></LinkButton>}
+          action={<LinkButton href="/gallery" variant="outline">Mở thư viện <ArrowRight size={17} aria-hidden="true" /></LinkButton>}
         />
         <GalleryLightbox items={items} />
       </Container>
@@ -296,11 +296,11 @@ export function UpcomingEventsSection({ events }: UpcomingEventsSectionProps) {
                 <h3>{event.title}</h3>
                 <p>{event.description}</p>
                 <div className="event-meta">
-                  <span><Clock3 size={16} /> {formatDateTime(event.startAt)}</span>
-                  <span><MapPin size={16} /> {event.location ?? event.platform ?? "Trực tuyến"}</span>
+                  <span><Clock3 size={16} aria-hidden="true" /> {formatDateTime(event.startAt)}</span>
+                  <span><MapPin size={16} aria-hidden="true" /> {event.location ?? event.platform ?? "Trực tuyến"}</span>
                 </div>
               </div>
-              <LinkButton href={`/events/${event.slug}`} variant="outline">Chi tiết <ArrowRight size={17} /></LinkButton>
+              <LinkButton href={`/events/${event.slug}`} variant="outline">Chi tiết <ArrowRight size={17} aria-hidden="true" /></LinkButton>
             </article>
           ))}
         </div>
