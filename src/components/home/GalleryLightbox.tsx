@@ -60,7 +60,20 @@ export function GalleryLightbox({ items }: GalleryLightboxProps) {
 
       <Dialog.Portal>
         <Dialog.Overlay className="dialog-overlay" />
-        <Dialog.Content className="gallery-dialog">
+        <Dialog.Content
+          className="gallery-dialog"
+          onKeyDown={(event) => {
+            if (event.key === "ArrowLeft") {
+              event.preventDefault();
+              move(-1);
+            }
+
+            if (event.key === "ArrowRight") {
+              event.preventDefault();
+              move(1);
+            }
+          }}
+        >
           <Dialog.Title className="sr-only">{selected.title}</Dialog.Title>
           <Dialog.Description className="sr-only">
             {selected.description ?? selected.alt}
@@ -80,8 +93,13 @@ export function GalleryLightbox({ items }: GalleryLightboxProps) {
             <div>
               <small>{selected.category}</small>
               <p>{selected.title}</p>
+              {selected.description ? (
+                <span className="mt-1 block text-xs leading-5 text-[var(--text-muted)]">
+                  {selected.description}
+                </span>
+              ) : null}
             </div>
-            <span>{selectedIndex + 1} / {items.length}</span>
+            <span className="shrink-0">{selectedIndex + 1} / {items.length}</span>
           </div>
 
           <Button
