@@ -7,7 +7,7 @@ export const campaigns = [
     slug: "giveaway-goc-sang-tao-thang-tam",
     description:
       "Chia sẻ góc làm việc của bạn và có cơ hội nhận một bộ đèn nhỏ gọn dành cho quay video tại nhà.",
-    banner: "/images/campaigns/giveaway-goc-sang-tao.jpg",
+    banner: "/images/creator/scene-08.jpg",
     startAt: "2026-07-01T00:00:00.000Z",
     endAt: "2026-08-15T16:59:59.000Z",
     status: "active",
@@ -30,7 +30,7 @@ export const campaigns = [
     slug: "thu-thach-7-ngay-ke-chuyen-bang-video",
     description:
       "Mỗi ngày hoàn thành một bài tập ngắn để xây dựng thói quen quan sát và kể chuyện rõ ràng hơn.",
-    banner: "/images/campaigns/thu-thach-7-ngay.jpg",
+    banner: "/images/creator/scene-01.jpg",
     startAt: "2026-08-24T00:00:00.000Z",
     endAt: "2026-08-30T16:59:59.000Z",
     status: "upcoming",
@@ -52,7 +52,7 @@ export const campaigns = [
     slug: "cung-nhau-trong-1000-cay-xanh",
     description:
       "Chiến dịch cộng đồng quy đổi các video chia sẻ thói quen xanh thành cây giống cho khu vực cần phục hồi.",
-    banner: "/images/campaigns/trong-1000-cay-xanh.jpg",
+    banner: "/images/creator/scene-04.jpg",
     startAt: "2026-04-01T00:00:00.000Z",
     endAt: "2026-05-31T16:59:59.000Z",
     status: "ended",
@@ -74,7 +74,7 @@ export const campaigns = [
     slug: "media-kit-danh-cho-doi-tac-2027",
     description:
       "Bản giới thiệu định hướng nội dung và các hình thức hợp tác dự kiến cho năm 2027.",
-    banner: "/images/campaigns/media-kit-2027.jpg",
+    banner: "/images/creator/scene-02.jpg",
     startAt: "2026-11-01T00:00:00.000Z",
     endAt: "2027-01-31T16:59:59.000Z",
     status: "draft",

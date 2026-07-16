@@ -31,6 +31,27 @@ export function formatDateTime(value: string | Date): string {
   });
 }
 
+export function formatDay(value: string | Date): string {
+  const date = parseDate(value);
+  if (!date) return "--";
+
+  return new Intl.DateTimeFormat(DEFAULT_LOCALE, {
+    day: "2-digit",
+    timeZone: DEFAULT_TIME_ZONE,
+  }).format(date);
+}
+
+export function formatMonthYear(value: string | Date): string {
+  const date = parseDate(value);
+  if (!date) return "Chưa xác định";
+
+  return new Intl.DateTimeFormat(DEFAULT_LOCALE, {
+    month: "short",
+    year: "numeric",
+    timeZone: DEFAULT_TIME_ZONE,
+  }).format(date);
+}
+
 export function toTimestamp(value: string | Date | undefined): number {
   if (!value) {
     return 0;

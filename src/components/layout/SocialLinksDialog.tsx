@@ -3,32 +3,34 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { ExternalLink, Users, X } from "lucide-react";
 
-import { Button } from "@/components/common/Button";
+import { Button, type ButtonVariant } from "@/components/common/Button";
 import { SocialIcon } from "@/components/common/SocialIcon";
-import { socialLinks } from "@/data/social-links";
 import { trackSocialClick } from "@/lib/analytics";
+import { getEnabledSocialLinks } from "@/services/social.service";
 import { cn } from "@/utils/cn";
-import { filterEnabledSocialLinks } from "@/utils/data";
 import { formatViewCount } from "@/utils/format";
 
 interface SocialLinksDialogProps {
   className?: string;
   compact?: boolean;
   nested?: boolean;
+  variant?: ButtonVariant;
 }
 
-const enabledSocialLinks = filterEnabledSocialLinks(socialLinks);
+const enabledSocialLinks = getEnabledSocialLinks();
 
 export function SocialLinksDialog({
   className,
   compact = false,
   nested = false,
+  variant = "primary",
 }: SocialLinksDialogProps) {
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
         <Button
           size={compact ? "icon" : "sm"}
+          variant={variant}
           className={className}
           aria-label={compact ? "Theo dõi Quang trên mạng xã hội" : undefined}
         >

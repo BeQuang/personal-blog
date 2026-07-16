@@ -7,7 +7,7 @@ export const events: readonly EventItem[] = [
     slug: "livestream-giai-dap-xay-kenh-video-ngan",
     description:
       "Buổi trò chuyện trực tiếp về chọn chủ đề, lịch đăng và cách đọc số liệu trong giai đoạn đầu.",
-    banner: "/images/events/livestream-video-ngan.jpg",
+    banner: "/images/creator/scene-01.jpg",
     type: "livestream",
     status: "upcoming",
     startAt: "2026-08-02T13:00:00.000Z",
@@ -27,7 +27,7 @@ export const events: readonly EventItem[] = [
     slug: "workshop-ke-chuyen-bang-video-60-giay",
     description:
       "Workshop thực hành dành cho người mới, tập trung vào cấu trúc mở đầu, cao trào và kết thúc.",
-    banner: "/images/events/workshop-video-60-giay.jpg",
+    banner: "/images/creator/scene-03.jpg",
     type: "workshop",
     status: "upcoming",
     startAt: "2026-08-22T02:00:00.000Z",
@@ -46,7 +46,7 @@ export const events: readonly EventItem[] = [
     slug: "cong-chieu-vlog-mot-da-lat-that-cham",
     description:
       "Cùng xem vlog mới và trò chuyện về những câu chuyện phía sau chuyến đi.",
-    banner: "/images/events/cong-chieu-vlog-da-lat.jpg",
+    banner: "/images/creator/scene-04.jpg",
     type: "premiere",
     status: "upcoming",
     startAt: "2026-07-25T13:00:00.000Z",
@@ -61,7 +61,7 @@ export const events: readonly EventItem[] = [
     slug: "fan-meeting-cam-on-250k",
     description:
       "Buổi gặp gỡ nhỏ để trò chuyện, chụp ảnh và nhìn lại những cột mốc đáng nhớ.",
-    banner: "/images/events/fan-meeting-250k.jpg",
+    banner: "/images/creator/scene-08.jpg",
     type: "fan-meeting",
     status: "ended",
     startAt: "2026-05-10T07:00:00.000Z",
@@ -75,7 +75,7 @@ export const events: readonly EventItem[] = [
     slug: "giveaway-bo-micro-danh-cho-nguoi-moi",
     description:
       "Sự kiện trực tuyến chia sẻ kinh nghiệm thu âm và công bố người nhận bộ micro.",
-    banner: "/images/events/giveaway-micro.jpg",
+    banner: "/images/creator/scene-02.jpg",
     type: "giveaway",
     status: "cancelled",
     startAt: "2026-06-12T13:00:00.000Z",

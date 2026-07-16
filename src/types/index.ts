@@ -1,6 +1,8 @@
 export type {
   ButtonStyle,
   CardStyle,
+  CreatorStatistic,
+  HomepageConfig,
   HomepageSectionKey,
   LayoutStyle,
   NavigationItem,

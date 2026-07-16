@@ -4,6 +4,7 @@ import { cn } from "@/utils/cn";
 
 interface SectionHeaderProps {
   title: string;
+  titleId?: string;
   description?: string;
   eyebrow?: string;
   action?: ReactNode;
@@ -13,6 +14,7 @@ interface SectionHeaderProps {
 
 export function SectionHeader({
   title,
+  titleId,
   description,
   eyebrow,
   action,
@@ -33,7 +35,7 @@ export function SectionHeader({
             {eyebrow}
           </p>
         ) : null}
-        <h2 className="text-[length:var(--text-h2)] font-bold tracking-[-0.03em] text-[var(--text-primary)]">
+        <h2 id={titleId} className="text-[length:var(--text-h2)] font-bold tracking-[-0.03em] text-[var(--text-primary)]">
           {title}
         </h2>
         {description ? (

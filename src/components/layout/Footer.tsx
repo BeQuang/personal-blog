@@ -4,10 +4,9 @@ import { Container } from "@/components/common/Container";
 import { SocialIcon } from "@/components/common/SocialIcon";
 import { footerNavigation, legalNavigation } from "@/config/navigation.config";
 import { siteConfig } from "@/config/site.config";
-import { socialLinks } from "@/data/social-links";
-import { filterEnabledSocialLinks } from "@/utils/data";
+import { getEnabledSocialLinks } from "@/services/social.service";
 
-const enabledSocialLinks = filterEnabledSocialLinks(socialLinks);
+const enabledSocialLinks = getEnabledSocialLinks();
 
 export function Footer() {
   const currentYear = new Date().getFullYear();

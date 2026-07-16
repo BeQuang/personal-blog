@@ -5,15 +5,20 @@ import {
   sortByDateAscending,
   sortByDateDescending,
 } from "@/utils/data";
+import { toTimestamp } from "@/utils/date";
 
 export function getEvents(): EventItem[] {
   return sortByDateDescending(events, (event) => event.startAt);
 }
 
-export function getUpcomingEvents(): EventItem[] {
+export function getUpcomingEvents(referenceDate: string | Date = new Date()): EventItem[] {
+  const referenceTimestamp = toTimestamp(referenceDate);
+
   return sortByDateAscending(
     events.filter(
-      (event) => event.status === "upcoming" || event.status === "live",
+      (event) =>
+        (event.status === "upcoming" || event.status === "live") &&
+        toTimestamp(event.endAt ?? event.startAt) > referenceTimestamp,
     ),
     (event) => event.startAt,
   );

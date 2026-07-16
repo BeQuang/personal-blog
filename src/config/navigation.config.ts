@@ -17,4 +17,5 @@ export const footerNavigation = [
 export const legalNavigation = [
   { label: "Chính sách quyền riêng tư", href: "/privacy" },
   { label: "Điều khoản sử dụng", href: "/terms" },
+  { label: "Chính sách cookie", href: "/cookies" },
 ] as const satisfies readonly NavigationItem[];
