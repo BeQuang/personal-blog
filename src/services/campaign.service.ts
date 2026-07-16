@@ -7,14 +7,26 @@ export function getCampaigns(): Campaign[] {
   return sortByDateDescending(campaigns, (campaign) => campaign.startAt);
 }
 
-export function getActiveCampaigns(referenceDate: string | Date = new Date()): Campaign[] {
-  const referenceTimestamp = toTimestamp(referenceDate);
+export function getPublicCampaigns(): Campaign[] {
+  return getCampaigns().filter((campaign) => campaign.status !== "draft");
+}
 
+export function getEffectiveCampaignStatus(
+  campaign: Pick<Campaign, "status" | "startAt" | "endAt">,
+  referenceDate: string | Date = new Date(),
+): CampaignStatus {
+  if (campaign.status === "draft") return "draft";
+
+  const referenceTimestamp = toTimestamp(referenceDate);
+  if (referenceTimestamp < toTimestamp(campaign.startAt)) return "upcoming";
+  if (referenceTimestamp >= toTimestamp(campaign.endAt)) return "ended";
+
+  return "active";
+}
+
+export function getActiveCampaigns(referenceDate: string | Date = new Date()): Campaign[] {
   return getCampaigns().filter(
-    (campaign) =>
-      campaign.status === "active" &&
-      toTimestamp(campaign.startAt) <= referenceTimestamp &&
-      toTimestamp(campaign.endAt) > referenceTimestamp,
+    (campaign) => getEffectiveCampaignStatus(campaign, referenceDate) === "active",
   );
 }
 
@@ -24,6 +36,10 @@ export function getFeaturedCampaign(): Campaign | undefined {
 
 export function getCampaignBySlug(slug: string): Campaign | undefined {
   return findBySlug(campaigns, slug);
+}
+
+export function getPublicCampaignBySlug(slug: string): Campaign | undefined {
+  return findBySlug(getPublicCampaigns(), slug);
 }
 
 export function getCampaignsByStatus(status: CampaignStatus): Campaign[] {

@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 interface CountdownProps {
   endAt: string;
   onExpired?: () => void;
+  expiredMessage?: string;
+  ariaLabel?: string;
 }
 
 interface RemainingTime {
@@ -30,16 +32,27 @@ function calculateRemaining(endAt: string): RemainingTime {
   };
 }
 
-export function Countdown({ endAt, onExpired }: CountdownProps) {
+export function Countdown({
+  endAt,
+  onExpired,
+  expiredMessage = "Chiến dịch đã kết thúc. Cảm ơn bạn đã quan tâm!",
+  ariaLabel = "Thời gian còn lại",
+}: CountdownProps) {
   const [remaining, setRemaining] = useState<RemainingTime | null>(null);
   const reportedExpired = useRef(false);
 
   useEffect(() => {
     reportedExpired.current = false;
+    let interval: number | null = null;
 
     const update = () => {
       const nextRemaining = calculateRemaining(endAt);
       setRemaining(nextRemaining);
+
+      if (nextRemaining.expired && interval !== null) {
+        window.clearInterval(interval);
+        interval = null;
+      }
 
       if (nextRemaining.expired && !reportedExpired.current) {
         reportedExpired.current = true;
@@ -51,8 +64,10 @@ export function Countdown({ endAt, onExpired }: CountdownProps) {
 
     if (update()) return;
 
-    const interval = window.setInterval(update, 1_000);
-    return () => window.clearInterval(interval);
+    interval = window.setInterval(update, 1_000);
+    return () => {
+      if (interval !== null) window.clearInterval(interval);
+    };
   }, [endAt, onExpired]);
 
   if (!remaining) {
@@ -70,7 +85,7 @@ export function Countdown({ endAt, onExpired }: CountdownProps) {
   if (remaining.expired) {
     return (
       <p className="campaign-ended" role="status">
-        Chiến dịch đã kết thúc. Cảm ơn bạn đã quan tâm!
+        {expiredMessage}
       </p>
     );
   }
@@ -83,7 +98,7 @@ export function Countdown({ endAt, onExpired }: CountdownProps) {
   ];
 
   return (
-    <div className="countdown-grid" aria-label="Thời gian còn lại" role="timer">
+    <div className="countdown-grid" aria-label={ariaLabel} role="timer">
       {units.map((unit) => (
         <span className="countdown-cell" key={unit.label}>
           <strong>{String(unit.value).padStart(2, "0")}</strong>

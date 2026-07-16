@@ -31,6 +31,17 @@ export function formatDateTime(value: string | Date): string {
   });
 }
 
+export function formatTime(value: string | Date): string {
+  const date = parseDate(value);
+  if (!date) return "Giờ chưa xác định";
+
+  return new Intl.DateTimeFormat(DEFAULT_LOCALE, {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: DEFAULT_TIME_ZONE,
+  }).format(date);
+}
+
 export function formatDay(value: string | Date): string {
   const date = parseDate(value);
   if (!date) return "--";
