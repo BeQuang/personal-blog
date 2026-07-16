@@ -4,6 +4,7 @@ import { Be_Vietnam_Pro } from "next/font/google";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { RouteChrome } from "@/components/layout/RouteChrome";
 import { siteConfig } from "@/config/site.config";
 import { themeStorageKey } from "@/config/theme.config";
 
@@ -62,13 +63,9 @@ export default function RootLayout({
           <a href="#main-content" className="skip-link">
             Chuyển đến nội dung chính
           </a>
-          <div className="site-shell">
-            <Header />
-            <main id="main-content" className="flex min-w-0 flex-1 flex-col">
-              {children}
-            </main>
-            <Footer />
-          </div>
+          <RouteChrome header={<Header />} footer={<Footer />}>
+            {children}
+          </RouteChrome>
         </ThemeProvider>
       </body>
     </html>

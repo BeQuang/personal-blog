@@ -26,3 +26,9 @@ export type {
   EventType,
 } from "./event";
 export type { Campaign, CampaignStatus } from "./campaign";
+export type {
+  AdminAppearanceSettings,
+  AdminResource,
+  AdminSiteSettings,
+  AdminTableRow,
+} from "./admin";
