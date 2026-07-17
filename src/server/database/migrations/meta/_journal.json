@@ -15,6 +15,27 @@
       "when": 1784195297199,
       "tag": "0001_enable_rls",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784253872897,
+      "tag": "0002_swift_rumiko_fujikawa",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1784253891476,
+      "tag": "0003_stage13_auth_rls",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1784257109039,
+      "tag": "0004_stage13_tighten_editor_rls",
+      "breakpoints": true
     }
   ]
 }

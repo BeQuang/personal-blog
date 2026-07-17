@@ -7,9 +7,19 @@ import { events } from "@/data/events";
 import { posts } from "@/data/posts";
 import { videos } from "@/data/videos";
 
+type AdminDashboardSearchParams = Promise<{
+  error?: string | string[];
+}>;
+
 export const metadata: Metadata = { title: "Tổng quan" };
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage({
+  searchParams,
+}: {
+  searchParams: AdminDashboardSearchParams;
+}) {
+  const params = await searchParams;
+  const error = Array.isArray(params.error) ? params.error[0] : params.error;
   const stats = [
     { key: "visits", label: "Tổng lượt truy cập", value: adminMockMetrics.totalVisits },
     { key: "posts", label: "Tổng bài viết", value: posts.length },
@@ -23,5 +33,14 @@ export default function AdminDashboardPage() {
     .slice(0, 4)
     .map(({ id, title, status }) => ({ id, title, status }));
 
-  return <AdminDashboard stats={stats} latestItems={latestItems} />;
+  return (
+    <>
+      {error === "forbidden" ? (
+        <p className="admin-access-denied" role="alert">
+          Tài khoản của bạn không có quyền truy cập khu vực vừa yêu cầu.
+        </p>
+      ) : null}
+      <AdminDashboard stats={stats} latestItems={latestItems} />
+    </>
+  );
 }

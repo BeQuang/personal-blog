@@ -32,3 +32,4 @@ export type {
   AdminSiteSettings,
   AdminTableRow,
 } from "./admin";
+export type { LoginActionState } from "./auth";

@@ -1,12 +1,14 @@
 import { index, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { authUsers } from "drizzle-orm/supabase";
 
 import { profileStatusEnum, userRoleEnum } from "./enums";
 
 export const profiles = pgTable(
   "profiles",
   {
-    // Stage 13 will add the cross-schema FK to auth.users after Supabase Auth is configured.
-    id: uuid("id").primaryKey(),
+    id: uuid("id")
+      .primaryKey()
+      .references(() => authUsers.id, { onDelete: "cascade" }),
     email: text("email"),
     displayName: text("display_name").notNull(),
     role: userRoleEnum("role").notNull().default("viewer"),

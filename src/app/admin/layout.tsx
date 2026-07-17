@@ -1,8 +1,6 @@
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import type { Metadata } from "next";
 
-import { AdminShell } from "@/components/admin/AdminShell";
-
 import "./admin.css";
 
 export const metadata: Metadata = {
@@ -15,9 +13,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <AntdRegistry>
-      <AdminShell>{children}</AdminShell>
-    </AntdRegistry>
-  );
+  return <AntdRegistry>{children}</AntdRegistry>;
 }

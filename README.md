@@ -1,6 +1,6 @@
 # Quang Official — Creator Blog & Social Hub
 
-Quang Official là website cá nhân dành cho content creator, tập trung vào bài viết, video, hình ảnh, sự kiện và chiến dịch cộng đồng. Dự án gồm một website public hoàn chỉnh và khu vực Admin Dashboard **chỉ dùng để demo giao diện**, chưa có backend hoặc xác thực production.
+Quang Official là website cá nhân dành cho content creator, tập trung vào bài viết, video, hình ảnh, sự kiện và chiến dịch cộng đồng. Dự án gồm website public, Admin Dashboard dùng dữ liệu mock, nền tảng PostgreSQL/Drizzle và lớp xác thực, phân quyền Supabase phía server.
 
 ## Giao diện
 
@@ -28,7 +28,7 @@ Phần public sử dụng phong cách creator hiện đại, hỗ trợ light/da
 - Appearance Editor có theme, màu sắc, kiểu card/button/layout, bật tắt section và preview.
 - Settings form chỉ mô phỏng thao tác lưu.
 
-> **Cảnh báo:** `/admin` không có authentication, authorization hay backend. Không sử dụng khu vực này như một hệ thống quản trị production.
+> **Cảnh báo:** `/admin` đã có Supabase Authentication và RBAC phía server, nhưng các bảng và thao tác nội dung vẫn dùng local state/mock data. Đây chưa phải CMS production hoàn chỉnh.
 
 ## Route
 
@@ -181,10 +181,21 @@ Chỉnh `src/data/campaigns.ts`. Campaign status `draft` không có route public
 | `NEXT_PUBLIC_META_PIXEL_ID` | Dự phòng | Chưa tích hợp Meta Pixel thật trong MVP. |
 | `NEXT_PUBLIC_TIKTOK_PIXEL_ID` | Dự phòng | Chưa tích hợp TikTok Pixel thật trong MVP. |
 | `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | Dự phòng | Chưa có upload hoặc Cloudinary integration. |
-| `DATABASE_URL` | Không sử dụng | MVP không có database. |
-| `AUTH_SECRET` | Không sử dụng | MVP không có authentication. |
+| `DATABASE_URL` | Bắt buộc cho Backend | Kết nối runtime PostgreSQL; ưu tiên Supavisor Transaction Pooler khi deploy serverless. |
+| `DIRECT_DATABASE_URL` | Bắt buộc khi migrate | Kết nối Direct hoặc Supavisor Session Pooler cho Drizzle migration. |
+| `NEXT_PUBLIC_SUPABASE_URL` | Bắt buộc cho Auth | URL Supabase project. |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Ưu tiên | Publishable key cho Supabase Auth trên browser/server SSR. |
+| `SUPABASE_SECRET_KEY` | Chỉ server | Secret key đặc quyền; tuyệt đối không thêm tiền tố `NEXT_PUBLIC_`. |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Legacy fallback | Chỉ dùng nếu project cũ chưa có publishable key. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Legacy fallback, chỉ server | Chỉ dùng nếu project cũ chưa có secret key; có thể bypass RLS. |
+| `BOOTSTRAP_ADMIN_ENABLED` | Mặc định `false` | Khi là `true`, kiểm tra và tạo Admin đầu tiên trước `npm run dev`/`npm start` nếu Supabase Auth chưa có user nào. |
+| `BOOTSTRAP_ADMIN_EMAIL` | Cần khi bật bootstrap | Email của Admin đầu tiên. |
+| `BOOTSTRAP_ADMIN_DISPLAY_NAME` | Cần khi bật bootstrap | Tên hiển thị của Admin đầu tiên. |
+| `BOOTSTRAP_ADMIN_PASSWORD` | Secret, chỉ server | Mật khẩu bootstrap, chỉ đặt trong `.env.local` hoặc secret manager. |
 
 Không commit `.env.local` hoặc secret. Các biến bắt đầu bằng `NEXT_PUBLIC_` được đưa vào client bundle tại thời điểm build, vì vậy cần redeploy sau khi thay giá trị production.
+
+`npm run dev` và `npm start` tự chạy `auth:bootstrap` trước khi khởi động. Script chỉ tạo user khi Auth hoàn toàn trống, xác nhận email, tạo `profiles` với role `super_admin`, và bỏ qua nếu đã có bất kỳ user nào. Có thể chạy kiểm tra thủ công bằng `npm run auth:bootstrap`. Sau khi bootstrap production thành công, nên tắt `BOOTSTRAP_ADMIN_ENABLED` và xoay mật khẩu ban đầu.
 
 ## Deploy lên Vercel
 
@@ -193,7 +204,7 @@ Không commit `.env.local` hoặc secret. Các biến bắt đầu bằng `NEXT_
 3. Trong Project Settings → Environment Variables, đặt `NEXT_PUBLIC_SITE_URL` bằng domain production chính thức, không dùng URL localhost.
 4. Deploy project. Khi đổi domain canonical, cập nhật biến trên rồi redeploy.
 5. Sau deploy, kiểm tra trang chủ, các route động, `/robots.txt`, `/sitemap.xml` và một route không tồn tại.
-6. Trước khi công khai `/admin`, cần xây dựng authentication, authorization và backend thật; bản hiện tại không bảo vệ dữ liệu.
+6. Bật bootstrap duy nhất cho lần deploy đầu khi Auth còn trống, xác nhận profile `super_admin` đã được tạo, sau đó tắt `BOOTSTRAP_ADMIN_ENABLED` và xoay mật khẩu ban đầu.
 
 ## Giới hạn của MVP
 
@@ -202,7 +213,7 @@ Không commit `.env.local` hoặc secret. Các biến bắt đầu bằng `NEXT_
 - Form newsletter, campaign, contact và settings không gửi dữ liệu thật.
 - File đính kèm chỉ được kiểm tra trên UI, không upload.
 - Analytics chỉ ghi event ra console trong development.
-- Không có authentication, authorization, database, email service hay API route nghiệp vụ.
+- Đã có authentication, authorization và database foundation; chưa có CRUD content, email service hoặc API nghiệp vụ.
 - Không đồng bộ dữ liệu với YouTube, TikTok, Instagram, Facebook hoặc social API khác.
 - Nội dung Privacy và Terms là nội dung mẫu, cần được chuyên gia pháp lý kiểm tra trước production.
 - Dữ liệu, hình ảnh, địa chỉ liên hệ và external URL hiện là dữ liệu minh họa cần được thay trước khi phát hành chính thức.
@@ -210,7 +221,7 @@ Không commit `.env.local` hoặc secret. Các biến bắt đầu bằng `NEXT_
 ## Hướng phát triển sau MVP
 
 - CMS hoặc backend quản lý nội dung và media.
-- Authentication, phân quyền admin và audit log.
+- CRUD content thật, quản lý user/role và ghi audit log.
 - Database, object storage và upload có kiểm soát.
 - Email transactional cho form và newsletter.
 - Analytics/consent management production.
@@ -223,6 +234,6 @@ Không commit `.env.local` hoặc secret. Các biến bắt đầu bằng `NEXT_
 - Đặt `NEXT_PUBLIC_SITE_URL` đúng domain canonical.
 - Kiểm tra pháp lý cho Privacy, Terms, cookie/analytics consent.
 - Thêm backend, chống spam, rate limit và lưu trữ an toàn nếu bật form thật.
-- Bảo vệ hoặc loại bỏ route admin demo trước khi phát hành.
+- Tạo Admin đầu tiên, gán role tối thiểu cần thiết và kiểm thử toàn bộ permission trước khi phát hành.
 - Chạy lại `npm run lint`, `npx tsc --noEmit` và `npm run build`.
 - Kiểm thử trình duyệt thật ở mobile, tablet và desktop trước khi go-live.

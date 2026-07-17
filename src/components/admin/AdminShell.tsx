@@ -19,6 +19,7 @@ import {
   Gauge,
   ImageIcon,
   Link2,
+  LogOut,
   MenuIcon,
   MonitorCog,
   Settings,
@@ -27,7 +28,13 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { logoutAction } from "@/actions/auth.actions";
 import { adminNavigation } from "@/config/admin.config";
+import {
+  hasPermission,
+  type Permission,
+  type UserRole,
+} from "@/server/auth/permissions";
 
 const { Header, Sider, Content } = Layout;
 
@@ -43,22 +50,48 @@ const navigationIcons = {
   settings: Settings,
 } as const;
 
-const menuItems: MenuProps["items"] = adminNavigation.map((item) => {
-  const Icon = navigationIcons[item.key];
-  return {
-    key: item.href,
-    icon: <Icon aria-hidden="true" size={18} />,
-    label: item.label,
-  };
-});
+const navigationPermissions = {
+  overview: "dashboard:view",
+  posts: "content:view",
+  "social-links": "settings:manage",
+  videos: "media:manage",
+  gallery: "media:manage",
+  events: "content:view",
+  campaigns: "content:view",
+  appearance: "settings:manage",
+  settings: "settings:manage",
+} as const satisfies Record<
+  (typeof adminNavigation)[number]["key"],
+  Permission
+>;
+
+const roleLabels: Record<UserRole, string> = {
+  super_admin: "Super Admin",
+  admin: "Admin",
+  editor: "Editor",
+  viewer: "Viewer",
+};
 
 function AdminMenu({
   selectedKey,
   onNavigate,
+  role,
 }: {
   selectedKey: string;
   onNavigate: (href: string) => void;
+  role: UserRole;
 }) {
+  const menuItems: MenuProps["items"] = adminNavigation
+    .filter((item) => hasPermission(role, navigationPermissions[item.key]))
+    .map((item) => {
+      const Icon = navigationIcons[item.key];
+      return {
+        key: item.href,
+        icon: <Icon aria-hidden="true" size={18} />,
+        label: item.label,
+      };
+    });
+
   return (
     <Menu
       mode="inline"
@@ -70,7 +103,17 @@ function AdminMenu({
   );
 }
 
-export function AdminShell({ children }: { children: React.ReactNode }) {
+export function AdminShell({
+  children,
+  currentUser,
+}: {
+  children: React.ReactNode;
+  currentUser: {
+    displayName: string;
+    email: string | null;
+    role: UserRole;
+  };
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -120,10 +163,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 <small>Dashboard demo</small>
               </span>
             </div>
-            <AdminMenu selectedKey={selectedItem.href} onNavigate={navigate} />
+            <AdminMenu
+              selectedKey={selectedItem.href}
+              onNavigate={navigate}
+              role={currentUser.role}
+            />
             <div className="admin-demo-note">
               <Tag color="gold">DEMO</Tag>
-              <p>Không có xác thực, backend hoặc dữ liệu production.</p>
+              <p>Xác thực thật; bảng và thao tác nội dung vẫn dùng dữ liệu mock.</p>
             </div>
           </Sider>
 
@@ -135,10 +182,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             onClose={() => setDrawerOpen(false)}
             className="admin-mobile-drawer"
           >
-            <AdminMenu selectedKey={selectedItem.href} onNavigate={navigate} />
+            <AdminMenu
+              selectedKey={selectedItem.href}
+              onNavigate={navigate}
+              role={currentUser.role}
+            />
             <div className="admin-demo-note">
               <Tag color="gold">DEMO</Tag>
-              <p>Không có xác thực, backend hoặc dữ liệu production.</p>
+              <p>Xác thực thật; bảng và thao tác nội dung vẫn dùng dữ liệu mock.</p>
             </div>
           </Drawer>
 
@@ -158,6 +209,18 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <Tag color="purple" className="admin-header-tag">
                 Dữ liệu mock
               </Tag>
+              <div className="admin-user-summary">
+                <span>{currentUser.displayName}</span>
+                <small>{roleLabels[currentUser.role]}</small>
+              </div>
+              <form action={logoutAction}>
+                <Button
+                  htmlType="submit"
+                  type="text"
+                  icon={<LogOut aria-hidden="true" size={18} />}
+                  aria-label="Đăng xuất"
+                />
+              </form>
             </Header>
             <Content className="admin-content">
               <Breadcrumb
