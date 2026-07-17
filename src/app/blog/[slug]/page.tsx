@@ -23,13 +23,13 @@ interface PostPageProps {
   params: Promise<{ slug: string }>;
 }
 
-export function generateStaticParams() {
-  return getPublishedPosts().map((post) => ({ slug: post.slug }));
+export async function generateStaticParams() {
+  return (await getPublishedPosts()).map((post) => ({ slug: post.slug }));
 }
 
 export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = await getPostBySlug(slug);
 
   if (!post) {
     notFound();
@@ -39,14 +39,14 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
   const image = post.coverImage ?? post.thumbnail;
 
   return withSocialMetadata({
-    title: post.title,
-    description: post.excerpt,
+    title: post.seoTitle ?? post.title,
+    description: post.seoDescription ?? post.excerpt,
     alternates: { canonical },
     authors: [{ name: post.author.name }],
     openGraph: {
       type: "article",
-      title: post.title,
-      description: post.excerpt,
+      title: post.seoTitle ?? post.title,
+      description: post.seoDescription ?? post.excerpt,
       url: canonical,
       images: [{ url: image, alt: `Ảnh bìa bài viết ${post.title}` }],
       authors: [post.author.name],
@@ -56,8 +56,8 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
     },
     twitter: {
       card: "summary_large_image",
-      title: post.title,
-      description: post.excerpt,
+      title: post.seoTitle ?? post.title,
+      description: post.seoDescription ?? post.excerpt,
       images: [image],
     },
   });
@@ -65,14 +65,14 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
 
 export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = await getPostBySlug(slug);
 
   if (!post) {
     notFound();
   }
 
   const publicationDate = post.publishedAt ?? post.createdAt;
-  const relatedPosts = getRelatedPosts(post, 3);
+  const relatedPosts = await getRelatedPosts(post, 3);
   const canonicalUrl = new URL(`/blog/${post.slug}`, siteConfig.siteUrl).toString();
 
   return (

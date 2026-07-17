@@ -10,6 +10,7 @@ import { SocialLinksDialog } from "@/components/layout/SocialLinksDialog";
 import { mainNavigation } from "@/config/navigation.config";
 import { siteConfig } from "@/config/site.config";
 import { cn } from "@/utils/cn";
+import type { SocialLink } from "@/types";
 
 function isActiveRoute(pathname: string, href: string): boolean {
   return href === "/"
@@ -17,7 +18,7 @@ function isActiveRoute(pathname: string, href: string): boolean {
     : pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function MobileMenu() {
+export function MobileMenu({ socialLinks }: { socialLinks: readonly SocialLink[] }) {
   const pathname = usePathname();
 
   return (
@@ -79,7 +80,7 @@ export function MobileMenu() {
           </nav>
 
           <div className="mt-auto border-t border-[var(--border)] p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-            <SocialLinksDialog className="w-full" nested />
+            <SocialLinksDialog links={socialLinks} className="w-full" nested />
           </div>
         </Dialog.Content>
       </Dialog.Portal>

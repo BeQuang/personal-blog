@@ -343,6 +343,37 @@
   font-size: 12px;
 }
 
+.admin-code-input {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.admin-table-taxonomy {
+  display: grid;
+  gap: 3px;
+}
+
+.admin-table-taxonomy span {
+  overflow: hidden;
+  color: #7c8494;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-taxonomy-list {
+  max-height: 420px;
+  margin-top: 18px;
+  overflow-y: auto;
+}
+
+.admin-post-form .ant-form-item-extra {
+  margin-top: 5px;
+  color: #7c8494;
+  font-size: 12px;
+}
+
 .admin-stat-card {
   height: 100%;
   border-color: #e7eaf0 !important;

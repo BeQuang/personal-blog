@@ -4,11 +4,9 @@ import { Container } from "@/components/common/Container";
 import { SocialIcon } from "@/components/common/SocialIcon";
 import { footerNavigation, legalNavigation } from "@/config/navigation.config";
 import { siteConfig } from "@/config/site.config";
-import { getEnabledSocialLinks } from "@/services/social.service";
+import type { SocialLink } from "@/types";
 
-const enabledSocialLinks = getEnabledSocialLinks();
-
-export function Footer() {
+export function Footer({ socialLinks }: { socialLinks: readonly SocialLink[] }) {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -31,7 +29,7 @@ export function Footer() {
               {siteConfig.siteDescription}
             </p>
             <ul className="mt-5 flex flex-wrap gap-2" aria-label="Mạng xã hội">
-              {enabledSocialLinks.map((link) => (
+              {socialLinks.map((link) => (
                 <li key={link.id}>
                   <a
                     href={link.url}

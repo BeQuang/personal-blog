@@ -6,8 +6,9 @@ import { DesktopNavigation } from "@/components/layout/DesktopNavigation";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import { SocialLinksDialog } from "@/components/layout/SocialLinksDialog";
 import { siteConfig } from "@/config/site.config";
+import type { SocialLink } from "@/types";
 
-export function Header() {
+export function Header({ socialLinks }: { socialLinks: readonly SocialLink[] }) {
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[color-mix(in_srgb,var(--background)_84%,transparent)] backdrop-blur-xl supports-[backdrop-filter]:bg-[color-mix(in_srgb,var(--background)_72%,transparent)]">
       <Container className="flex min-h-16 items-center gap-3 py-2 lg:min-h-18">
@@ -33,8 +34,8 @@ export function Header() {
           <DesktopNavigation />
           <span className="mx-1 hidden h-6 w-px bg-[var(--border)] xl:block" />
           <ThemeToggle />
-          <SocialLinksDialog className="hidden sm:inline-flex" />
-          <MobileMenu />
+          <SocialLinksDialog links={socialLinks} className="hidden sm:inline-flex" />
+          <MobileMenu socialLinks={socialLinks} />
         </div>
       </Container>
     </header>

@@ -1,13 +1,32 @@
 import type { Metadata } from "next";
 
-import { requireAdminPagePermission } from "@/server/auth";
-import { AdminResourceTable } from "@/components/admin/AdminResourceTable";
-import { getAdminRows } from "@/lib/admin-data";
+import { AdminPostsManager } from "@/components/admin/AdminPostsManager";
+import { hasPermission, requireAdminPagePermission } from "@/server/auth";
+import {
+  getAdminPosts,
+  getPostMediaOptions,
+} from "@/server/services/posts.service";
+import { getCategories, getTags } from "@/server/services/taxonomies.service";
 
 export const metadata: Metadata = { title: "Bài viết" };
 
 export default async function AdminPostsPage() {
-  await requireAdminPagePermission("content:view");
+  const currentUser = await requireAdminPagePermission("content:view");
+  const [posts, categories, tags, mediaOptions] = await Promise.all([
+    getAdminPosts(),
+    getCategories(),
+    getTags(),
+    getPostMediaOptions(),
+  ]);
 
-  return <AdminResourceTable resource="posts" description="Quản lý bản nháp, lịch xuất bản và nội dung nổi bật bằng dữ liệu tạm." initialRows={getAdminRows("posts")} supportsFeatured />;
+  return (
+    <AdminPostsManager
+      posts={posts}
+      categories={categories}
+      tags={tags}
+      mediaOptions={mediaOptions}
+      canWrite={hasPermission(currentUser.role, "content:write")}
+      canPublish={hasPermission(currentUser.role, "content:publish")}
+    />
+  );
 }

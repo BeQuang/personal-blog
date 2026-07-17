@@ -177,6 +177,7 @@ Chỉnh `src/data/campaigns.ts`. Campaign status `draft` không có route public
 | Biến | Trạng thái | Mục đích |
 | --- | --- | --- |
 | `NEXT_PUBLIC_SITE_URL` | Cần đặt khi deploy | Origin canonical của website, dùng cho metadata, sitemap và robots. Ví dụ `https://example.com`. |
+| `USE_DATABASE_CONTENT` | Mặc định `false` | Cầu nối migration cho server service mới: `false` đọc mock, `true` đọc PostgreSQL và không silently fallback khi query lỗi. |
 | `NEXT_PUBLIC_GA_ID` | Dự phòng | Chưa tích hợp Google Analytics thật trong MVP. |
 | `NEXT_PUBLIC_META_PIXEL_ID` | Dự phòng | Chưa tích hợp Meta Pixel thật trong MVP. |
 | `NEXT_PUBLIC_TIKTOK_PIXEL_ID` | Dự phòng | Chưa tích hợp TikTok Pixel thật trong MVP. |
@@ -196,6 +197,20 @@ Chỉnh `src/data/campaigns.ts`. Campaign status `draft` không có route public
 Không commit `.env.local` hoặc secret. Các biến bắt đầu bằng `NEXT_PUBLIC_` được đưa vào client bundle tại thời điểm build, vì vậy cần redeploy sau khi thay giá trị production.
 
 `npm run dev` và `npm start` tự chạy `auth:bootstrap` trước khi khởi động. Script chỉ tạo user khi Auth hoàn toàn trống, xác nhận email, tạo `profiles` với role `super_admin`, và bỏ qua nếu đã có bất kỳ user nào. Có thể chạy kiểm tra thủ công bằng `npm run auth:bootstrap`. Sau khi bootstrap production thành công, nên tắt `BOOTSTRAP_ADMIN_ENABLED` và xoay mật khẩu ban đầu.
+
+## Seed dữ liệu mock
+
+- `npm run db:seed -- --validate-only`: chỉ validate fixture, không kết nối hoặc ghi database.
+- `npm run db:seed`: insert category, tag, media và nội dung còn thiếu. Script dùng slug, object key và UUID xác định; không update hay delete record đã tồn tại.
+- `npm run db:smoke`: kiểm tra mapper/repository/service ở DB mode và fallback mock khi không có `DATABASE_URL`.
+
+Seed cần một profile `super_admin` active để làm author cho bài viết. Từ Giai đoạn 15, `/`, `/blog`, `/blog/[slug]`, sitemap, metadata và các vị trí social public đọc PostgreSQL khi `USE_DATABASE_CONTENT=true`; đặt `false` để giữ fallback mock trong development. Admin Posts và Social Links luôn dùng database thật và mọi mutation đều kiểm tra permission phía server.
+
+Các smoke test Backend nội dung:
+
+- `npm run content:test:service`: kiểm tra Zod từ chối content block sai và Server Action không có session bị từ chối.
+- `npm run content:test`: tạo các bản ghi có namespace tạm trên Supabase để kiểm tra category/tag/post/social CRUD, duplicate slug, publish/unpublish/schedule, RLS public visibility và social order; script tự dọn đúng các bản ghi test trong `finally`.
+- `npm run content:test:authorization`: tạo editor tạm để xác minh taxonomy và post-tag chỉ được sửa trên draft, bị từ chối khi ảnh hưởng nội dung đã publish, sau đó tự cleanup.
 
 ## Deploy lên Vercel
 

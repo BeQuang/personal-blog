@@ -6,20 +6,20 @@ import { ExternalLink, Users, X } from "lucide-react";
 import { Button, type ButtonVariant } from "@/components/common/Button";
 import { SocialIcon } from "@/components/common/SocialIcon";
 import { trackSocialClick } from "@/lib/analytics";
-import { getEnabledSocialLinks } from "@/services/social.service";
+import type { SocialLink } from "@/types";
 import { cn } from "@/utils/cn";
 import { formatViewCount } from "@/utils/format";
 
 interface SocialLinksDialogProps {
+  links: readonly SocialLink[];
   className?: string;
   compact?: boolean;
   nested?: boolean;
   variant?: ButtonVariant;
 }
 
-const enabledSocialLinks = getEnabledSocialLinks();
-
 export function SocialLinksDialog({
+  links,
   className,
   compact = false,
   nested = false,
@@ -67,7 +67,7 @@ export function SocialLinksDialog({
           </Dialog.Close>
 
           <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-            {enabledSocialLinks.map((link) => (
+            {links.map((link) => (
               <li key={link.id}>
                 <a
                   href={link.url}

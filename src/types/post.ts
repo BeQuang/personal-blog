@@ -37,6 +37,8 @@ export interface BlogPost {
   featured: boolean;
   readingTime: number;
   viewCount?: number;
+  seoTitle?: string;
+  seoDescription?: string;
   publishedAt?: string;
   createdAt: string;
   updatedAt: string;

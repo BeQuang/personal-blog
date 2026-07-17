@@ -24,19 +24,19 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-export default function Home() {
+export default async function Home() {
   const sections = siteConfig.homepageSections;
-  const featuredPost = getFeaturedPosts(1)[0];
-  const latestPosts = getPublishedPosts().slice(0, 6);
+  const featuredPost = (await getFeaturedPosts(1))[0];
+  const latestPosts = (await getPublishedPosts()).slice(0, 6);
   const latestVideos = getVideos().slice(0, 6);
   const galleryItems = getGalleryPreview(8);
   const upcomingEvents = getUpcomingEvents().slice(0, 3);
   const activeCampaign = getFeaturedCampaign();
-  const socialLinks = getEnabledSocialLinks();
+  const socialLinks = await getEnabledSocialLinks();
 
   return (
     <div className="home-page">
-      {sections.hero ? <HeroSection /> : null}
+      {sections.hero ? <HeroSection links={socialLinks} /> : null}
       {sections.socialLinks ? <SocialLinksSection links={socialLinks} /> : null}
       {sections.featuredContent && featuredPost ? (
         <FeaturedContentSection post={featuredPost} />

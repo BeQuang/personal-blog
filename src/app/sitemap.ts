@@ -9,7 +9,7 @@ function absoluteUrl(pathname: string): string {
   return new URL(pathname, siteConfig.siteUrl).toString();
 }
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: absoluteUrl("/"), changeFrequency: "weekly", priority: 1 },
     { url: absoluteUrl("/blog"), changeFrequency: "weekly", priority: 0.9 },
@@ -23,7 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: absoluteUrl("/terms"), changeFrequency: "yearly", priority: 0.3 },
   ];
 
-  const postRoutes: MetadataRoute.Sitemap = getPublishedPosts().map((post) => ({
+  const postRoutes: MetadataRoute.Sitemap = (await getPublishedPosts()).map((post) => ({
     url: absoluteUrl(`/blog/${post.slug}`),
     lastModified: post.updatedAt,
     changeFrequency: "monthly",

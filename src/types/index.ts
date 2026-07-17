@@ -33,3 +33,14 @@ export type {
   AdminTableRow,
 } from "./admin";
 export type { LoginActionState } from "./auth";
+export type {
+  ActionFieldErrors,
+  AdminActionResult,
+  AdminPost,
+  AdminPostStatus,
+  MediaOption,
+  PostMutationInput,
+  SocialLinkMutationInput,
+  TaxonomyItem,
+  TaxonomyMutationInput,
+} from "./content-admin";

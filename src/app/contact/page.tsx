@@ -23,8 +23,8 @@ export const metadata: Metadata = withSocialMetadata({
   },
 });
 
-export default function ContactPage() {
-  const socialLinks = getEnabledSocialLinks().filter((link) => link.platform !== "email");
+export default async function ContactPage() {
+  const socialLinks = (await getEnabledSocialLinks()).filter((link) => link.platform !== "email");
 
   return (
     <div className="pb-20 sm:pb-24">

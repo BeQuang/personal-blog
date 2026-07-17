@@ -7,6 +7,7 @@ import { Header } from "@/components/layout/Header";
 import { RouteChrome } from "@/components/layout/RouteChrome";
 import { siteConfig } from "@/config/site.config";
 import { themeStorageKey } from "@/config/theme.config";
+import { getEnabledSocialLinks } from "@/services/social.service";
 
 import "./globals.css";
 
@@ -90,11 +91,13 @@ const themeInitializationScript = `
   })();
 `;
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const socialLinks = await getEnabledSocialLinks();
+
   return (
     <html
       lang="vi"
@@ -110,7 +113,10 @@ export default function RootLayout({
           <a href="#main-content" className="skip-link">
             Chuyển đến nội dung chính
           </a>
-          <RouteChrome header={<Header />} footer={<Footer />}>
+          <RouteChrome
+            header={<Header socialLinks={socialLinks} />}
+            footer={<Footer socialLinks={socialLinks} />}
+          >
             {children}
           </RouteChrome>
         </ThemeProvider>

@@ -22,9 +22,9 @@ export const metadata: Metadata = withSocialMetadata({
   },
 });
 
-export default function BlogPage() {
-  const posts = getPublishedPosts();
-  const featuredPost = getFeaturedPosts(1)[0] ?? posts[0];
+export default async function BlogPage() {
+  const posts = await getPublishedPosts();
+  const featuredPost = (await getFeaturedPosts(1))[0] ?? posts[0];
   const postSummaries: PostCardPost[] = posts.map((post) => ({
     id: post.id,
     slug: post.slug,

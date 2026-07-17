@@ -56,8 +56,8 @@ const values = [
   { title: "Phát triển cùng cộng đồng", description: "Lắng nghe phản hồi, tôn trọng khác biệt và tạo ra những hoạt động có giá trị lâu dài.", icon: Sparkles },
 ] as const;
 
-export default function AboutPage() {
-  const socialLinks = getEnabledSocialLinks();
+export default async function AboutPage() {
+  const socialLinks = await getEnabledSocialLinks();
   const socialStats = socialLinks.filter((link) => link.followerCount !== undefined);
   const followLink = socialLinks.find((link) => link.platform === "youtube") ?? socialLinks[0];
 

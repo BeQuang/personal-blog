@@ -49,7 +49,7 @@ const eventStatusLabels: Record<EventItem["status"], string> = {
   cancelled: "Đã hủy",
 };
 
-export function HeroSection() {
+export function HeroSection({ links }: { links: readonly SocialLink[] }) {
   const config = homepageConfig.hero;
 
   return (
@@ -69,7 +69,7 @@ export function HeroSection() {
             <LinkButton href="#featured-content" size="lg">
               Xem nội dung mới <ArrowRight size={18} aria-hidden="true" />
             </LinkButton>
-            <SocialLinksDialog variant="outline" />
+            <SocialLinksDialog links={links} variant="outline" />
           </div>
 
           <dl className="hero-stats">
