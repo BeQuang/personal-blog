@@ -17,6 +17,9 @@
     "content:test": "node scripts/test-stage15-content.mjs",
     "content:test:authorization": "node scripts/test-stage15-authorization.mjs",
     "content:test:service": "node --conditions=react-server --import tsx scripts/test-stage15-services.ts",
+    "storage:test": "node --conditions=react-server --import tsx scripts/test-stage16-storage.ts",
+    "storage:test:database": "node --conditions=react-server --import tsx scripts/test-stage16-database.ts",
+    "storage:test:security": "node --conditions=react-server --import tsx scripts/test-stage16-security.ts",
     "db:studio": "drizzle-kit studio",
     "auth:bootstrap": "node scripts/bootstrap-admin.mjs",
     "auth:test": "node scripts/test-auth-flow.mjs",
@@ -24,6 +27,8 @@
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.3.0",
+    "@aws-sdk/client-s3": "^3.1089.0",
+    "@aws-sdk/s3-request-presigner": "^3.1089.0",
     "@radix-ui/react-dialog": "^1.1.19",
     "@supabase/ssr": "^0.12.3",
     "@supabase/supabase-js": "^2.110.7",

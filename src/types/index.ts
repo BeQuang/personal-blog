@@ -44,3 +44,14 @@ export type {
   TaxonomyItem,
   TaxonomyMutationInput,
 } from "./content-admin";
+export type {
+  ConfirmMediaUploadInput,
+  CreateMediaUploadData,
+  CreateMediaUploadInput,
+  MediaActionResult,
+  MediaAssetItem,
+  MediaLibraryPage,
+  MediaLibraryQuery,
+  MediaMimeType,
+  MediaPurpose,
+} from "./media-admin";

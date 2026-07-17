@@ -4,9 +4,10 @@ import { App, Alert, Button, Card, Form, Input, Space } from "antd";
 import { RotateCcw, Save } from "lucide-react";
 import { useState } from "react";
 
+import { AdminMediaPicker } from "@/components/admin/AdminMediaPicker";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { siteConfig } from "@/config/site.config";
-import type { AdminSiteSettings } from "@/types";
+import type { AdminSiteSettings, MediaOption } from "@/types";
 
 const initialValues: AdminSiteSettings = {
   siteName: siteConfig.siteName,
@@ -18,10 +19,18 @@ const initialValues: AdminSiteSettings = {
   defaultSeoDescription: siteConfig.siteDescription,
 };
 
-export function AdminSettingsForm() {
+interface AdminSettingsFormProps {
+  mediaOptions: readonly MediaOption[];
+}
+
+export function AdminSettingsForm({ mediaOptions }: AdminSettingsFormProps) {
   const { message } = App.useApp();
   const [form] = Form.useForm<AdminSiteSettings>();
   const [saving, setSaving] = useState(false);
+  const avatarUrl = Form.useWatch("avatarUrl", form);
+  const coverUrl = Form.useWatch("coverUrl", form);
+  const avatarMediaId = mediaOptions.find((item) => item.publicUrl === avatarUrl)?.id;
+  const coverMediaId = mediaOptions.find((item) => item.publicUrl === coverUrl)?.id;
 
   const submit = async () => {
     setSaving(true);
@@ -69,11 +78,27 @@ export function AdminSettingsForm() {
             <Input.TextArea rows={3} maxLength={240} showCount placeholder="Mô tả ngắn về website" />
           </Form.Item>
           <div className="admin-form-grid">
-            <Form.Item name="avatarUrl" label="Avatar URL" rules={[{ required: true, whitespace: true, message: "Vui lòng nhập Avatar URL." }]} extra="Chỉ nhập đường dẫn; Admin demo không upload file.">
-              <Input placeholder="/images/avatar.jpg hoặc https://..." />
+            <Form.Item name="avatarUrl" hidden rules={[{ required: true, whitespace: true, message: "Vui lòng chọn Avatar." }]}>
+              <Input />
             </Form.Item>
-            <Form.Item name="coverUrl" label="Cover URL" rules={[{ required: true, whitespace: true, message: "Vui lòng nhập Cover URL." }]} extra="Chỉ nhập đường dẫn; không có upload thật.">
-              <Input placeholder="/images/cover.jpg hoặc https://..." />
+            <Form.Item name="coverUrl" hidden rules={[{ required: true, whitespace: true, message: "Vui lòng chọn Cover." }]}>
+              <Input />
+            </Form.Item>
+            <Form.Item label="Avatar" extra={avatarUrl || "Chọn ảnh từ Media Library."}>
+              <AdminMediaPicker
+                items={mediaOptions}
+                value={avatarMediaId}
+                label="Avatar"
+                onChange={(selection) => form.setFieldValue("avatarUrl", selection?.publicUrl ?? "")}
+              />
+            </Form.Item>
+            <Form.Item label="Cover / banner" extra={coverUrl || "Chọn ảnh từ Media Library."}>
+              <AdminMediaPicker
+                items={mediaOptions}
+                value={coverMediaId}
+                label="Cover / banner"
+                onChange={(selection) => form.setFieldValue("coverUrl", selection?.publicUrl ?? "")}
+              />
             </Form.Item>
           </div>
           <Form.Item name="defaultSeoTitle" label="SEO title mặc định" rules={[{ required: true, whitespace: true, message: "Vui lòng nhập SEO title." }, { max: 70, message: "SEO title nên tối đa 70 ký tự." }]}>

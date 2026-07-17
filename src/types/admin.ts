@@ -23,6 +23,8 @@ export interface AdminTableRow {
   date?: string;
   featured?: boolean;
   enabled?: boolean;
+  mediaId?: string;
+  mediaUrl?: string;
 }
 
 export interface AdminAppearanceSettings {

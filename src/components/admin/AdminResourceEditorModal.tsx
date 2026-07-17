@@ -2,7 +2,8 @@
 
 import { Input, Modal } from "antd";
 
-import type { AdminResource, AdminTableRow } from "@/types";
+import { AdminMediaPicker } from "@/components/admin/AdminMediaPicker";
+import type { AdminResource, AdminTableRow, MediaOption } from "@/types";
 
 interface AdminResourceEditorModalProps {
   resource: AdminResource;
@@ -11,7 +12,10 @@ interface AdminResourceEditorModalProps {
   editingRow: AdminTableRow | null;
   draftTitle: string;
   titleError: string | null;
+  mediaOptions?: readonly MediaOption[];
+  selectedMediaId?: string;
   onTitleChange: (value: string) => void;
+  onMediaChange?: (value: { id: string; publicUrl: string } | null) => void;
   onSave: () => void;
   onCancel: () => void;
 }
@@ -23,7 +27,10 @@ export function AdminResourceEditorModal({
   editingRow,
   draftTitle,
   titleError,
+  mediaOptions = [],
+  selectedMediaId,
   onTitleChange,
+  onMediaChange,
   onSave,
   onCancel,
 }: AdminResourceEditorModalProps) {
@@ -64,6 +71,17 @@ export function AdminResourceEditorModal({
         <p id={errorId} className="admin-modal-error" role="alert">
           {titleError}
         </p>
+      ) : null}
+      {(resource === "events" || resource === "campaigns") && onMediaChange ? (
+        <div className="admin-modal-media-field">
+          <span>Banner</span>
+          <AdminMediaPicker
+            items={mediaOptions}
+            value={selectedMediaId}
+            label={resource === "events" ? "Event banner" : "Campaign banner"}
+            onChange={onMediaChange}
+          />
+        </div>
       ) : null}
       <p className="admin-modal-note">Dữ liệu sẽ mất khi tải lại trang.</p>
     </Modal>

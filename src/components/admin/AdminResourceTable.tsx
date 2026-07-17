@@ -19,7 +19,7 @@ import {
   createAdminDemoRow,
 } from "@/components/admin/admin-table.config";
 import { adminResourceLabels } from "@/config/admin.config";
-import type { AdminResource, AdminTableRow } from "@/types";
+import type { AdminResource, AdminTableRow, MediaOption } from "@/types";
 
 interface AdminResourceTableProps {
   resource: AdminResource;
@@ -27,6 +27,7 @@ interface AdminResourceTableProps {
   initialRows: AdminTableRow[];
   supportsFeatured?: boolean;
   supportsEnabled?: boolean;
+  mediaOptions?: readonly MediaOption[];
 }
 
 export function AdminResourceTable({
@@ -35,6 +36,7 @@ export function AdminResourceTable({
   initialRows,
   supportsFeatured = false,
   supportsEnabled = true,
+  mediaOptions = [],
 }: AdminResourceTableProps) {
   const { message, modal } = App.useApp();
   const [rows, setRows] = useState(initialRows);
@@ -43,6 +45,7 @@ export function AdminResourceTable({
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingRow, setEditingRow] = useState<AdminTableRow | null>(null);
   const [draftTitle, setDraftTitle] = useState("");
+  const [draftMediaId, setDraftMediaId] = useState<string | undefined>();
   const [titleError, setTitleError] = useState<string | null>(null);
   const label = adminResourceLabels[resource];
 
@@ -79,6 +82,7 @@ export function AdminResourceTable({
   const openCreate = () => {
     setEditingRow(null);
     setDraftTitle("");
+    setDraftMediaId(undefined);
     setTitleError(null);
     setEditorOpen(true);
   };
@@ -86,6 +90,7 @@ export function AdminResourceTable({
   const openEdit = (row: AdminTableRow) => {
     setEditingRow(row);
     setDraftTitle(row.title);
+    setDraftMediaId(row.mediaId);
     setTitleError(null);
     setEditorOpen(true);
   };
@@ -98,10 +103,20 @@ export function AdminResourceTable({
     }
 
     if (editingRow) {
-      updateRow(editingRow.id, { title });
+      const selectedMedia = mediaOptions.find((item) => item.id === draftMediaId);
+      updateRow(editingRow.id, {
+        title,
+        mediaId: selectedMedia?.id,
+        mediaUrl: selectedMedia?.publicUrl,
+      });
       void message.success(`Đã cập nhật ${label.toLocaleLowerCase("vi-VN")} trong phiên demo.`);
     } else {
-      setRows((current) => [createAdminDemoRow(resource, title), ...current]);
+      const selectedMedia = mediaOptions.find((item) => item.id === draftMediaId);
+      setRows((current) => [{
+        ...createAdminDemoRow(resource, title),
+        mediaId: selectedMedia?.id,
+        mediaUrl: selectedMedia?.publicUrl,
+      }, ...current]);
       void message.success(`Đã thêm ${label.toLocaleLowerCase("vi-VN")} vào local state.`);
     }
     setEditorOpen(false);
@@ -185,10 +200,13 @@ export function AdminResourceTable({
         editingRow={editingRow}
         draftTitle={draftTitle}
         titleError={titleError}
+        mediaOptions={mediaOptions}
+        selectedMediaId={draftMediaId}
         onTitleChange={(value) => {
           setDraftTitle(value);
           if (titleError) setTitleError(null);
         }}
+        onMediaChange={(selection) => setDraftMediaId(selection?.id)}
         onSave={saveEditor}
         onCancel={() => {
           setEditorOpen(false);

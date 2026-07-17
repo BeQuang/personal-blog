@@ -3,6 +3,7 @@
 import { Form, Input, InputNumber, Modal, Select, Switch } from "antd";
 import { useEffect } from "react";
 
+import { AdminMediaPicker } from "@/components/admin/AdminMediaPicker";
 import type {
   ActionFieldErrors,
   AdminPost,
@@ -86,6 +87,8 @@ export function AdminPostEditorModal({
 }: AdminPostEditorModalProps) {
   const [form] = Form.useForm<PostFormValues>();
   const status = Form.useWatch("status", form);
+  const thumbnailMediaId = Form.useWatch("thumbnailMediaId", form);
+  const coverMediaId = Form.useWatch("coverMediaId", form);
 
   useEffect(() => {
     if (!open) return;
@@ -199,11 +202,21 @@ export function AdminPostEditorModal({
         </div>
 
         <div className="admin-form-grid">
-          <Form.Item name="thumbnailMediaId" label="Thumbnail" extra="Chỉ chọn media đã tồn tại; không upload ở giai đoạn này.">
-            <Select allowClear options={mediaOptions.map((item) => ({ value: item.id, label: item.label }))} />
+          <Form.Item label="Thumbnail" extra="Chọn ảnh đã được xác minh trong Media Library.">
+            <AdminMediaPicker
+              items={mediaOptions}
+              value={thumbnailMediaId}
+              label="Thumbnail"
+              onChange={(selection) => form.setFieldValue("thumbnailMediaId", selection?.id)}
+            />
           </Form.Item>
-          <Form.Item name="coverMediaId" label="Cover image">
-            <Select allowClear options={mediaOptions.map((item) => ({ value: item.id, label: item.label }))} />
+          <Form.Item label="Cover image">
+            <AdminMediaPicker
+              items={mediaOptions}
+              value={coverMediaId}
+              label="Cover image"
+              onChange={(selection) => form.setFieldValue("coverMediaId", selection?.id)}
+            />
           </Form.Item>
         </div>
 
