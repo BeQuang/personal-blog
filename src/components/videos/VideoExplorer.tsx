@@ -11,8 +11,7 @@ import type { VideoItem, VideoPlatform } from "@/types";
 const INITIAL_VIDEO_COUNT = 6;
 const ALL_PLATFORMS = "all";
 
-type PublicVideoPlatform = Exclude<VideoPlatform, "internal">;
-type PlatformFilter = typeof ALL_PLATFORMS | PublicVideoPlatform;
+type PlatformFilter = typeof ALL_PLATFORMS | VideoPlatform;
 
 const platformFilters: readonly { value: PlatformFilter; label: string }[] = [
   { value: ALL_PLATFORMS, label: "Tất cả" },
@@ -20,6 +19,7 @@ const platformFilters: readonly { value: PlatformFilter; label: string }[] = [
   { value: "tiktok", label: "TikTok" },
   { value: "instagram", label: "Instagram" },
   { value: "facebook", label: "Facebook" },
+  { value: "internal", label: "Mux" },
 ];
 
 interface VideoExplorerProps {

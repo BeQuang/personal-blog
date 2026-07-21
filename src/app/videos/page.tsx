@@ -20,10 +20,9 @@ export const metadata: Metadata = withSocialMetadata({
   },
 });
 
-export default function VideosPage() {
-  const videos = getVideos().filter((video) => video.platform !== "internal");
-  const featuredVideo =
-    getFeaturedVideos().find((video) => video.platform !== "internal") ?? videos[0];
+export default async function VideosPage() {
+  const videos = await getVideos();
+  const featuredVideo = (await getFeaturedVideos(1))[0] ?? videos[0];
   const topics = Array.from(new Set(videos.map((video) => video.topic))).sort((a, b) =>
     a.localeCompare(b, "vi-VN"),
   );

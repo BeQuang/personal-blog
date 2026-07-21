@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
-function getR2RemotePattern(): NonNullable<NextConfig["images"]>["remotePatterns"] {
+function getR2RemotePattern(): NonNullable<
+  NonNullable<NextConfig["images"]>["remotePatterns"]
+> {
   const publicBaseUrl = process.env.R2_PUBLIC_BASE_URL?.trim();
   if (!publicBaseUrl) return [];
 
@@ -25,7 +27,14 @@ function getR2RemotePattern(): NonNullable<NextConfig["images"]>["remotePatterns
 
 const nextConfig: NextConfig = {
   images: {
-    remotePatterns: getR2RemotePattern(),
+    remotePatterns: [
+      ...getR2RemotePattern(),
+      {
+        protocol: "https",
+        hostname: "image.mux.com",
+        pathname: "/**",
+      },
+    ],
   },
 };
 

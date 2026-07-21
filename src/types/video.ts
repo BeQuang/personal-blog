@@ -15,6 +15,7 @@ export interface VideoItem {
   orientation: VideoOrientation;
   thumbnail: string;
   videoUrl: string;
+  playbackId?: string;
   duration?: string;
   viewCount?: number;
   topic: string;

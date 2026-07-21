@@ -332,6 +332,15 @@ video {
   }
 }
 
+.video-player-dialog {
+  width: min(calc(100vw - 24px), 960px);
+  max-height: 90vh;
+}
+
+.video-player-dialog mux-player {
+  --media-object-fit: contain;
+}
+
 /* Homepage */
 .home-page {
   min-width: 0;

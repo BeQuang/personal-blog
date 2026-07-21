@@ -42,6 +42,7 @@ export const videos = pgTable(
     durationSeconds: numeric("duration_seconds", { precision: 12, scale: 3 }),
     aspectRatio: text("aspect_ratio"),
     processingStatus: mediaStatusEnum("processing_status").notNull().default("pending"),
+    processingError: text("processing_error"),
     contentStatus: contentStatusEnum("content_status").notNull().default("draft"),
     featured: boolean("featured").notNull().default(false),
     viewCount: bigint("view_count", { mode: "number" }).notNull().default(0),
@@ -72,6 +73,22 @@ export const videos = pgTable(
     check(
       "videos_external_url_required",
       sql`${table.platform} = 'internal' or ${table.externalUrl} is not null`,
+    ),
+  ],
+).enableRLS();
+
+export const videoWebhookEvents = pgTable(
+  "video_webhook_events",
+  {
+    eventId: text("event_id").primaryKey(),
+    eventType: text("event_type").notNull(),
+    muxObjectId: text("mux_object_id"),
+    processedAt: timestamp("processed_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("video_webhook_events_type_processed_at_idx").on(
+      table.eventType,
+      table.processedAt.desc(),
     ),
   ],
 ).enableRLS();

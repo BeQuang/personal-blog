@@ -28,7 +28,7 @@ export default async function Home() {
   const sections = siteConfig.homepageSections;
   const featuredPost = (await getFeaturedPosts(1))[0];
   const latestPosts = (await getPublishedPosts()).slice(0, 6);
-  const latestVideos = getVideos().slice(0, 6);
+  const latestVideos = (await getVideos()).slice(0, 6);
   const galleryItems = getGalleryPreview(8);
   const upcomingEvents = getUpcomingEvents().slice(0, 3);
   const activeCampaign = getFeaturedCampaign();

@@ -1,13 +1,24 @@
 import type { Metadata } from "next";
 
-import { requireAdminPagePermission } from "@/server/auth";
-import { AdminResourceTable } from "@/components/admin/AdminResourceTable";
-import { getAdminRows } from "@/lib/admin-data";
+import { AdminVideosManager } from "@/components/admin/AdminVideosManager";
+import { hasPermission, requireAdminPagePermission } from "@/server/auth";
+import { getAdminVideos, getVideoMediaOptions } from "@/server/services/videos.service";
 
 export const metadata: Metadata = { title: "Video" };
 
 export default async function AdminVideosPage() {
-  await requireAdminPagePermission("media:manage");
+  const currentUser = await requireAdminPagePermission("media:manage");
+  const [videos, mediaOptions] = await Promise.all([
+    getAdminVideos(),
+    getVideoMediaOptions(),
+  ]);
 
-  return <AdminResourceTable resource="videos" description="Theo dõi video theo nền tảng, hướng hiển thị và trạng thái nổi bật." initialRows={getAdminRows("videos")} supportsFeatured />;
+  return (
+    <AdminVideosManager
+      videos={videos}
+      mediaOptions={mediaOptions}
+      canWrite={hasPermission(currentUser.role, "content:write")}
+      canPublish={hasPermission(currentUser.role, "content:publish")}
+    />
+  );
 }

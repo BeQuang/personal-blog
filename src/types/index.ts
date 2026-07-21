@@ -55,3 +55,12 @@ export type {
   MediaMimeType,
   MediaPurpose,
 } from "./media-admin";
+export type {
+  AdminVideo,
+  AdminVideosPageData,
+  CreateVideoUploadData,
+  CreateVideoUploadInput,
+  VideoActionResult,
+  VideoMutationInput,
+  VideoProcessingStatus,
+} from "./video-admin";

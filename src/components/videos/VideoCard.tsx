@@ -1,6 +1,7 @@
 import { Clock3, ExternalLink, Eye, Play } from "lucide-react";
 import Image from "next/image";
 
+import { VideoPlaybackTrigger } from "@/components/videos/VideoPlaybackTrigger";
 import type { VideoItem, VideoPlatform } from "@/types";
 import { formatDate } from "@/utils/date";
 import { formatViewCount } from "@/utils/format";
@@ -22,11 +23,11 @@ export function VideoCard({ video }: VideoCardProps) {
 
   return (
     <article className="group flex min-w-0 flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] transition duration-200 hover:-translate-y-1 hover:border-[var(--border-strong)] hover:shadow-[var(--shadow-card)]">
-      <a
-        href={video.videoUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={`Xem video ${video.title} trên ${videoPlatformLabels[video.platform]} (mở trong tab mới)`}
+      <VideoPlaybackTrigger
+        video={video}
+        ariaLabel={video.platform === "internal"
+          ? `Phát video ${video.title}`
+          : `Xem video ${video.title} trên ${videoPlatformLabels[video.platform]} (mở trong tab mới)`}
         className="flex h-full flex-col rounded-[var(--radius-lg)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-inset"
       >
         <div
@@ -72,10 +73,14 @@ export function VideoCard({ video }: VideoCardProps) {
                 <Eye size={15} aria-hidden="true" /> {formatViewCount(video.viewCount)} lượt xem
               </span>
             ) : null}
-            <ExternalLink className="ml-auto" size={16} aria-hidden="true" />
+            {video.platform === "internal" ? (
+              <Play className="ml-auto" size={16} aria-hidden="true" />
+            ) : (
+              <ExternalLink className="ml-auto" size={16} aria-hidden="true" />
+            )}
           </div>
         </div>
-      </a>
+      </VideoPlaybackTrigger>
     </article>
   );
 }

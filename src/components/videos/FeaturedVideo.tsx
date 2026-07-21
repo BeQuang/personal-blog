@@ -2,6 +2,7 @@ import { ArrowUpRight, Clock3, Eye, Play, Sparkles } from "lucide-react";
 import Image from "next/image";
 
 import { videoPlatformLabels } from "@/components/videos/VideoCard";
+import { VideoPlaybackTrigger } from "@/components/videos/VideoPlaybackTrigger";
 import type { VideoItem } from "@/types";
 import { formatDate } from "@/utils/date";
 import { formatViewCount } from "@/utils/format";
@@ -15,11 +16,11 @@ export function FeaturedVideo({ video }: FeaturedVideoProps) {
 
   return (
     <article className="grid overflow-hidden rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[var(--surface)] shadow-[var(--shadow-card)] lg:grid-cols-[0.82fr_1.18fr]">
-      <a
-        href={video.videoUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={`Xem video nổi bật ${video.title} (mở trong tab mới)`}
+      <VideoPlaybackTrigger
+        video={video}
+        ariaLabel={video.platform === "internal"
+          ? `Phát video nổi bật ${video.title}`
+          : `Xem video nổi bật ${video.title} (mở trong tab mới)`}
         className="relative mx-auto block w-full overflow-hidden bg-[var(--surface-elevated)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-inset"
       >
         <div
@@ -40,7 +41,7 @@ export function FeaturedVideo({ video }: FeaturedVideoProps) {
             <Play size={24} fill="currentColor" aria-hidden="true" />
           </span>
         </div>
-      </a>
+      </VideoPlaybackTrigger>
 
       <div className="flex flex-col items-start justify-center p-6 sm:p-10 lg:p-12">
         <span className="inline-flex items-center gap-2 rounded-full bg-[var(--primary-soft)] px-3 py-1.5 text-xs font-bold text-[var(--primary)]">
@@ -68,15 +69,16 @@ export function FeaturedVideo({ video }: FeaturedVideoProps) {
             </span>
           ) : null}
         </div>
-        <a
-          href={video.videoUrl}
-          target="_blank"
-          rel="noopener noreferrer"
+        <VideoPlaybackTrigger
+          video={video}
+          ariaLabel={video.platform === "internal"
+            ? `Phát video ${video.title}`
+            : `Xem video ${video.title} (mở trong tab mới)`}
           className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-lg)] bg-[linear-gradient(135deg,var(--action-primary),var(--action-secondary))] px-5 font-bold text-white outline-none transition-transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
         >
           Xem video <ArrowUpRight size={18} aria-hidden="true" />
-          <span className="sr-only">(mở trong tab mới)</span>
-        </a>
+          {video.platform === "internal" ? null : <span className="sr-only">(mở trong tab mới)</span>}
+        </VideoPlaybackTrigger>
       </div>
     </article>
   );

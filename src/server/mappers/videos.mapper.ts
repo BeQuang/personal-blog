@@ -3,8 +3,6 @@ import type { VideoItem } from "@/types";
 import { ValidationError } from "@/server/errors";
 import type { findPublishedVideos } from "@/server/repositories/videos.repository";
 
-import { requirePublicMediaUrl } from "./mapper-helpers";
-
 type VideoWithRelations = Awaited<ReturnType<typeof findPublishedVideos>>[number];
 
 function formatDuration(value: string | null) {
@@ -22,8 +20,14 @@ function formatDuration(value: string | null) {
 }
 
 export function mapVideoRowToVideoItem(row: VideoWithRelations): VideoItem {
-  const videoUrl = row.platform === "internal" ? row.videoMedia?.publicUrl : row.externalUrl;
-  if (!videoUrl || !row.publishedAt) {
+  const videoUrl = row.platform === "internal" && row.muxPlaybackId
+    ? `https://stream.mux.com/${row.muxPlaybackId}.m3u8`
+    : row.externalUrl;
+  const thumbnail = row.thumbnailMedia?.publicUrl ??
+    (row.platform === "internal" && row.muxPlaybackId
+      ? `https://image.mux.com/${row.muxPlaybackId}/thumbnail.webp?width=1200&fit_mode=preserve`
+      : null);
+  if (!videoUrl || !thumbnail || !row.publishedAt) {
     throw new ValidationError(`Published video '${row.id}' is missing its URL or published date`);
   }
 
@@ -33,8 +37,9 @@ export function mapVideoRowToVideoItem(row: VideoWithRelations): VideoItem {
     ...(row.description ? { description: row.description } : {}),
     platform: row.platform,
     orientation: row.orientation,
-    thumbnail: requirePublicMediaUrl(row.thumbnailMedia, `Video '${row.id}' thumbnail`),
+    thumbnail,
     videoUrl,
+    ...(row.muxPlaybackId ? { playbackId: row.muxPlaybackId } : {}),
     ...(formatDuration(row.durationSeconds)
       ? { duration: formatDuration(row.durationSeconds) }
       : {}),
