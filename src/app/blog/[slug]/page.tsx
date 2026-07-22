@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { AnalyticsView } from "@/components/analytics/AnalyticsView";
 import { PostCard } from "@/components/blog/PostCard";
 import { PostContent } from "@/components/blog/PostContent";
 import { ShareButtons } from "@/components/blog/ShareButtons";
@@ -77,6 +78,7 @@ export default async function PostPage({ params }: PostPageProps) {
 
   return (
     <article className="pb-20 sm:pb-24">
+      <AnalyticsView type="post" entityId={post.id} />
       <header className="border-b border-[var(--border)] bg-[var(--background-secondary)] py-8 sm:py-12">
         <Container size="article">
           <nav aria-label="Breadcrumb" className="text-sm text-[var(--text-muted)]">

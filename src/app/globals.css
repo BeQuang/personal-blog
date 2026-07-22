@@ -332,6 +332,61 @@ video {
   }
 }
 
+.analytics-consent {
+  position: fixed;
+  z-index: 100;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  display: flex;
+  width: min(760px, calc(100% - 32px));
+  margin-inline: auto;
+  padding: 18px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface-elevated);
+  box-shadow: var(--shadow-dialog);
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.analytics-consent strong {
+  display: block;
+  color: var(--text-primary);
+}
+
+.analytics-consent p {
+  margin-top: 4px;
+  color: var(--text-secondary);
+  font-size: .875rem;
+  line-height: 1.5;
+}
+
+.analytics-consent p a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.analytics-consent-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .analytics-consent {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .analytics-consent-actions > * {
+    flex: 1;
+  }
+}
+
 .video-player-dialog {
   width: min(calc(100vw - 24px), 960px);
   max-height: 90vh;

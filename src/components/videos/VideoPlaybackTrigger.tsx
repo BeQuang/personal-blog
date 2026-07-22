@@ -6,6 +6,7 @@ import { X } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Button } from "@/components/common/Button";
+import { trackVideoView } from "@/lib/analytics";
 import type { VideoItem } from "@/types";
 
 interface VideoPlaybackTriggerProps {
@@ -18,7 +19,7 @@ interface VideoPlaybackTriggerProps {
 export function VideoPlaybackTrigger({ video, className, ariaLabel, children }: VideoPlaybackTriggerProps) {
   if (video.platform !== "internal" || !video.playbackId) {
     return (
-      <a href={video.videoUrl} target="_blank" rel="noopener noreferrer" aria-label={ariaLabel} className={className}>
+      <a href={video.videoUrl} target="_blank" rel="noopener noreferrer" aria-label={ariaLabel} className={className} onClick={() => trackVideoView(video.id)}>
         {children}
       </a>
     );
@@ -48,6 +49,7 @@ export function VideoPlaybackTrigger({ video, className, ariaLabel, children }: 
             preload="metadata"
             autoPlay={false}
             metadata={{ video_id: video.id, video_title: video.title }}
+            onPlay={() => trackVideoView(video.id)}
             className="mt-5 block aspect-video w-full overflow-hidden rounded-[var(--radius-lg)] bg-black"
           />
           <Dialog.Close asChild>

@@ -23,6 +23,8 @@
     "video:test": "node --conditions=react-server --import tsx scripts/test-stage17-video.ts",
     "submissions:test:database": "node scripts/test-stage19-database.mjs",
     "submissions:test:security": "node --conditions=react-server --import tsx scripts/test-stage19-security.ts",
+    "analytics:test": "node --conditions=react-server --import tsx scripts/test-stage20-analytics.ts",
+    "analytics:retention": "node --conditions=react-server --import tsx scripts/prune-analytics.ts",
     "db:studio": "drizzle-kit studio",
     "auth:bootstrap": "node scripts/bootstrap-admin.mjs",
     "auth:test": "node scripts/test-auth-flow.mjs",
@@ -47,6 +49,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "resend": "^6.18.0",
+    "uplot": "^1.6.32",
     "zod": "^4.4.3"
   },
   "devDependencies": {

@@ -85,3 +85,16 @@ export type {
   SubmissionResource,
   SubmissionStatus,
 } from "./submissions";
+export type {
+  AnalyticsCampaignPerformance,
+  AnalyticsDashboardData,
+  AnalyticsDailyPoint,
+  AnalyticsDateRange,
+  AnalyticsDeviceCategory,
+  AnalyticsEntityType,
+  AnalyticsEventType,
+  AnalyticsRankedItem,
+  AnalyticsRecentEvent,
+  ClientAnalyticsEventInput,
+  ClientAnalyticsEventType,
+} from "./analytics";

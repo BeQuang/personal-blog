@@ -1067,6 +1067,78 @@
   width: min(100%, 360px);
 }
 
+.admin-analytics-filters {
+  display: flex;
+  margin-bottom: 18px;
+  padding: 16px;
+  border: 1px solid #eaecf0;
+  border-radius: 12px;
+  background: #fff;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.admin-analytics-presets,
+.admin-analytics-custom-range {
+  display: flex;
+  gap: 10px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.admin-analytics-custom-range label {
+  display: grid;
+  gap: 5px;
+  color: #475467;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-analytics-custom-range input {
+  min-height: 32px;
+  padding: 4px 9px;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  color: #101828;
+  background: #fff;
+}
+
+.admin-analytics-chart {
+  width: 100%;
+  min-height: 320px;
+  overflow-x: auto;
+}
+
+.admin-ranked-list {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-ranked-list > div > div:first-child {
+  display: flex;
+  min-width: 0;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-ranked-list strong {
+  overflow: hidden;
+  color: #101828;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-ranked-list span,
+.admin-analytics-empty {
+  color: #667085;
+}
+
+.admin-dashboard-card + .admin-dashboard-card {
+  margin-top: 16px;
+}
+
 @media (max-width: 1100px) {
   .admin-appearance-grid { grid-template-columns: 1fr; }
   .admin-media-upload-panel,
@@ -1086,4 +1158,7 @@
   .admin-media-toolbar { grid-template-columns: 1fr; }
   .admin-media-grid,
   .admin-media-picker-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-analytics-filters,
+  .admin-analytics-custom-range { align-items: stretch; }
+  .admin-analytics-custom-range { display: grid; width: 100%; grid-template-columns: 1fr; }
 }

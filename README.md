@@ -121,7 +121,7 @@ src/
 ├── components/          # Component common và theo từng khu vực nghiệp vụ
 ├── config/              # Cấu hình site, navigation, theme và admin
 ├── data/                # Dữ liệu mock cho nội dung
-├── lib/                 # Analytics mock và tiện ích nền tảng
+├── lib/                 # Analytics client và tiện ích nền tảng
 ├── services/            # Hàm truy vấn dữ liệu mock
 ├── types/               # TypeScript types dùng chung
 └── utils/               # Formatter và helper
@@ -178,6 +178,7 @@ Chỉnh `src/data/campaigns.ts`. Campaign status `draft` không có route public
 | --- | --- | --- |
 | `NEXT_PUBLIC_SITE_URL` | Cần đặt khi deploy | Origin canonical của website, dùng cho metadata, sitemap và robots. Ví dụ `https://example.com`. |
 | `USE_DATABASE_CONTENT` | Mặc định `false` | Cầu nối migration cho server service mới: `false` đọc mock, `true` đọc PostgreSQL và không silently fallback khi query lỗi. |
+| `NEXT_PUBLIC_ANALYTICS_ENABLED` | Mặc định `true` | Tắt toàn bộ ingest/banner analytics khi đặt `false`; vẫn cần consent trước khi ghi event. |
 | `NEXT_PUBLIC_GA_ID` | Dự phòng | Chưa tích hợp Google Analytics thật trong MVP. |
 | `NEXT_PUBLIC_META_PIXEL_ID` | Dự phòng | Chưa tích hợp Meta Pixel thật trong MVP. |
 | `NEXT_PUBLIC_TIKTOK_PIXEL_ID` | Dự phòng | Chưa tích hợp TikTok Pixel thật trong MVP. |
@@ -206,6 +207,15 @@ Không commit `.env.local` hoặc secret. Các biến bắt đầu bằng `NEXT_
 
 Seed cần một profile `super_admin` active để làm author cho bài viết. Từ Giai đoạn 15, `/`, `/blog`, `/blog/[slug]`, sitemap, metadata và các vị trí social public đọc PostgreSQL khi `USE_DATABASE_CONTENT=true`; đặt `false` để giữ fallback mock trong development. Admin Posts và Social Links luôn dùng database thật và mọi mutation đều kiểm tra permission phía server.
 
+## Analytics nội bộ
+
+- Client chỉ gửi event view/click trong allowlist sau khi người dùng đồng ý; submit conversion được ghi từ backend sau khi submission thành công.
+- Endpoint `/api/analytics/events` giới hạn JSON ở 4 KB, kiểm tra same-origin, Zod allowlist và rate limit.
+- Không lưu nội dung form, email, số điện thoại, full IP, password, token hoặc secret trong analytics.
+- Anonymous session là UUID ngẫu nhiên trong `sessionStorage`; server chỉ lưu SHA-256 hash. Dashboard ghi rõ đây là **ước tính phiên duy nhất**.
+- Raw event có chính sách retention 90 ngày. Chạy `npm run analytics:retention` định kỳ bằng Vercel Cron hoặc scheduler tương đương; daily aggregate không bị xóa bởi lệnh này.
+- Dashboard chỉ query theo date range, đọc `daily_analytics` cho metric dài hạn và phân trang recent raw events.
+
 Các smoke test Backend nội dung:
 
 - `npm run content:test:service`: kiểm tra Zod từ chối content block sai và Server Action không có session bị từ chối.
@@ -227,7 +237,7 @@ Các smoke test Backend nội dung:
 - Appearance Editor chỉ lưu cấu hình demo trong localStorage của trình duyệt.
 - Form newsletter, campaign, contact và settings không gửi dữ liệu thật.
 - File đính kèm chỉ được kiểm tra trên UI, không upload.
-- Analytics chỉ ghi event ra console trong development.
+- Analytics nội bộ phụ thuộc consent và scheduler production cần chạy `analytics:retention` định kỳ.
 - Đã có authentication, authorization và database foundation; chưa có CRUD content, email service hoặc API nghiệp vụ.
 - Không đồng bộ dữ liệu với YouTube, TikTok, Instagram, Facebook hoặc social API khác.
 - Nội dung Privacy và Terms là nội dung mẫu, cần được chuyên gia pháp lý kiểm tra trước production.
@@ -239,7 +249,7 @@ Các smoke test Backend nội dung:
 - CRUD content thật, quản lý user/role và ghi audit log.
 - Database, object storage và upload có kiểm soát.
 - Email transactional cho form và newsletter.
-- Analytics/consent management production.
+- Mở rộng consent theo khu vực pháp lý và bổ sung cơ chế quản lý/xóa dữ liệu production.
 - Tích hợp social API, lịch xuất bản và cập nhật số liệu tự động.
 - Bộ kiểm thử tự động cho unit, integration, accessibility và end-to-end.
 

@@ -1,14 +1,15 @@
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import type { Metadata } from "next";
+import "uplot/dist/uPlot.min.css";
 
 import "./admin.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Admin Dashboard demo",
-    template: "%s | Admin demo",
+    default: "Admin Dashboard",
+    template: "%s | Admin",
   },
-  description: "Giao diện Admin Dashboard dùng dữ liệu mock, không có backend.",
+  description: "Admin Dashboard quản lý nội dung và analytics nội bộ.",
   robots: { index: false, follow: false },
 };
 

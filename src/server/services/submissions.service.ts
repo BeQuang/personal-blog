@@ -21,6 +21,7 @@ import type { PublicRequestContext } from "@/server/anti-spam/request-context";
 import { verifyTurnstileToken, type TurnstileAction } from "@/server/anti-spam/turnstile";
 import { getEmailProvider } from "@/server/email/resend-provider";
 import { getRateLimiter } from "@/server/rate-limit/upstash-rate-limiter";
+import { recordServerAnalyticsEventSafely } from "@/server/services/analytics.service";
 import type { RateLimitPolicy } from "@/server/rate-limit/rate-limiter";
 import type {
   AdminCampaignSubmission,
@@ -192,6 +193,11 @@ export async function submitContact(
     }),
   );
 
+  await recordServerAnalyticsEventSafely({
+    eventType: "contact_submit",
+    path: "/contact",
+  });
+
   try {
     await getEmailProvider().sendContactNotification({
       submissionId: row.id,
@@ -243,6 +249,11 @@ export async function subscribeNewsletter(
       unsubscribeTokenHash: tokenHash,
     }),
   );
+
+  await recordServerAnalyticsEventSafely({
+    eventType: "newsletter_submit",
+    path: "/",
+  });
 
   if (row.status !== "suppressed") {
     try {
@@ -324,6 +335,14 @@ export async function submitCampaign(
         },
       ),
     );
+    if (row) {
+      await recordServerAnalyticsEventSafely({
+        eventType: "campaign_submit",
+        entityType: "campaign",
+        entityId: row.campaignId,
+        path: `/campaigns/${parsed.campaignSlug}`,
+      });
+    }
     return { id: row.id, created: true };
   } catch (error) {
     if (error instanceof ConflictError) {

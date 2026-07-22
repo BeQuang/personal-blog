@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 
+import { AnalyticsView } from "@/components/analytics/AnalyticsView";
 import { CampaignParticipation } from "@/components/campaigns/CampaignParticipation";
 import { LinkButton } from "@/components/common/Button";
 import { Container } from "@/components/common/Container";
@@ -72,6 +73,7 @@ export default async function CampaignDetailPage({ params }: CampaignPageProps) 
 
   return (
     <article className="pb-20 sm:pb-24">
+      <AnalyticsView type="campaign" entityId={campaign.id} />
       <header className="border-b border-[var(--border)] bg-[var(--background-secondary)] py-8 sm:py-12">
         <Container>
           <nav aria-label="Breadcrumb" className="text-sm text-[var(--text-muted)]">

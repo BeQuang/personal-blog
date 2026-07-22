@@ -6,7 +6,7 @@ import { withSocialMetadata } from "@/lib/metadata";
 
 export const metadata: Metadata = withSocialMetadata({
   title: "Chính sách quyền riêng tư",
-  description: "Nội dung mẫu về cách Quang Official dự kiến xử lý thông tin trên website.",
+  description: "Nội dung mẫu về cách Quang Official xử lý biểu mẫu và analytics nội bộ.",
   alternates: { canonical: "/privacy" },
   openGraph: {
     title: `Chính sách quyền riêng tư | ${siteConfig.siteName}`,
@@ -20,25 +20,27 @@ const sections: readonly LegalSection[] = [
   {
     title: "1. Phạm vi của bản chính sách mẫu",
     paragraphs: [
-      "Tài liệu mô tả cách website dự kiến tiếp cận quyền riêng tư khi người dùng đọc nội dung, xem media hoặc tương tác với các biểu mẫu mô phỏng.",
-      "Phiên bản MVP hiện không có tài khoản người dùng, backend tiếp nhận biểu mẫu hoặc hệ thống thanh toán.",
+      "Tài liệu mô tả cách website tiếp cận quyền riêng tư khi người dùng đọc nội dung, xem media hoặc chủ động gửi biểu mẫu.",
+      "Website có backend tiếp nhận biểu mẫu public và khu vực quản trị được bảo vệ. Nội dung này vẫn là mẫu và cần được kiểm tra pháp lý trước production.",
     ],
   },
   {
     title: "2. Thông tin xuất hiện trong biểu mẫu",
     paragraphs: [
-      "Form newsletter, đăng ký chiến dịch và liên hệ hợp tác chỉ chạy trong trình duyệt để minh họa trải nghiệm. Nội dung nhập vào không được gửi đến máy chủ, không được ghi vào cơ sở dữ liệu và không được dùng để liên hệ thật.",
+      "Form newsletter, đăng ký chiến dịch và liên hệ hợp tác được validate, chống spam và lưu trên máy chủ khi người dùng chủ động gửi.",
     ],
     items: [
-      "Thông tin liên hệ như họ tên, email và số điện thoại chỉ tồn tại tạm thời trong giao diện đang mở.",
+      "Chỉ các trường cần thiết cho mục đích liên hệ hoặc tham gia chiến dịch mới được lưu; Turnstile token không được lưu.",
       "File được chọn trong form liên hệ chỉ được kiểm tra tên, phần mở rộng và kích thước tại trình duyệt; file không được upload.",
-      "Khi làm mới hoặc rời trang, dữ liệu form chưa gửi sẽ không được website khôi phục.",
+      "Email thông báo thất bại không làm mất submission đã được ghi nhận.",
     ],
   },
   {
     title: "3. Dữ liệu kỹ thuật và đo lường",
     paragraphs: [
-      "Bản MVP chỉ có placeholder analytics phía giao diện. Trước khi kích hoạt bất kỳ công cụ đo lường production nào, website cần công bố rõ loại dữ liệu, mục đích, thời hạn lưu và cơ chế đồng ý phù hợp.",
+      "Analytics nội bộ chỉ bắt đầu sau khi người dùng đồng ý. Hệ thống ghi loại event, đường dẫn, domain giới thiệu, UTM, nhóm thiết bị, country code khi hạ tầng cung cấp và mã băm của session ngẫu nhiên.",
+      "Hệ thống không lưu nội dung form, email, số điện thoại, password, authentication token, secret hoặc IP đầy đủ trong analytics. Raw event có chính sách lưu tối đa 90 ngày; aggregate theo ngày có thể được giữ lâu hơn để xem xu hướng.",
+      "Số phiên duy nhất chỉ là ước tính theo anonymous session và không đại diện chính xác cho số người dùng.",
     ],
   },
   {
@@ -51,6 +53,7 @@ const sections: readonly LegalSection[] = [
     title: "5. Lưu trữ cục bộ và lựa chọn giao diện",
     paragraphs: [
       "Website có thể lưu lựa chọn giao diện sáng hoặc tối trên thiết bị để duy trì trải nghiệm. Thông tin này không dùng để nhận dạng danh tính và có thể được xóa bằng công cụ quản lý dữ liệu website của trình duyệt.",
+      "Lựa chọn đồng ý hoặc từ chối analytics cũng được lưu trong localStorage. Người dùng có thể xóa dữ liệu website của trình duyệt để đặt lại lựa chọn.",
     ],
   },
   {
@@ -67,8 +70,8 @@ export default function PrivacyPage() {
       eyebrow="Thông tin và quyền riêng tư"
       title="Chính sách quyền riêng tư"
       description="Bản mô tả minh bạch về dữ liệu trong phiên bản MVP và những việc cần hoàn thiện trước production."
-      updatedAt="2026-07-16"
-      updatedLabel="16 tháng 7, 2026"
+      updatedAt="2026-07-22"
+      updatedLabel="22 tháng 7, 2026"
       sections={sections}
     />
   );

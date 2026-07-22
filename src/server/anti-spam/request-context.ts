@@ -17,8 +17,9 @@ function readClientIp(requestHeaders: Headers) {
   return candidate && candidate.length <= 64 ? candidate : undefined;
 }
 
-export async function createPublicRequestContext(): Promise<PublicRequestContext> {
-  const requestHeaders = await headers();
+export function createPublicRequestContextFromHeaders(
+  requestHeaders: Headers,
+): PublicRequestContext {
   const ipAddress = readClientIp(requestHeaders);
   const userAgent = requestHeaders.get("user-agent")?.slice(0, 256) ?? "unknown";
   const fingerprint = createHash("sha256")
@@ -29,4 +30,9 @@ export async function createPublicRequestContext(): Promise<PublicRequestContext
     fingerprint,
     ...(ipAddress ? { ipAddress } : {}),
   };
+}
+
+export async function createPublicRequestContext(): Promise<PublicRequestContext> {
+  const requestHeaders = await headers();
+  return createPublicRequestContextFromHeaders(requestHeaders);
 }

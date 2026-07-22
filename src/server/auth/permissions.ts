@@ -40,7 +40,7 @@ export const permissionMatrix = {
     "content:write",
     "media:manage",
   ],
-  viewer: ["dashboard:view"],
+  viewer: ["dashboard:view", "analytics:view"],
 } as const satisfies Record<UserRole, readonly Permission[]>;
 
 export function hasPermission(role: UserRole, permission: Permission) {

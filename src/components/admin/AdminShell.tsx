@@ -53,7 +53,7 @@ const navigationIcons = {
 } as const;
 
 const navigationPermissions = {
-  overview: "dashboard:view",
+  overview: "analytics:view",
   posts: "content:view",
   "social-links": "settings:manage",
   videos: "media:manage",

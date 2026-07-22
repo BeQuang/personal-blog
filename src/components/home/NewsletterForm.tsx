@@ -6,7 +6,6 @@ import { type FormEvent, useCallback, useState, useTransition } from "react";
 import { subscribeNewsletterAction } from "@/actions/submissions.actions";
 import { Button } from "@/components/common/Button";
 import { TurnstileWidget } from "@/components/common/TurnstileWidget";
-import { trackNewsletterSubmit } from "@/lib/analytics";
 
 interface NewsletterFormProps {
   privacyNote: string;
@@ -57,7 +56,6 @@ export function NewsletterForm({ privacyNote }: NewsletterFormProps) {
       setError("");
       setSubmitted(true);
       setEmail("");
-      trackNewsletterSubmit();
     });
   }
 

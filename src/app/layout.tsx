@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Be_Vietnam_Pro } from "next/font/google";
 
+import { AnalyticsProvider } from "@/components/analytics/AnalyticsProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
@@ -116,6 +117,7 @@ export default async function RootLayout({
       </head>
       <body>
         <ThemeProvider defaultTheme={settings.theme.mode}>
+          <AnalyticsProvider />
           <a href="#main-content" className="skip-link">
             Chuyển đến nội dung chính
           </a>
