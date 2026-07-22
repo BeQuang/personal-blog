@@ -58,6 +58,19 @@ export async function verifyTurnstileToken(
       return { success: false, errorCode: "TURNSTILE_ACTION_MISMATCH" };
     }
 
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+    if (siteUrl) {
+      let expectedHostname: string;
+      try {
+        expectedHostname = new URL(siteUrl).hostname;
+      } catch {
+        return { success: false, errorCode: "SITE_URL_INVALID" };
+      }
+      if (parsed.data.hostname !== expectedHostname) {
+        return { success: false, errorCode: "TURNSTILE_HOSTNAME_MISMATCH" };
+      }
+    }
+
     return { success: true };
   } catch {
     return { success: false, errorCode: "TURNSTILE_UNAVAILABLE" };

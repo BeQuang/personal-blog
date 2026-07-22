@@ -5,17 +5,9 @@ import { z } from "zod";
 import { slugSchema } from "@/server/domain/content-rules";
 import { ValidationError } from "@/server/errors";
 
-const idSchema = z.uuid("ID không hợp lệ");
+import { internalOrHttpUrlSchema } from "./url.validation";
 
-const internalOrAbsoluteUrlSchema = z.string().trim().refine((value) => {
-  if (value.startsWith("/")) return true;
-  try {
-    const url = new URL(value);
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch {
-    return false;
-  }
-}, "URL phải là đường dẫn nội bộ hoặc URL http/https hợp lệ");
+const idSchema = z.uuid("ID không hợp lệ");
 
 const contentBlockSchema = z.discriminatedUnion("type", [
   z.object({
@@ -29,7 +21,7 @@ const contentBlockSchema = z.discriminatedUnion("type", [
   }),
   z.object({
     type: z.literal("image"),
-    src: internalOrAbsoluteUrlSchema,
+    src: internalOrHttpUrlSchema,
     alt: z.string().trim().min(1, "Ảnh trong bài phải có alt"),
     caption: z.string().trim().optional(),
   }),
@@ -50,7 +42,7 @@ const contentBlockSchema = z.discriminatedUnion("type", [
   }),
   z.object({
     type: z.literal("video"),
-    url: internalOrAbsoluteUrlSchema,
+    url: internalOrHttpUrlSchema,
     title: z.string().trim().min(1),
   }),
   z.object({
@@ -58,7 +50,7 @@ const contentBlockSchema = z.discriminatedUnion("type", [
     title: z.string().trim().min(1),
     description: z.string().trim().min(1),
     label: z.string().trim().min(1),
-    href: internalOrAbsoluteUrlSchema,
+    href: internalOrHttpUrlSchema,
   }),
   z.object({ type: z.literal("divider") }),
 ]);

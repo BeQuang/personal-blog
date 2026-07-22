@@ -5,6 +5,7 @@ import { z } from "zod";
 import { siteConfig } from "@/config/site.config";
 import { ValidationError } from "@/server/errors";
 import { mapSettingsRowToSiteConfig } from "@/server/mappers/settings.mapper";
+import { internalPathSchema } from "@/server/validation/url.validation";
 import type { SiteConfig, SiteSettingsMutationInput } from "@/types";
 
 import { getContentSource } from "./content-source";
@@ -18,7 +19,7 @@ const settingsMutationSchema = z.object({
   avatarMediaId: z.uuid().nullable().optional(), coverMediaId: z.uuid().nullable().optional(),
   defaultSeoTitle: z.string().trim().min(2).max(100).nullable().optional(), defaultSeoDescription: z.string().trim().min(10).max(300).nullable().optional(),
   theme: themeSchema, homepageSections: sectionSchema,
-  navigation: z.array(z.object({ label: z.string().trim().min(1).max(80), href: z.string().trim().startsWith("/"), description: z.string().trim().max(200).optional(), external: z.boolean().optional() })).max(30),
+  navigation: z.array(z.object({ label: z.string().trim().min(1).max(80), href: internalPathSchema, description: z.string().trim().max(200).optional(), external: z.boolean().optional() })).max(30),
 });
 
 async function ensureImage(mediaId: string | null | undefined, field: "avatarMediaId" | "coverMediaId") {

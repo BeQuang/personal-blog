@@ -4,7 +4,10 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { getCurrentUser } from "@/server/auth";
+import { createPublicRequestContext } from "@/server/anti-spam/request-context";
 import { syncAuthUserProfile } from "@/server/auth/profile-sync";
+import { getSafeAdminDestination } from "@/server/auth/safe-redirect";
+import { getRateLimiter } from "@/server/rate-limit/upstash-rate-limiter";
 import { createSupabaseServerClient } from "@/server/supabase/server";
 import type { LoginActionState } from "@/types";
 
@@ -13,19 +16,6 @@ const loginSchema = z.object({
   next: z.string().trim().optional(),
   password: z.string().min(1, "Vui lòng nhập mật khẩu"),
 });
-
-function getSafeAdminDestination(value?: string) {
-  if (
-    value &&
-    value.startsWith("/admin") &&
-    !value.startsWith("//") &&
-    !value.startsWith("/admin/login")
-  ) {
-    return value;
-  }
-
-  return "/admin";
-}
 
 export async function loginAction(
   _previousState: LoginActionState,
@@ -39,6 +29,20 @@ export async function loginAction(
 
   if (!parsed.success) {
     return { errors: parsed.error.flatten().fieldErrors };
+  }
+
+  try {
+    const requestContext = await createPublicRequestContext();
+    const rateLimit = await getRateLimiter().check(
+      "admin-login",
+      requestContext.fingerprint,
+      { limit: 10, window: "15 m" },
+    );
+    if (!rateLimit.success) {
+      return { message: "Quá nhiều lần thử. Vui lòng thử lại sau." };
+    }
+  } catch {
+    return { message: "Không thể xử lý đăng nhập lúc này." };
   }
 
   const supabase = await createSupabaseServerClient();

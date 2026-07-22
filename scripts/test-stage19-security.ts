@@ -33,7 +33,9 @@ async function main() {
 
   const originalFetch = globalThis.fetch;
   const originalTurnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+  const originalSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
   process.env.TURNSTILE_SECRET_KEY = "test-secret";
+  process.env.NEXT_PUBLIC_SITE_URL = "https://example.com";
   try {
     globalThis.fetch = async () => Response.json({ success: true });
     assert.equal(
@@ -42,10 +44,17 @@ async function main() {
     );
 
     globalThis.fetch = async () =>
-      Response.json({ success: true, action: "contact" });
+      Response.json({ success: true, action: "contact", hostname: "example.com" });
     assert.equal(
       (await verifyTurnstileToken("test-token", "contact")).success,
       true,
+    );
+
+    globalThis.fetch = async () =>
+      Response.json({ success: true, action: "contact", hostname: "evil.example" });
+    assert.equal(
+      (await verifyTurnstileToken("test-token", "contact")).errorCode,
+      "TURNSTILE_HOSTNAME_MISMATCH",
     );
   } finally {
     globalThis.fetch = originalFetch;
@@ -53,6 +62,11 @@ async function main() {
       delete process.env.TURNSTILE_SECRET_KEY;
     } else {
       process.env.TURNSTILE_SECRET_KEY = originalTurnstileSecret;
+    }
+    if (originalSiteUrl === undefined) {
+      delete process.env.NEXT_PUBLIC_SITE_URL;
+    } else {
+      process.env.NEXT_PUBLIC_SITE_URL = originalSiteUrl;
     }
   }
 

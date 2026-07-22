@@ -1,13 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { syncAuthUserProfile } from "@/server/auth/profile-sync";
+import { getSafeAdminDestination } from "@/server/auth/safe-redirect";
 import { createSupabaseServerClient } from "@/server/supabase/server";
-
-function getSafeDestination(value: string | null) {
-  return value?.startsWith("/admin") && !value.startsWith("//")
-    ? value
-    : "/admin";
-}
 
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get("code");
@@ -38,7 +33,7 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.redirect(
     new URL(
-      getSafeDestination(request.nextUrl.searchParams.get("next")),
+      getSafeAdminDestination(request.nextUrl.searchParams.get("next")),
       request.url,
     ),
   );

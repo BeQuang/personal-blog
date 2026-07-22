@@ -4,6 +4,7 @@ import {
   DeleteObjectCommand,
   GetObjectCommand,
   HeadObjectCommand,
+  ListObjectsV2Command,
   NotFound,
   PutObjectCommand,
   S3Client,
@@ -17,6 +18,7 @@ import type {
   CreateUploadUrlInput,
   MediaStorage,
   StoredObjectMetadata,
+  StoredObjectSummary,
 } from "./storage.types";
 
 const r2ConfigSchema = z.object({
@@ -144,5 +146,32 @@ export class R2Storage implements MediaStorage {
     );
     if (!result.Body) throw new Error("R2 object body is unavailable");
     return result.Body.transformToByteArray();
+  }
+
+  async listObjects(prefix = "images/"): Promise<StoredObjectSummary[]> {
+    if (prefix !== "images/") throw new Error("Unsafe R2 list prefix");
+    const objects: StoredObjectSummary[] = [];
+    let continuationToken: string | undefined;
+
+    do {
+      const result = await this.client.send(new ListObjectsV2Command({
+        Bucket: this.bucketName,
+        Prefix: prefix,
+        ContinuationToken: continuationToken,
+      }));
+      for (const item of result.Contents ?? []) {
+        if (!item.Key || !isSafeImageObjectKey(item.Key)) continue;
+        objects.push({
+          objectKey: item.Key,
+          lastModified: item.LastModified ?? null,
+          sizeBytes: item.Size ?? 0,
+        });
+      }
+      continuationToken = result.IsTruncated
+        ? result.NextContinuationToken
+        : undefined;
+    } while (continuationToken);
+
+    return objects;
   }
 }

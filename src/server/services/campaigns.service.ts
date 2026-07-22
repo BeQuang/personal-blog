@@ -5,6 +5,7 @@ import { z } from "zod";
 import { campaigns as mockCampaigns } from "@/data/campaigns";
 import { ConflictError, NotFoundError, ValidationError } from "@/server/errors";
 import { mapCampaignRowToCampaign } from "@/server/mappers/campaigns.mapper";
+import { internalOrHttpUrlSchema } from "@/server/validation/url.validation";
 import type { AdminCampaign, Campaign, CampaignStatus } from "@/types";
 
 import { getContentSource } from "./content-source";
@@ -15,7 +16,7 @@ const campaignMutationSchema = z.object({
   title: z.string().trim().min(3).max(180), slug: slugSchema.optional(),
   description: z.string().trim().min(10).max(5_000), bannerMediaId: z.uuid("Hãy chọn banner từ Media Library"),
   startAt: z.coerce.date(), endAt: z.coerce.date(), status: z.enum(["draft", "upcoming", "active", "ended"]),
-  buttonLabel: z.string().trim().min(1).max(100), buttonUrl: z.string().trim().max(500).nullable().optional(),
+  buttonLabel: z.string().trim().min(1).max(100), buttonUrl: internalOrHttpUrlSchema.nullable().optional(),
   rules: z.array(z.string().trim().min(1).max(500)).min(1).max(50), terms: z.array(z.string().trim().min(1).max(500)).min(1).max(50),
   featured: z.boolean(), submissionEnabled: z.boolean(), submissionLimit: z.coerce.number().int().positive().max(1_000_000).nullable().optional(),
 });

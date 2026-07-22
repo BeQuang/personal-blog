@@ -19,12 +19,20 @@ const globalForDatabase = globalThis as typeof globalThis & {
   postgresClient?: ReturnType<typeof postgres>;
 };
 
+const configuredPoolMaximum = z.coerce
+  .number()
+  .int()
+  .min(1)
+  .max(10)
+  .default(process.env.NODE_ENV === "production" ? 1 : 5)
+  .parse(process.env.DATABASE_POOL_MAX);
+
 export const postgresClient =
   globalForDatabase.postgresClient ??
   postgres(databaseUrl, {
     connect_timeout: 10,
     idle_timeout: 20,
-    max: 10,
+    max: configuredPoolMaximum,
     prepare: false,
   });
 

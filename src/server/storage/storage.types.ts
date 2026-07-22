@@ -15,6 +15,12 @@ export interface StoredObjectMetadata {
   etag: string | null;
 }
 
+export interface StoredObjectSummary {
+  objectKey: string;
+  lastModified: Date | null;
+  sizeBytes: number;
+}
+
 export interface MediaStorage {
   createUploadUrl(input: CreateUploadUrlInput): Promise<string>;
   createDownloadUrl(input: CreateDownloadUrlInput): Promise<string>;
@@ -23,4 +29,5 @@ export interface MediaStorage {
   getPublicUrl(objectKey: string): string;
   getObjectMetadata(objectKey: string): Promise<StoredObjectMetadata | null>;
   readObjectPrefix(objectKey: string, maximumBytes: number): Promise<Uint8Array>;
+  listObjects(prefix?: string): Promise<StoredObjectSummary[]>;
 }

@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+import { getSecurityHeaders } from "./src/config/security.config";
+
 function getR2RemotePattern(): NonNullable<
   NonNullable<NextConfig["images"]>["remotePatterns"]
 > {
@@ -26,6 +28,35 @@ function getR2RemotePattern(): NonNullable<
 }
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: getSecurityHeaders(process.env.NODE_ENV === "production"),
+      },
+      {
+        source: "/api/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-store, max-age=0" },
+        ],
+      },
+      {
+        source: "/admin/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-store, max-age=0" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+        ],
+      },
+      {
+        source: "/auth/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-store, max-age=0" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+        ],
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       ...getR2RemotePattern(),

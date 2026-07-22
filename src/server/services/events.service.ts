@@ -5,6 +5,7 @@ import { z } from "zod";
 import { events as mockEvents } from "@/data/events";
 import { ConflictError, NotFoundError, ValidationError } from "@/server/errors";
 import { mapEventRowToEventItem } from "@/server/mappers/events.mapper";
+import { httpUrlSchema } from "@/server/validation/url.validation";
 import type { AdminEvent } from "@/types";
 
 import { getContentSource } from "./content-source";
@@ -24,7 +25,7 @@ const eventMutationSchema = z.object({
   timezone: z.string().trim().min(1).max(100),
   location: z.string().trim().max(300).nullable().optional(),
   platform: z.string().trim().max(100).nullable().optional(),
-  externalUrl: z.union([z.url(), z.literal(""), z.null()]).optional(),
+  externalUrl: z.union([httpUrlSchema, z.literal(""), z.null()]).optional(),
   schedule: z.array(z.object({ time: z.string().trim().min(1).max(50), title: z.string().trim().min(1).max(200), description: z.string().trim().max(500).optional() })).max(30).optional(),
   featured: z.boolean(),
 });

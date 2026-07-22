@@ -38,6 +38,14 @@ export async function findMediaAssetByObjectKey(objectKey: string) {
   return row ?? null;
 }
 
+export async function findAllMediaObjectKeys() {
+  const rows = await database
+    .select({ objectKey: mediaAssets.objectKey })
+    .from(mediaAssets)
+    .where(isNotNull(mediaAssets.objectKey));
+  return new Set(rows.flatMap((row) => row.objectKey ? [row.objectKey] : []));
+}
+
 export async function insertMediaAssetIfMissing(values: NewMediaAssetRow) {
   const existing = values.objectKey
     ? await findMediaAssetByObjectKey(values.objectKey)

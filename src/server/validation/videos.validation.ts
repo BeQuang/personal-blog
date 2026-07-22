@@ -4,6 +4,8 @@ import { z } from "zod";
 
 import { ValidationError } from "@/server/errors";
 
+import { httpUrlSchema } from "./url.validation";
+
 const videoPlatforms = ["youtube", "tiktok", "instagram", "facebook", "internal"] as const;
 const videoOrientations = ["landscape", "portrait"] as const;
 const allowedVideoMimeTypes = [
@@ -42,7 +44,7 @@ const createUploadSchema = metadataSchema.extend({
 
 const mutationSchema = metadataSchema.extend({
   platform: z.enum(videoPlatforms),
-  externalUrl: z.url().nullable().optional(),
+  externalUrl: httpUrlSchema.nullable().optional(),
 }).superRefine((value, context) => {
   if (value.platform !== "internal" && !value.externalUrl) {
     context.addIssue({

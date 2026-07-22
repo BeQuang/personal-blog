@@ -1,10 +1,10 @@
 # Quang Official — Creator Blog & Social Hub
 
-Quang Official là website cá nhân dành cho content creator, tập trung vào bài viết, video, hình ảnh, sự kiện và chiến dịch cộng đồng. Dự án gồm website public, Admin Dashboard dùng dữ liệu mock, nền tảng PostgreSQL/Drizzle và lớp xác thực, phân quyền Supabase phía server.
+Quang Official là website cá nhân dành cho content creator, tập trung vào bài viết, video, hình ảnh, sự kiện và chiến dịch cộng đồng. Dự án gồm website public, Admin CMS, PostgreSQL/Drizzle, Supabase Authentication/RBAC, R2 media, Mux video, form/email và analytics nội bộ.
 
 ## Giao diện
 
-Phần public sử dụng phong cách creator hiện đại, hỗ trợ light/dark/system theme, card nội dung giàu hình ảnh và bố cục responsive. Phần admin có sidebar, bảng dữ liệu Ant Design, biểu mẫu mock và trình chỉnh giao diện với preview riêng. Ảnh minh họa mẫu được đặt trong `public/images/creator/`.
+Phần public sử dụng phong cách creator hiện đại, hỗ trợ light/dark/system theme, card nội dung giàu hình ảnh và bố cục responsive. Phần admin có sidebar, bảng dữ liệu Ant Design, CRUD có kiểm tra quyền và trình chỉnh giao diện với preview riêng. Ảnh minh họa fallback được đặt trong `public/images/creator/`.
 
 ## Tính năng
 
@@ -15,20 +15,20 @@ Phần public sử dụng phong cách creator hiện đại, hỗ trợ light/da
 - Video có lọc platform/chủ đề, phân biệt landscape/portrait và chỉ mở video ngoài khi người dùng chọn.
 - Gallery có lọc category, lightbox, caption, previous/next/close và điều hướng bằng bàn phím.
 - Events và Campaigns có danh sách theo trạng thái, trang chi tiết, metadata và xử lý slug không tồn tại.
-- Campaign có countdown an toàn với hydration và form đăng ký mock có validation.
+- Campaign có countdown an toàn với hydration và form đăng ký thật có validation server, Turnstile và rate limit.
 - About, Contact, Privacy, Terms và trang 404 tùy biến.
 - SEO cơ bản gồm metadata, canonical URL, Open Graph, Twitter card, sitemap và robots.
 - Accessibility cơ bản gồm semantic HTML, label form, focus state, skip link, dialog title, alt text và reduced motion.
 
-### Admin Dashboard demo
+### Admin Dashboard
 
-- Dashboard thống kê và hoạt động gần đây bằng dữ liệu mock.
+- Dashboard thống kê nội bộ theo khoảng ngày và dữ liệu aggregate phía server.
 - Bảng quản lý Posts, Social Links, Videos, Gallery, Events và Campaigns.
-- Search, filter, thêm, sửa, xóa, featured và enable/disable chỉ cập nhật local state.
+- Search, filter, thêm, sửa, archive/publish, featured và enable/disable ghi PostgreSQL qua service/repository có RBAC.
 - Appearance Editor có theme, màu sắc, kiểu card/button/layout, bật tắt section và preview.
 - Settings form chỉ mô phỏng thao tác lưu.
 
-> **Cảnh báo:** `/admin` đã có Supabase Authentication và RBAC phía server, nhưng các bảng và thao tác nội dung vẫn dùng local state/mock data. Đây chưa phải CMS production hoàn chỉnh.
+> **Cảnh báo:** `/admin` là CMS có Authentication/RBAC thật, nhưng vẫn cần hoàn tất cấu hình provider, backup, monitoring, legal/privacy review và kiểm thử trình duyệt trước khi được xem là production-ready.
 
 ## Route
 
@@ -106,12 +106,11 @@ Mở [http://localhost:3000](http://localhost:3000).
 
 ```bash
 npm run lint
-npx tsc --noEmit
+npm run type-check
+npm run test
 npm run build
 npm run start
 ```
-
-Dự án hiện chưa khai báo script `type-check`; lệnh kiểm tra TypeScript tương đương là `npx tsc --noEmit`.
 
 ## Cấu trúc thư mục
 
@@ -197,6 +196,66 @@ Chỉnh `src/data/campaigns.ts`. Campaign status `draft` không có route public
 
 Không commit `.env.local` hoặc secret. Các biến bắt đầu bằng `NEXT_PUBLIC_` được đưa vào client bundle tại thời điểm build, vì vậy cần redeploy sau khi thay giá trị production.
 
+### Biến Backend production
+
+- `DATABASE_POOL_MAX=1` là mặc định an toàn cho mỗi instance serverless. `DATABASE_URL` nên là Supavisor Transaction Pooler; `DIRECT_DATABASE_URL` nên là Direct connection hoặc Supavisor Session Pooler.
+- R2 cần `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_PUBLIC_BASE_URL`. `MEDIA_ORPHAN_MIN_AGE_HOURS` mặc định là `24` để tránh xóa upload vừa cấp URL nhưng chưa confirm.
+- Mux cần `MUX_TOKEN_ID`, `MUX_TOKEN_SECRET`, `MUX_WEBHOOK_SECRET`.
+- Form thật cần `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `CONTACT_NOTIFICATION_EMAIL`.
+- Chỉ `NEXT_PUBLIC_SUPABASE_URL`, publishable/anon key, `NEXT_PUBLIC_SITE_URL`, Turnstile site key và cờ analytics được phép có tiền tố `NEXT_PUBLIC_`. Không đặt secret Supabase, R2, Mux, Resend, Turnstile hoặc Upstash dưới tiền tố này.
+
+## Thiết lập Backend production
+
+### Supabase, migration và seed
+
+1. Tạo Supabase project, lấy runtime pooler URL, migration URL, project URL và API keys. Bật email/password Auth và cấu hình Site URL/Redirect URL thành `https://your-domain.com/auth/callback`.
+2. Sao chép `.env.example` sang `.env.local`, điền secret bằng dashboard/secret manager và chạy `npm run db:check`. Lệnh này chỉ báo database/user, không in connection string.
+3. Chạy `npm run db:migrate`. Nếu máy không phân giải được hostname Direct IPv6 nhưng `DATABASE_URL` pooler kết nối được, chạy `npm run db:migrate:pooled`. Không dùng schema push trên production.
+4. Chạy `npm run auth:bootstrap` đúng một lần nếu Auth hoàn toàn trống, sau đó tắt `BOOTSTRAP_ADMIN_ENABLED`, xóa bootstrap password khỏi môi trường và đổi mật khẩu quản trị.
+5. Có thể chạy `npm run db:seed -- --validate-only` trước, rồi `npm run db:seed` khi cần nhập dữ liệu mock. Seed là idempotent theo slug/external key và không xóa dữ liệu đã có.
+6. Xác minh RLS bằng `npm run test:database` và test role bằng `npm run content:test:authorization` trước khi mở admin cho người dùng khác.
+
+Migration phải được chạy trong CI/CD job riêng hoặc thủ công trước deploy ứng dụng. Không chạy migration đồng thời từ nhiều Vercel instance.
+
+### Cloudflare R2
+
+1. Tạo bucket và Account API Token chỉ có `Object Read & Write` trên đúng bucket.
+2. Bật custom domain cho production (ưu tiên) hoặc `r2.dev` chỉ để phát triển; đặt origin đó vào `R2_PUBLIC_BASE_URL`.
+3. Cấu hình CORS `PUT, GET, HEAD` cho chính xác origin development/production và cho phép header `Content-Type`. Browser upload trực tiếp bằng presigned URL; file không đi qua Next.js/Vercel.
+4. Chạy `npm run storage:orphans` để audit khô. Chỉ sau khi kiểm tra danh sách mới chạy `npm run storage:orphans:delete`; lệnh chỉ xét object `images/` không có record DB và cũ hơn ngưỡng cấu hình.
+
+### Mux
+
+1. Tạo access token có quyền Mux Video và đặt token ID/secret ở server environment.
+2. Tạo webhook production trỏ tới `https://your-domain.com/api/webhooks/mux`, sao chép signing secret vào `MUX_WEBHOOK_SECRET` rồi redeploy.
+3. Test upload trực tiếp, event processing/ready/failed, signature sai và event lặp. Endpoint xác minh raw body trước khi xử lý; `video_webhook_events` bảo đảm idempotency.
+4. Khi phát triển local, dùng HTTPS tunnel. Mux CLI chưa có binary Windows ở một số phiên bản nên có thể dùng WSL/Linux/macOS hoặc tunnel và webhook dashboard.
+
+### Resend, Turnstile và Upstash
+
+1. Xác minh domain gửi trong Resend, tạo API key chỉ cho ứng dụng, cấu hình `RESEND_FROM_EMAIL` thuộc domain đã xác minh và email nhận thông báo.
+2. Tạo Turnstile widget cho đúng hostname production/local test. Backend kiểm tra token, action và hostname khớp `NEXT_PUBLIC_SITE_URL`.
+3. Tạo Upstash Redis REST database gần khu vực deploy. Production fail closed nếu thiếu rate limiter; không dùng in-memory fallback giữa nhiều instance.
+4. Không log payload form. Email gửi lỗi không rollback submission đã lưu; theo dõi lỗi gửi bằng log/alert không chứa nội dung cá nhân.
+
+### Vercel và security checklist
+
+- Khai báo biến cho đúng scope Production/Preview/Development, đặt `NEXT_PUBLIC_SITE_URL` theo từng environment và redeploy sau khi đổi public variables.
+- Security headers được cấu hình ở `next.config.ts`; admin/auth/API dùng `no-store`, admin/auth có `noindex`.
+- Chạy `npm run lint`, `npm run type-check`, `npm run test`, `npm run build` trong CI. Chạy migration như một bước có khóa trước deploy, không trong request/runtime startup.
+- Cấu hình scheduler cho `npm run analytics:retention`; theo dõi error rate của upload, webhook, email, rate limit và DB connection.
+- Giữ secret trong Vercel/Supabase/Cloudflare secret manager, xoay key định kỳ và ngay khi nghi ngờ bị lộ.
+
+### Backup PostgreSQL
+
+- Bật backup/PITR phù hợp với gói Supabase. Ngoài backup managed, lên lịch `pg_dump` bằng `DIRECT_DATABASE_URL` từ runner tin cậy, mã hóa file và lưu ở bucket/tài khoản tách biệt.
+- Thường xuyên kiểm tra restore vào project/database tạm; backup chưa test restore không được xem là hoàn chỉnh.
+- Backup trước migration có thay đổi schema lớn. Không đưa dump chứa dữ liệu cá nhân hoặc credential vào Git.
+
+### Docker trong tương lai
+
+Dự án hiện chưa cung cấp Dockerfile production. Khi container hóa, dùng multi-stage build, chạy user không phải root, chỉ copy output cần thiết, truyền secret lúc runtime (không `ARG`/bake vào image), có health check và đặt reverse proxy TLS phía trước. Database migration vẫn chạy bằng job riêng, không chạy đồng thời trong mọi replica.
+
 `npm run dev` và `npm start` tự chạy `auth:bootstrap` trước khi khởi động. Script chỉ tạo user khi Auth hoàn toàn trống, xác nhận email, tạo `profiles` với role `super_admin`, và bỏ qua nếu đã có bất kỳ user nào. Có thể chạy kiểm tra thủ công bằng `npm run auth:bootstrap`. Sau khi bootstrap production thành công, nên tắt `BOOTSTRAP_ADMIN_ENABLED` và xoay mật khẩu ban đầu.
 
 ## Seed dữ liệu mock
@@ -235,10 +294,10 @@ Các smoke test Backend nội dung:
 
 - Admin Dashboard là demo; thao tác bảng phần lớn mất khi refresh.
 - Appearance Editor chỉ lưu cấu hình demo trong localStorage của trình duyệt.
-- Form newsletter, campaign, contact và settings không gửi dữ liệu thật.
+- Contact, newsletter và campaign submission lưu PostgreSQL thật; email phụ thuộc Resend, chống spam phụ thuộc Turnstile/Upstash.
 - File đính kèm chỉ được kiểm tra trên UI, không upload.
 - Analytics nội bộ phụ thuộc consent và scheduler production cần chạy `analytics:retention` định kỳ.
-- Đã có authentication, authorization và database foundation; chưa có CRUD content, email service hoặc API nghiệp vụ.
+- Một số dữ liệu mock vẫn được giữ làm development fallback khi `USE_DATABASE_CONTENT=false`; không nên bật chế độ này ở production.
 - Không đồng bộ dữ liệu với YouTube, TikTok, Instagram, Facebook hoặc social API khác.
 - Nội dung Privacy và Terms là nội dung mẫu, cần được chuyên gia pháp lý kiểm tra trước production.
 - Dữ liệu, hình ảnh, địa chỉ liên hệ và external URL hiện là dữ liệu minh họa cần được thay trước khi phát hành chính thức.
@@ -260,5 +319,5 @@ Các smoke test Backend nội dung:
 - Kiểm tra pháp lý cho Privacy, Terms, cookie/analytics consent.
 - Thêm backend, chống spam, rate limit và lưu trữ an toàn nếu bật form thật.
 - Tạo Admin đầu tiên, gán role tối thiểu cần thiết và kiểm thử toàn bộ permission trước khi phát hành.
-- Chạy lại `npm run lint`, `npx tsc --noEmit` và `npm run build`.
+- Chạy lại `npm run lint`, `npm run type-check`, `npm run test` và `npm run build`.
 - Kiểm thử trình duyệt thật ở mobile, tablet và desktop trước khi go-live.
