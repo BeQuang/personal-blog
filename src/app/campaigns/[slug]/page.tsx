@@ -175,6 +175,7 @@ export default async function CampaignDetailPage({ params }: CampaignPageProps) 
         {campaign.submissionEnabled !== false ? <div className="mt-14 border-t border-[var(--border)] pt-12">
           <CampaignParticipation
             title={campaign.title}
+            slug={campaign.slug}
             status={effectiveStatus}
             startAt={campaign.startAt}
             endAt={campaign.endAt}
@@ -190,7 +191,7 @@ export default async function CampaignDetailPage({ params }: CampaignPageProps) 
               ? campaign.submissionEnabled === false
                 ? "Chiến dịch hiện không nhận đăng ký mới. Bạn có thể khám phá các hoạt động khác."
                 : "Chiến dịch này đã kết thúc, nhưng vẫn còn nhiều hoạt động khác để bạn khám phá."
-              : "Đọc kỹ thể lệ rồi gửi biểu mẫu mock để hoàn tất trải nghiệm đăng ký."}
+              : "Đọc kỹ thể lệ rồi gửi biểu mẫu để hoàn tất đăng ký tham gia."}
           </p>
           {!canSubmit ? (
             <LinkButton href="/campaigns" size="lg" variant="outline" className="mt-6">

@@ -16,6 +16,7 @@ export const adminNavigation = [
   { key: "gallery", label: "Hình ảnh", href: "/admin/gallery" },
   { key: "events", label: "Sự kiện", href: "/admin/events" },
   { key: "campaigns", label: "Chiến dịch", href: "/admin/campaigns" },
+  { key: "submissions", label: "Hộp thư & đăng ký", href: "/admin/submissions" },
   { key: "appearance", label: "Giao diện", href: "/admin/appearance" },
   { key: "settings", label: "Cài đặt", href: "/admin/settings" },
 ] as const;

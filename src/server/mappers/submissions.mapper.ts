@@ -23,6 +23,26 @@ export interface CampaignSubmissionDto {
   updatedAt: string;
 }
 
+type CampaignSubmissionMappableRow = Pick<
+  CampaignSubmissionRow,
+  | "id"
+  | "campaignId"
+  | "fullName"
+  | "email"
+  | "phone"
+  | "followedPlatform"
+  | "socialUsername"
+  | "notes"
+  | "status"
+  | "source"
+  | "createdAt"
+  | "updatedAt"
+>;
+
+export type CampaignSubmissionWithTitleRow = CampaignSubmissionMappableRow & {
+  campaignTitle: string;
+};
+
 export interface ContactSubmissionDto {
   id: string;
   fullName: string;
@@ -50,7 +70,9 @@ export interface NewsletterSubscriptionDto {
   updatedAt: string;
 }
 
-export function mapCampaignSubmissionRow(row: CampaignSubmissionRow): CampaignSubmissionDto {
+export function mapCampaignSubmissionRow(
+  row: CampaignSubmissionMappableRow,
+): CampaignSubmissionDto {
   return {
     id: row.id,
     campaignId: row.campaignId,
@@ -64,6 +86,13 @@ export function mapCampaignSubmissionRow(row: CampaignSubmissionRow): CampaignSu
     ...(row.source ? { source: row.source } : {}),
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
+  };
+}
+
+export function mapAdminCampaignSubmissionRow(row: CampaignSubmissionWithTitleRow) {
+  return {
+    ...mapCampaignSubmissionRow(row),
+    campaignTitle: row.campaignTitle,
   };
 }
 

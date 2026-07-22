@@ -21,6 +21,8 @@
     "storage:test:database": "node --conditions=react-server --import tsx scripts/test-stage16-database.ts",
     "storage:test:security": "node --conditions=react-server --import tsx scripts/test-stage16-security.ts",
     "video:test": "node --conditions=react-server --import tsx scripts/test-stage17-video.ts",
+    "submissions:test:database": "node scripts/test-stage19-database.mjs",
+    "submissions:test:security": "node --conditions=react-server --import tsx scripts/test-stage19-security.ts",
     "db:studio": "drizzle-kit studio",
     "auth:bootstrap": "node scripts/bootstrap-admin.mjs",
     "auth:test": "node scripts/test-auth-flow.mjs",
@@ -35,6 +37,8 @@
     "@radix-ui/react-dialog": "^1.1.19",
     "@supabase/ssr": "^0.12.3",
     "@supabase/supabase-js": "^2.110.7",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.38.0",
     "antd": "^6.5.1",
     "drizzle-orm": "^0.45.2",
     "lucide-react": "^1.24.0",
@@ -42,6 +46,7 @@
     "postgres": "^3.4.9",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "resend": "^6.18.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

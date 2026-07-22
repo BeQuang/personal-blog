@@ -4,6 +4,7 @@ export type ApplicationErrorCode =
   | "UNAUTHORIZED"
   | "FORBIDDEN"
   | "CONFLICT"
+  | "RATE_LIMITED"
   | "INTERNAL_ERROR";
 
 export class ApplicationError extends Error {
@@ -59,6 +60,17 @@ export class ConflictError extends ApplicationError {
   constructor(message = "The resource conflicts with existing data", options?: ErrorOptions) {
     super(message, "CONFLICT", 409, options);
     this.name = "ConflictError";
+  }
+}
+
+export class RateLimitError extends ApplicationError {
+  constructor(
+    readonly retryAfterSeconds: number,
+    message = "Too many requests",
+    options?: ErrorOptions,
+  ) {
+    super(message, "RATE_LIMITED", 429, options);
+    this.name = "RateLimitError";
   }
 }
 

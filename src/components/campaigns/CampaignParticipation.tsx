@@ -8,6 +8,7 @@ import type { CampaignStatus } from "@/types";
 
 interface CampaignParticipationProps {
   title: string;
+  slug: string;
   status: CampaignStatus;
   startAt: string;
   endAt: string;
@@ -15,6 +16,7 @@ interface CampaignParticipationProps {
 
 export function CampaignParticipation({
   title,
+  slug,
   status,
   startAt,
   endAt,
@@ -22,7 +24,7 @@ export function CampaignParticipation({
   const [expired, setExpired] = useState(false);
   const isUpcoming = status === "upcoming";
   const countdownTarget = isUpcoming ? startAt : endAt;
-  const registrationDisabled = status === "ended" || (status === "active" && expired);
+  const registrationDisabled = status !== "active" || expired;
   const handleExpired = useCallback(() => setExpired(true), []);
 
   return (
@@ -48,7 +50,11 @@ export function CampaignParticipation({
         </div>
       </section>
 
-      <CampaignRegistrationForm campaignTitle={title} disabled={registrationDisabled} />
+      <CampaignRegistrationForm
+        campaignTitle={title}
+        campaignSlug={slug}
+        disabled={registrationDisabled}
+      />
     </div>
   );
 }

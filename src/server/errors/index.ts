@@ -4,6 +4,7 @@ export {
   ForbiddenError,
   mapDatabaseError,
   NotFoundError,
+  RateLimitError,
   UnauthorizedError,
   ValidationError,
   type ApplicationErrorCode,

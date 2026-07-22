@@ -1,9 +1,11 @@
 "use client";
 
-import { CheckCircle2, Mail } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { CheckCircle2, LoaderCircle, Mail } from "lucide-react";
+import { type FormEvent, useCallback, useState, useTransition } from "react";
 
+import { subscribeNewsletterAction } from "@/actions/submissions.actions";
 import { Button } from "@/components/common/Button";
+import { TurnstileWidget } from "@/components/common/TurnstileWidget";
 import { trackNewsletterSubmit } from "@/lib/analytics";
 
 interface NewsletterFormProps {
@@ -14,51 +16,89 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function NewsletterForm({ privacyNote }: NewsletterFormProps) {
   const [email, setEmail] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReset, setTurnstileReset] = useState(0);
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [pending, startTransition] = useTransition();
+  const handleTurnstileToken = useCallback((token: string) => {
+    setTurnstileToken(token);
+    if (token) setError("");
+  }, []);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const normalizedEmail = email.trim();
+    if (pending) return;
 
+    const normalizedEmail = email.trim().toLowerCase();
     if (!emailPattern.test(normalizedEmail)) {
       setSubmitted(false);
       setError("Vui lòng nhập một địa chỉ email hợp lệ.");
       return;
     }
+    if (!turnstileToken) {
+      setSubmitted(false);
+      setError("Vui lòng hoàn tất xác minh chống spam.");
+      return;
+    }
 
-    setError("");
-    setSubmitted(true);
-    setEmail("");
-    trackNewsletterSubmit();
+    startTransition(async () => {
+      const result = await subscribeNewsletterAction({
+        email: normalizedEmail,
+        turnstileToken,
+      });
+      setTurnstileReset((current) => current + 1);
+      if (!result.success) {
+        setSubmitted(false);
+        setError(result.fieldErrors?.email?.[0] ?? result.message);
+        return;
+      }
+
+      setError("");
+      setSubmitted(true);
+      setEmail("");
+      trackNewsletterSubmit();
+    });
   }
 
   return (
     <div>
-      <form onSubmit={handleSubmit} noValidate className="newsletter-form">
-        <label htmlFor="newsletter-email" className="sr-only">
-          Địa chỉ email
-        </label>
-        <div className="newsletter-input-wrap">
-          <Mail size={19} aria-hidden="true" />
-          <input
-            id="newsletter-email"
-            name="email"
-            type="email"
-            inputMode="email"
-            autoComplete="email"
-            placeholder="ban@example.com"
-            value={email}
-            aria-invalid={Boolean(error)}
-            aria-describedby={error ? "newsletter-error" : "newsletter-note"}
-            onChange={(event) => {
-              setEmail(event.target.value);
-              if (error) setError("");
-              if (submitted) setSubmitted(false);
-            }}
+      <form onSubmit={handleSubmit} noValidate className="space-y-3">
+        <div className="newsletter-form">
+          <label htmlFor="newsletter-email" className="sr-only">
+            Địa chỉ email
+          </label>
+          <div className="newsletter-input-wrap">
+            <Mail size={19} aria-hidden="true" />
+            <input
+              id="newsletter-email"
+              name="email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              placeholder="ban@example.com"
+              value={email}
+              disabled={pending}
+              aria-invalid={Boolean(error)}
+              aria-describedby={error ? "newsletter-error" : "newsletter-note"}
+              onChange={(event) => {
+                setEmail(event.target.value);
+                if (error) setError("");
+                if (submitted) setSubmitted(false);
+              }}
+            />
+          </div>
+          <Button type="submit" size="lg" disabled={pending}>
+            {pending ? <><LoaderCircle size={18} className="animate-spin" aria-hidden="true" /> Đang gửi</> : "Đăng ký"}
+          </Button>
+        </div>
+        <div>
+          <TurnstileWidget
+            action="newsletter"
+            onTokenChange={handleTurnstileToken}
+            resetSignal={turnstileReset}
           />
         </div>
-        <Button type="submit" size="lg">Đăng ký</Button>
       </form>
 
       {error ? (
@@ -72,7 +112,7 @@ export function NewsletterForm({ privacyNote }: NewsletterFormProps) {
       {submitted ? (
         <div className="newsletter-toast" role="status" aria-live="polite">
           <CheckCircle2 size={20} aria-hidden="true" />
-          Đăng ký thành công! Đây là thao tác mô phỏng, email của bạn không được lưu.
+          Yêu cầu đăng ký đã được ghi nhận.
         </div>
       ) : null}
     </div>

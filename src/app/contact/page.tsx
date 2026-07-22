@@ -17,7 +17,7 @@ export const metadata: Metadata = withSocialMetadata({
   alternates: { canonical: "/contact" },
   openGraph: {
     title: `Liên hệ hợp tác | ${siteConfig.siteName}`,
-    description: "Thông tin liên hệ và biểu mẫu brief hợp tác mô phỏng.",
+    description: "Thông tin liên hệ và biểu mẫu tiếp nhận brief hợp tác.",
     url: "/contact",
     images: [{ url: siteConfig.coverImage, alt: `Liên hệ ${siteConfig.creatorName}` }],
   },

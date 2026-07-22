@@ -4,12 +4,16 @@ import { CheckCircle2, FileUp, LoaderCircle, Send } from "lucide-react";
 import {
   type ChangeEvent,
   type FormEvent,
+  useCallback,
   useEffect,
   useRef,
   useState,
+  useTransition,
 } from "react";
 
+import { submitContactAction } from "@/actions/submissions.actions";
 import { Button } from "@/components/common/Button";
+import { TurnstileWidget } from "@/components/common/TurnstileWidget";
 import {
   ContactFieldError,
   ContactFormFields,
@@ -22,19 +26,27 @@ import {
 } from "@/components/contact/contact-form.types";
 import { contactFileRules } from "@/config/contact.config";
 
+function firstFieldError(
+  fieldErrors: Readonly<Record<string, readonly string[]>> | undefined,
+  field: string,
+) {
+  return fieldErrors?.[field]?.[0];
+}
+
 export function ContactForm() {
   const [values, setValues] = useState<ContactFormValues>(initialContactFormValues);
   const [errors, setErrors] = useState<ContactFormErrors>({});
   const [fileName, setFileName] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReset, setTurnstileReset] = useState(0);
   const [success, setSuccess] = useState(false);
+  const [responseMessage, setResponseMessage] = useState("");
+  const [submitting, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
-  const submitTimer = useRef<number | null>(null);
   const toastTimer = useRef<number | null>(null);
 
   useEffect(
     () => () => {
-      if (submitTimer.current !== null) window.clearTimeout(submitTimer.current);
       if (toastTimer.current !== null) window.clearTimeout(toastTimer.current);
     },
     [],
@@ -46,11 +58,20 @@ export function ContactForm() {
   ) {
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
+    setResponseMessage("");
     setSuccess(false);
   }
 
+  const handleTurnstileToken = useCallback((token: string) => {
+    setTurnstileToken(token);
+    if (token) {
+      setErrors((current) => ({ ...current, turnstile: undefined }));
+    }
+  }, []);
+
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
+    setResponseMessage("");
     setSuccess(false);
 
     if (!file) {
@@ -69,7 +90,7 @@ export function ContactForm() {
       setFileName("");
       setErrors((current) => ({
         ...current,
-        attachment: "Định dạng file chưa được hỗ trợ trong bản mô phỏng.",
+        attachment: "Định dạng file chưa được hỗ trợ.",
       }));
       return;
     }
@@ -102,6 +123,9 @@ export function ContactForm() {
       message: values.message.trim(),
     };
     const nextErrors = validateContactForm(normalizedValues);
+    if (!turnstileToken) {
+      nextErrors.turnstile = "Vui lòng hoàn tất xác minh chống spam.";
+    }
     setValues(normalizedValues);
     setErrors((current) => ({
       ...nextErrors,
@@ -110,17 +134,40 @@ export function ContactForm() {
 
     if (Object.keys(nextErrors).length > 0 || errors.attachment) return;
 
-    setSubmitting(true);
-    if (toastTimer.current !== null) window.clearTimeout(toastTimer.current);
-    submitTimer.current = window.setTimeout(() => {
-      setSubmitting(false);
+    startTransition(async () => {
+      const result = await submitContactAction({
+        ...normalizedValues,
+        budgetRange: normalizedValues.budget,
+        turnstileToken,
+      });
+      setTurnstileReset((current) => current + 1);
+
+      if (!result.success) {
+        setSuccess(false);
+        setResponseMessage(result.message);
+        setErrors((current) => ({
+          ...current,
+          fullName: firstFieldError(result.fieldErrors, "fullName"),
+          email: firstFieldError(result.fieldErrors, "email"),
+          phone: firstFieldError(result.fieldErrors, "phone"),
+          company: firstFieldError(result.fieldErrors, "company"),
+          collaborationType: firstFieldError(result.fieldErrors, "collaborationType"),
+          budget: firstFieldError(result.fieldErrors, "budgetRange"),
+          message: firstFieldError(result.fieldErrors, "message"),
+          turnstile: firstFieldError(result.fieldErrors, "turnstileToken"),
+        }));
+        return;
+      }
+
       setValues(initialContactFormValues);
       setFileName("");
       setErrors({});
+      setResponseMessage("");
       setSuccess(true);
       formRef.current?.reset();
+      if (toastTimer.current !== null) window.clearTimeout(toastTimer.current);
       toastTimer.current = window.setTimeout(() => setSuccess(false), 5_000);
-    }, 900);
+    });
   }
 
   const hasErrors = Object.values(errors).some(Boolean);
@@ -135,8 +182,8 @@ export function ContactForm() {
         >
           <CheckCircle2 className="mt-0.5 shrink-0" size={20} aria-hidden="true" />
           <span>
-            <strong className="block">Đã ghi nhận yêu cầu mô phỏng</strong>
-            Không có thông tin hoặc file nào được gửi hay lưu lại.
+            <strong className="block">Đã ghi nhận yêu cầu</strong>
+            Thông tin đã được lưu an toàn để quản trị viên xem xét.
           </span>
         </div>
       ) : null}
@@ -149,15 +196,15 @@ export function ContactForm() {
           Chia sẻ ý tưởng của bạn
         </h2>
         <p className="mt-3 max-w-2xl leading-7 text-[var(--text-secondary)]">
-          Form này chỉ mô phỏng quy trình tiếp nhận brief. Dữ liệu không được gửi tới máy chủ,
-          lưu trữ hoặc dùng để liên hệ thật.
+          Thông tin được dùng để đánh giá và phản hồi yêu cầu hợp tác. File đính kèm hiện vẫn chỉ
+          là giao diện xem trước và chưa được tải lên máy chủ.
         </p>
       </div>
 
       <form ref={formRef} className="mt-7" onSubmit={handleSubmit} noValidate>
-        {hasErrors ? (
+        {hasErrors || responseMessage ? (
           <p className="mb-5 rounded-[var(--radius-md)] bg-[color-mix(in_srgb,var(--danger)_10%,transparent)] px-4 py-3 text-sm text-[var(--danger)]" role="alert">
-            Vui lòng kiểm tra các trường được đánh dấu bên dưới.
+            {responseMessage || "Vui lòng kiểm tra các trường được đánh dấu bên dưới."}
           </p>
         ) : null}
 
@@ -175,24 +222,29 @@ export function ContactForm() {
                 accept={contactFileRules.accept}
                 onChange={handleFileChange}
                 aria-invalid={Boolean(errors.attachment)}
-                aria-describedby={
-                  errors.attachment
-                    ? "contact-attachment-note contact-attachment-error"
-                    : "contact-attachment-note"
-                }
+                aria-describedby={errors.attachment ? "contact-attachment-note contact-attachment-error" : "contact-attachment-note"}
                 className="sr-only"
               />
             </span>
             <span id="contact-attachment-note" className="sr-only">File chỉ được đọc tên, định dạng và kích thước trong trình duyệt; không được tải lên.</span>
             <ContactFieldError id="contact-attachment-error" message={errors.attachment} />
           </label>
+
+          <div className="sm:col-span-2">
+            <TurnstileWidget
+              action="contact"
+              onTokenChange={handleTurnstileToken}
+              resetSignal={turnstileReset}
+            />
+            <ContactFieldError id="contact-turnstile-error" message={errors.turnstile} />
+          </div>
         </fieldset>
 
         <Button type="submit" size="lg" disabled={submitting} className="mt-6 w-full sm:w-auto">
           {submitting ? (
-            <><LoaderCircle className="animate-spin" size={18} aria-hidden="true" /> Đang xử lý mock...</>
+            <><LoaderCircle className="animate-spin" size={18} aria-hidden="true" /> Đang gửi...</>
           ) : (
-            <><Send size={18} aria-hidden="true" /> Gửi yêu cầu mock</>
+            <><Send size={18} aria-hidden="true" /> Gửi yêu cầu</>
           )}
         </Button>
       </form>

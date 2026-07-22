@@ -1,9 +1,11 @@
 "use client";
 
 import { CheckCircle2, LoaderCircle } from "lucide-react";
-import { type FormEvent, useEffect, useRef, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useRef, useState, useTransition } from "react";
 
+import { submitCampaignAction } from "@/actions/submissions.actions";
 import { Button } from "@/components/common/Button";
+import { TurnstileWidget } from "@/components/common/TurnstileWidget";
 
 interface FormValues {
   fullName: string;
@@ -14,7 +16,7 @@ interface FormValues {
   note: string;
 }
 
-type FormErrors = Partial<Record<keyof FormValues, string>>;
+type FormErrors = Partial<Record<keyof FormValues | "turnstile", string>>;
 
 const initialValues: FormValues = {
   fullName: "",
@@ -53,23 +55,26 @@ function validate(values: FormValues): FormErrors {
 
 interface CampaignRegistrationFormProps {
   campaignTitle: string;
+  campaignSlug: string;
   disabled?: boolean;
 }
 
 export function CampaignRegistrationForm({
   campaignTitle,
+  campaignSlug,
   disabled = false,
 }: CampaignRegistrationFormProps) {
   const [values, setValues] = useState<FormValues>(initialValues);
   const [errors, setErrors] = useState<FormErrors>({});
-  const [submitting, setSubmitting] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReset, setTurnstileReset] = useState(0);
+  const [responseError, setResponseError] = useState("");
+  const [submitting, startTransition] = useTransition();
   const [success, setSuccess] = useState(false);
-  const submitTimer = useRef<number | null>(null);
   const toastTimer = useRef<number | null>(null);
 
   useEffect(
     () => () => {
-      if (submitTimer.current !== null) window.clearTimeout(submitTimer.current);
       if (toastTimer.current !== null) window.clearTimeout(toastTimer.current);
     },
     [],
@@ -78,8 +83,17 @@ export function CampaignRegistrationForm({
   function updateField<Key extends keyof FormValues>(field: Key, value: FormValues[Key]) {
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
+    setResponseError("");
     setSuccess(false);
   }
+
+  const handleTurnstileToken = useCallback((token: string) => {
+    setTurnstileToken(token);
+    if (token) {
+      setErrors((current) => ({ ...current, turnstile: undefined }));
+      setResponseError("");
+    }
+  }, []);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -94,18 +108,49 @@ export function CampaignRegistrationForm({
       note: values.note.trim(),
     };
     const nextErrors = validate(normalizedValues);
+    if (!turnstileToken) {
+      nextErrors.turnstile = "Vui lòng hoàn tất xác minh chống spam.";
+    }
     setValues(normalizedValues);
     setErrors(nextErrors);
 
     if (Object.keys(nextErrors).length > 0) return;
 
-    setSubmitting(true);
-    submitTimer.current = window.setTimeout(() => {
-      setSubmitting(false);
+    startTransition(async () => {
+      const result = await submitCampaignAction({
+        campaignSlug,
+        fullName: normalizedValues.fullName,
+        email: normalizedValues.email,
+        phone: normalizedValues.phone,
+        followedPlatform: normalizedValues.platform,
+        socialUsername: normalizedValues.username,
+        notes: normalizedValues.note,
+        turnstileToken,
+      });
+      setTurnstileReset((current) => current + 1);
+
+      if (!result.success) {
+        setSuccess(false);
+        setResponseError(result.message);
+        setErrors({
+          fullName: result.fieldErrors?.fullName?.[0],
+          email: result.fieldErrors?.email?.[0],
+          phone: result.fieldErrors?.phone?.[0],
+          platform: result.fieldErrors?.followedPlatform?.[0],
+          username: result.fieldErrors?.socialUsername?.[0],
+          note: result.fieldErrors?.notes?.[0],
+          turnstile: result.fieldErrors?.turnstileToken?.[0],
+        });
+        return;
+      }
+
       setValues(initialValues);
+      setErrors({});
+      setResponseError("");
       setSuccess(true);
+      if (toastTimer.current !== null) window.clearTimeout(toastTimer.current);
       toastTimer.current = window.setTimeout(() => setSuccess(false), 4_000);
-    }, 800);
+    });
   }
 
   return (
@@ -118,7 +163,7 @@ export function CampaignRegistrationForm({
           <CheckCircle2 className="mt-0.5 shrink-0" size={20} aria-hidden="true" />
           <span>
             <strong className="block">Đăng ký thành công</strong>
-            Đây là biểu mẫu mô phỏng; dữ liệu của bạn không được gửi hoặc lưu lại.
+            Thông tin tham gia đã được lưu để quản trị viên xem xét.
           </span>
         </div>
       ) : null}
@@ -131,17 +176,22 @@ export function CampaignRegistrationForm({
           Gửi thông tin cho “{campaignTitle}”
         </h2>
         <p className="mt-3 max-w-2xl leading-7 text-[var(--text-secondary)]">
-          Đây là form mock để kiểm tra trải nghiệm. Thông tin không được gửi, lưu trữ hoặc dùng cho liên hệ thật.
+          Thông tin được kiểm tra chống spam và lưu để phục vụ việc xét duyệt chiến dịch.
         </p>
       </div>
 
       {disabled ? (
         <p className="mt-6 rounded-[var(--radius-md)] bg-[var(--primary-soft)] px-4 py-3 text-sm font-semibold text-[var(--primary)]">
-          Chiến dịch đã kết thúc nên biểu mẫu hiện không nhận đăng ký.
+          Chiến dịch hiện chưa mở hoặc đã kết thúc nên biểu mẫu không nhận đăng ký.
         </p>
       ) : null}
 
       <form className="mt-7" onSubmit={handleSubmit} noValidate>
+        {responseError ? (
+          <p className="mb-5 rounded-[var(--radius-md)] bg-[color-mix(in_srgb,var(--danger)_10%,transparent)] px-4 py-3 text-sm text-[var(--danger)]" role="alert">
+            {responseError}
+          </p>
+        ) : null}
         <fieldset disabled={disabled || submitting} className="grid gap-5 sm:grid-cols-2">
           <label className="text-sm font-semibold text-[var(--text-primary)]">
             Họ tên <span aria-hidden="true" className="text-[var(--danger)]">*</span>
@@ -232,13 +282,22 @@ export function CampaignRegistrationForm({
               className={`${inputClasses} resize-y py-3`}
             />
           </label>
+
+          <div className="sm:col-span-2">
+            <TurnstileWidget
+              action="campaign_submission"
+              onTokenChange={handleTurnstileToken}
+              resetSignal={turnstileReset}
+            />
+            {errors.turnstile ? <span className="mt-1 block text-xs text-[var(--danger)]">{errors.turnstile}</span> : null}
+          </div>
         </fieldset>
 
         <Button type="submit" size="lg" disabled={disabled || submitting} className="mt-6 w-full sm:w-auto">
           {submitting ? (
             <><LoaderCircle className="animate-spin" size={18} aria-hidden="true" /> Đang xử lý...</>
           ) : (
-            "Gửi đăng ký mock"
+            "Gửi đăng ký"
           )}
         </Button>
       </form>

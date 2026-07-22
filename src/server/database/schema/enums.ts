@@ -86,6 +86,8 @@ export const campaignStatusEnum = pgEnum("campaign_status", [
 
 export const submissionStatusEnum = pgEnum("submission_status", [
   "new",
+  "read",
+  "replied",
   "reviewing",
   "accepted",
   "rejected",

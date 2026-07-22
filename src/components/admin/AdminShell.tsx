@@ -18,6 +18,7 @@ import {
   GalleryHorizontalEnd,
   Gauge,
   ImageIcon,
+  Inbox,
   Link2,
   LogOut,
   MenuIcon,
@@ -46,6 +47,7 @@ const navigationIcons = {
   gallery: ImageIcon,
   events: CalendarDays,
   campaigns: GalleryHorizontalEnd,
+  submissions: Inbox,
   appearance: MonitorCog,
   settings: Settings,
 } as const;
@@ -58,6 +60,7 @@ const navigationPermissions = {
   gallery: "media:manage",
   events: "content:view",
   campaigns: "content:view",
+  submissions: "submissions:view",
   appearance: "settings:manage",
   settings: "settings:manage",
 } as const satisfies Record<
@@ -169,8 +172,8 @@ export function AdminShell({
               role={currentUser.role}
             />
             <div className="admin-demo-note">
-              <Tag color="gold">DEMO</Tag>
-              <p>Xác thực thật; bảng và thao tác nội dung vẫn dùng dữ liệu mock.</p>
+              <Tag color="gold">MVP</Tag>
+              <p>Khu vực quản trị có phân quyền; một số tích hợp ngoài phạm vi vẫn là bản MVP.</p>
             </div>
           </Sider>
 
@@ -188,8 +191,8 @@ export function AdminShell({
               role={currentUser.role}
             />
             <div className="admin-demo-note">
-              <Tag color="gold">DEMO</Tag>
-              <p>Xác thực thật; bảng và thao tác nội dung vẫn dùng dữ liệu mock.</p>
+              <Tag color="gold">MVP</Tag>
+              <p>Khu vực quản trị có phân quyền; một số tích hợp ngoài phạm vi vẫn là bản MVP.</p>
             </div>
           </Drawer>
 
@@ -207,7 +210,7 @@ export function AdminShell({
                 <strong>{selectedItem.label}</strong>
               </div>
               <Tag color="purple" className="admin-header-tag">
-                Dữ liệu mock
+                Admin MVP
               </Tag>
               <div className="admin-user-summary">
                 <span>{currentUser.displayName}</span>

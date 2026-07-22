@@ -71,3 +71,17 @@ export type {
   VideoMutationInput,
   VideoProcessingStatus,
 } from "./video-admin";
+export type {
+  AdminCampaignSubmission,
+  AdminContactSubmission,
+  AdminNewsletterSubscription,
+  AdminSubmissionPage,
+  CampaignSubmissionInput,
+  ContactSubmissionInput,
+  NewsletterStatus,
+  NewsletterSubscriptionInput,
+  PublicSubmissionActionResult,
+  SubmissionCampaignOption,
+  SubmissionResource,
+  SubmissionStatus,
+} from "./submissions";

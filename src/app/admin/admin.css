@@ -1058,6 +1058,15 @@
   cursor: pointer;
 }
 
+.admin-submission-toolbar {
+  width: 100%;
+  margin-bottom: 18px;
+}
+
+.admin-submission-toolbar > .ant-input-affix-wrapper {
+  width: min(100%, 360px);
+}
+
 @media (max-width: 1100px) {
   .admin-appearance-grid { grid-template-columns: 1fr; }
   .admin-media-upload-panel,

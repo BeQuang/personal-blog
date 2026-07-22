@@ -9,7 +9,7 @@ export interface ContactFormValues {
 }
 
 export type ContactFormErrors = Partial<
-  Record<keyof ContactFormValues | "attachment", string>
+  Record<keyof ContactFormValues | "attachment" | "turnstile", string>
 >;
 
 export type UpdateContactField = <Key extends keyof ContactFormValues>(
