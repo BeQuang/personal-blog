@@ -8,7 +8,6 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/common/Button";
 import { SocialLinksDialog } from "@/components/layout/SocialLinksDialog";
 import { mainNavigation } from "@/config/navigation.config";
-import { siteConfig } from "@/config/site.config";
 import { cn } from "@/utils/cn";
 import type { SocialLink } from "@/types";
 
@@ -18,7 +17,7 @@ function isActiveRoute(pathname: string, href: string): boolean {
     : pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function MobileMenu({ socialLinks }: { socialLinks: readonly SocialLink[] }) {
+export function MobileMenu({ socialLinks, siteName }: { socialLinks: readonly SocialLink[]; siteName: string }) {
   const pathname = usePathname();
 
   return (
@@ -43,7 +42,7 @@ export function MobileMenu({ socialLinks }: { socialLinks: readonly SocialLink[]
                 Menu
               </Dialog.Title>
               <Dialog.Description className="mt-0.5 text-xs text-[var(--text-muted)]">
-                {siteConfig.siteName}
+                {siteName}
               </Dialog.Description>
             </div>
             <Dialog.Close asChild>

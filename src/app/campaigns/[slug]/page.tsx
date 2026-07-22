@@ -16,20 +16,21 @@ import {
   getPublicCampaigns,
 } from "@/services/campaign.service";
 import { formatDateTime } from "@/utils/date";
+import { getSiteSettings } from "@/server/services/settings.service";
 
 interface CampaignPageProps {
   params: Promise<{ slug: string }>;
 }
 
-export function generateStaticParams() {
-  return getPublicCampaigns().map((campaign) => ({ slug: campaign.slug }));
+export async function generateStaticParams() {
+  return (await getPublicCampaigns()).map((campaign) => ({ slug: campaign.slug }));
 }
 
 export async function generateMetadata({
   params,
 }: CampaignPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const campaign = getPublicCampaignBySlug(slug);
+  const [campaign, settings] = await Promise.all([getPublicCampaignBySlug(slug), getSiteSettings()]);
 
   if (!campaign) {
     notFound();
@@ -53,13 +54,13 @@ export async function generateMetadata({
       description: campaign.description,
       images: [campaign.banner],
     },
-  });
+  }, settings);
 }
 
 export default async function CampaignDetailPage({ params }: CampaignPageProps) {
   await connection();
   const { slug } = await params;
-  const campaign = getPublicCampaignBySlug(slug);
+  const campaign = await getPublicCampaignBySlug(slug);
 
   if (!campaign) {
     notFound();
@@ -67,6 +68,7 @@ export default async function CampaignDetailPage({ params }: CampaignPageProps) 
 
   const effectiveStatus = getEffectiveCampaignStatus(campaign);
   const isEnded = effectiveStatus === "ended";
+  const canSubmit = !isEnded && campaign.submissionEnabled !== false;
 
   return (
     <article className="pb-20 sm:pb-24">
@@ -170,25 +172,27 @@ export default async function CampaignDetailPage({ params }: CampaignPageProps) 
           </section>
         </div>
 
-        <div className="mt-14 border-t border-[var(--border)] pt-12">
+        {campaign.submissionEnabled !== false ? <div className="mt-14 border-t border-[var(--border)] pt-12">
           <CampaignParticipation
             title={campaign.title}
             status={effectiveStatus}
             startAt={campaign.startAt}
             endAt={campaign.endAt}
           />
-        </div>
+        </div> : null}
 
         <aside className="mt-14 rounded-[var(--radius-xl)] border border-[var(--border-strong)] bg-[linear-gradient(135deg,color-mix(in_srgb,var(--primary)_16%,var(--surface)),color-mix(in_srgb,var(--secondary)_10%,var(--surface)))] p-7 text-center sm:p-10">
           <h2 className="text-2xl font-bold tracking-[-0.03em]">
-            {isEnded ? "Khám phá chiến dịch khác" : "Sẵn sàng tham gia?"}
+            {canSubmit ? "Sẵn sàng tham gia?" : "Khám phá chiến dịch khác"}
           </h2>
           <p className="mx-auto mt-3 max-w-xl leading-7 text-[var(--text-secondary)]">
-            {isEnded
-              ? "Chiến dịch này đã kết thúc, nhưng vẫn còn nhiều hoạt động khác để bạn khám phá."
+            {!canSubmit
+              ? campaign.submissionEnabled === false
+                ? "Chiến dịch hiện không nhận đăng ký mới. Bạn có thể khám phá các hoạt động khác."
+                : "Chiến dịch này đã kết thúc, nhưng vẫn còn nhiều hoạt động khác để bạn khám phá."
               : "Đọc kỹ thể lệ rồi gửi biểu mẫu mock để hoàn tất trải nghiệm đăng ký."}
           </p>
-          {isEnded ? (
+          {!canSubmit ? (
             <LinkButton href="/campaigns" size="lg" variant="outline" className="mt-6">
               <ArrowLeft size={18} aria-hidden="true" /> Xem các chiến dịch
             </LinkButton>

@@ -35,12 +35,19 @@ export type {
 export type { LoginActionState } from "./auth";
 export type {
   ActionFieldErrors,
+  AdminCampaign,
+  AdminEvent,
+  AdminGalleryItem,
   AdminActionResult,
   AdminPost,
   AdminPostStatus,
+  CampaignMutationInput,
+  EventMutationInput,
+  GalleryMutationInput,
   MediaOption,
   PostMutationInput,
   SocialLinkMutationInput,
+  SiteSettingsMutationInput,
   TaxonomyItem,
   TaxonomyMutationInput,
 } from "./content-admin";

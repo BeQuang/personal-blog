@@ -14,4 +14,6 @@ export interface Campaign {
   rules: readonly string[];
   terms: readonly string[];
   featured: boolean;
+  submissionEnabled?: boolean;
+  submissionLimit?: number;
 }

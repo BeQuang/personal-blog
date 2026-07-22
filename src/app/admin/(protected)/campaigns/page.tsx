@@ -1,19 +1,16 @@
 import type { Metadata } from "next";
 
-import { requireAdminPagePermission } from "@/server/auth";
-import { AdminResourceTable } from "@/components/admin/AdminResourceTable";
-import { getAdminRows } from "@/lib/admin-data";
+import { AdminCampaignsManager } from "@/components/admin/AdminCampaignsManager";
+import { hasPermission, requireAdminPagePermission } from "@/server/auth";
+import { getAdminCampaigns } from "@/server/services/campaigns.service";
 import { getMediaPickerItems } from "@/server/services/media.service";
 
 export const metadata: Metadata = { title: "Chiến dịch" };
 
 export default async function AdminCampaignsPage() {
-  await requireAdminPagePermission("content:view");
-  const mediaOptions = (await getMediaPickerItems()).map((item) => ({
-    id: item.id,
-    label: item.alt || item.originalFilename,
-    publicUrl: item.publicUrl,
-  }));
-
-  return <AdminResourceTable resource="campaigns" description="Quản lý trạng thái, thời gian và nội dung nổi bật của chiến dịch demo." initialRows={getAdminRows("campaigns")} mediaOptions={mediaOptions} supportsFeatured />;
+  const currentUser = await requireAdminPagePermission("content:view");
+  const canWrite = hasPermission(currentUser.role, "content:write");
+  const [campaigns, mediaRows] = await Promise.all([getAdminCampaigns(), canWrite ? getMediaPickerItems() : Promise.resolve([])]);
+  const mediaOptions = mediaRows.map((item) => ({ id: item.id, label: item.alt || item.originalFilename, publicUrl: item.publicUrl }));
+  return <AdminCampaignsManager campaigns={campaigns} mediaOptions={mediaOptions} canWrite={canWrite} canPublish={hasPermission(currentUser.role, "content:publish")} />;
 }

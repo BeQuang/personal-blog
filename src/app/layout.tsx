@@ -5,9 +5,9 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { RouteChrome } from "@/components/layout/RouteChrome";
-import { siteConfig } from "@/config/site.config";
 import { themeStorageKey } from "@/config/theme.config";
 import { getEnabledSocialLinks } from "@/services/social.service";
+import { getSiteSettings } from "@/server/services/settings.service";
 
 import "./globals.css";
 
@@ -18,17 +18,19 @@ const beVietnamPro = Be_Vietnam_Pro({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.siteUrl),
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  return {
+  metadataBase: new URL(settings.siteUrl),
   title: {
-    default: siteConfig.siteName,
-    template: `%s | ${siteConfig.siteName}`,
+    default: settings.defaultSeoTitle ?? settings.siteName,
+    template: `%s | ${settings.siteName}`,
   },
-  description: siteConfig.siteDescription,
-  authors: [{ name: siteConfig.creatorName }],
-  creator: siteConfig.creatorName,
-  publisher: siteConfig.siteName,
-  applicationName: siteConfig.siteName,
+  description: settings.defaultSeoDescription ?? settings.siteDescription,
+  authors: [{ name: settings.creatorName }],
+  creator: settings.creatorName,
+  publisher: settings.siteName,
+  applicationName: settings.siteName,
   keywords: [
     "Quang Official",
     "sáng tạo nội dung",
@@ -41,22 +43,22 @@ export const metadata: Metadata = {
     type: "website",
     locale: "vi_VN",
     url: "/",
-    siteName: siteConfig.siteName,
-    title: siteConfig.siteName,
-    description: siteConfig.siteDescription,
-    images: [
+    siteName: settings.siteName,
+    title: settings.defaultSeoTitle ?? settings.siteName,
+    description: settings.defaultSeoDescription ?? settings.siteDescription,
+    images: settings.coverImage ? [
       {
-        url: siteConfig.coverImage,
-        alt: `Ảnh giới thiệu ${siteConfig.creatorName}`,
+        url: settings.coverImage,
+        alt: `Ảnh giới thiệu ${settings.creatorName}`,
       },
-    ],
+    ] : [],
   },
   twitter: {
     card: "summary_large_image",
-    title: siteConfig.siteName,
-    description: siteConfig.siteDescription,
-    creator: siteConfig.username,
-    images: [siteConfig.coverImage],
+    title: settings.defaultSeoTitle ?? settings.siteName,
+    description: settings.defaultSeoDescription ?? settings.siteDescription,
+    creator: settings.username,
+    images: settings.coverImage ? [settings.coverImage] : [],
   },
   robots: {
     index: true,
@@ -69,15 +71,17 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
-};
+  };
+}
 
-const themeInitializationScript = `
+function createThemeInitializationScript(defaultMode: "light" | "dark" | "system") {
+return `
   (() => {
     try {
       const storedTheme = localStorage.getItem(${JSON.stringify(themeStorageKey)});
       const preference = ["light", "dark", "system"].includes(storedTheme)
         ? storedTheme
-        : ${JSON.stringify(siteConfig.theme.mode)};
+        : ${JSON.stringify(defaultMode)};
       const resolvedTheme = preference === "system"
         ? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
         : preference;
@@ -86,17 +90,19 @@ const themeInitializationScript = `
       root.dataset.themePreference = preference;
       root.style.colorScheme = resolvedTheme;
     } catch {
-      document.documentElement.dataset.theme = ${JSON.stringify(siteConfig.theme.mode === "light" ? "light" : "dark")};
+      document.documentElement.dataset.theme = ${JSON.stringify(defaultMode === "light" ? "light" : "dark")};
     }
   })();
 `;
+}
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const socialLinks = await getEnabledSocialLinks();
+  const [socialLinks, settings] = await Promise.all([getEnabledSocialLinks(), getSiteSettings()]);
+  const themeInitializationScript = createThemeInitializationScript(settings.theme.mode);
 
   return (
     <html
@@ -109,13 +115,13 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInitializationScript }} />
       </head>
       <body>
-        <ThemeProvider defaultTheme={siteConfig.theme.mode}>
+        <ThemeProvider defaultTheme={settings.theme.mode}>
           <a href="#main-content" className="skip-link">
             Chuyển đến nội dung chính
           </a>
           <RouteChrome
-            header={<Header socialLinks={socialLinks} />}
-            footer={<Footer socialLinks={socialLinks} />}
+            header={<Header socialLinks={socialLinks} settings={settings} />}
+            footer={<Footer socialLinks={socialLinks} settings={settings} />}
           >
             {children}
           </RouteChrome>

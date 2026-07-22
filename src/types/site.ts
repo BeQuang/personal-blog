@@ -47,6 +47,8 @@ export interface SiteConfig {
   creatorName: string;
   username: string;
   contactEmail: string;
+  defaultSeoTitle?: string;
+  defaultSeoDescription?: string;
   theme: ThemeSettings;
   navigation: readonly NavigationItem[];
   homepageSections: Record<HomepageSectionKey, boolean>;

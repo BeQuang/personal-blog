@@ -26,7 +26,7 @@ export const metadata: Metadata = withSocialMetadata({
 export default async function CampaignsPage() {
   await connection();
   const referenceDate = new Date();
-  const campaigns = getPublicCampaigns().map((campaign) => ({
+  const campaigns = (await getPublicCampaigns()).map((campaign) => ({
     ...campaign,
     status: getEffectiveCampaignStatus(campaign, referenceDate),
   }));

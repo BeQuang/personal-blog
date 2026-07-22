@@ -1,5 +1,8 @@
 import type { PostContentBlock } from "./post";
 import type { SocialPlatform } from "./social";
+import type { EventScheduleItem, EventStatus, EventType } from "./event";
+import type { CampaignStatus } from "./campaign";
+import type { HomepageSectionKey, NavigationItem, ThemeSettings } from "./site";
 
 export type AdminPostStatus = "draft" | "scheduled" | "published" | "archived";
 
@@ -72,6 +75,125 @@ export interface SocialLinkMutationInput {
   description?: string | null;
   enabled: boolean;
   order: number;
+}
+
+export interface AdminGalleryItem {
+  id: string;
+  mediaAssetId: string;
+  imageUrl: string;
+  title: string;
+  caption: string | null;
+  category: string;
+  alt: string;
+  sortOrder: number;
+  status: AdminPostStatus;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GalleryMutationInput {
+  mediaAssetId: string;
+  title: string;
+  caption?: string | null;
+  category: string;
+  alt: string;
+  sortOrder: number;
+  status: AdminPostStatus;
+  publishedAt?: string | null;
+}
+
+export interface AdminEvent {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  bannerMediaId: string | null;
+  bannerUrl: string | null;
+  type: EventType;
+  eventStatus: EventStatus;
+  contentStatus: AdminPostStatus;
+  startAt: string;
+  endAt: string | null;
+  timezone: string;
+  location: string | null;
+  platform: string | null;
+  externalUrl: string | null;
+  schedule: readonly EventScheduleItem[];
+  featured: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface EventMutationInput {
+  title: string;
+  slug?: string;
+  description: string;
+  bannerMediaId: string;
+  type: EventType;
+  eventStatus: EventStatus;
+  contentStatus: AdminPostStatus;
+  startAt: string;
+  endAt?: string | null;
+  timezone: string;
+  location?: string | null;
+  platform?: string | null;
+  externalUrl?: string | null;
+  schedule?: readonly EventScheduleItem[];
+  featured: boolean;
+}
+
+export interface AdminCampaign {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  bannerMediaId: string | null;
+  bannerUrl: string | null;
+  startAt: string;
+  endAt: string;
+  status: CampaignStatus;
+  buttonLabel: string;
+  buttonUrl: string | null;
+  rules: readonly string[];
+  terms: readonly string[];
+  featured: boolean;
+  submissionEnabled: boolean;
+  submissionLimit: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CampaignMutationInput {
+  title: string;
+  slug?: string;
+  description: string;
+  bannerMediaId: string;
+  startAt: string;
+  endAt: string;
+  status: CampaignStatus;
+  buttonLabel: string;
+  buttonUrl?: string | null;
+  rules: readonly string[];
+  terms: readonly string[];
+  featured: boolean;
+  submissionEnabled: boolean;
+  submissionLimit?: number | null;
+}
+
+export interface SiteSettingsMutationInput {
+  siteName: string;
+  siteDescription: string;
+  creatorName: string;
+  username: string;
+  contactEmail: string;
+  avatarMediaId?: string | null;
+  coverMediaId?: string | null;
+  defaultSeoTitle?: string | null;
+  defaultSeoDescription?: string | null;
+  theme: ThemeSettings;
+  homepageSections: Record<HomepageSectionKey, boolean>;
+  navigation: readonly NavigationItem[];
 }
 
 export type ActionFieldErrors = Readonly<Record<string, readonly string[]>>;

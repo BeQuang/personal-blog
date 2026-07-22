@@ -15,6 +15,8 @@ export function mapSettingsRowToSiteConfig(row: SettingsWithMedia, siteUrl: stri
     creatorName: row.creatorName,
     username: row.username,
     contactEmail: row.contactEmail,
+    ...(row.defaultSeoTitle ? { defaultSeoTitle: row.defaultSeoTitle } : {}),
+    ...(row.defaultSeoDescription ? { defaultSeoDescription: row.defaultSeoDescription } : {}),
     theme: row.theme,
     navigation: row.navigation,
     homepageSections: row.homepageSections,

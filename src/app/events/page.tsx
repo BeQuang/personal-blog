@@ -20,8 +20,8 @@ export const metadata: Metadata = withSocialMetadata({
   },
 });
 
-export default function EventsPage() {
-  const events = getEvents();
+export default async function EventsPage() {
+  const events = await getEvents();
   const types = Array.from(new Set(events.map((event) => event.type))) as EventType[];
 
   return (

@@ -21,5 +21,7 @@ export function mapCampaignRowToCampaign(row: CampaignWithMedia): Campaign {
     rules: row.rules,
     terms: row.terms,
     featured: row.featured,
+    submissionEnabled: row.submissionEnabled,
+    ...(row.submissionLimit ? { submissionLimit: row.submissionLimit } : {}),
   };
 }

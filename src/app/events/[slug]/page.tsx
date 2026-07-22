@@ -8,22 +8,22 @@ import { LinkButton } from "@/components/common/Button";
 import { Container } from "@/components/common/Container";
 import { EventShareButtons } from "@/components/events/EventShareButtons";
 import { eventStatusLabels, eventTypeLabels } from "@/config/event.config";
-import { siteConfig } from "@/config/site.config";
 import { withSocialMetadata } from "@/lib/metadata";
 import { getEventBySlug, getEvents } from "@/services/event.service";
+import { getSiteSettings } from "@/server/services/settings.service";
 import { formatDate, formatTime } from "@/utils/date";
 
 interface EventPageProps {
   params: Promise<{ slug: string }>;
 }
 
-export function generateStaticParams() {
-  return getEvents().map((event) => ({ slug: event.slug }));
+export async function generateStaticParams() {
+  return (await getEvents()).map((event) => ({ slug: event.slug }));
 }
 
 export async function generateMetadata({ params }: EventPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const event = getEventBySlug(slug);
+  const [event, settings] = await Promise.all([getEventBySlug(slug), getSiteSettings()]);
 
   if (!event) {
     notFound();
@@ -47,19 +47,19 @@ export async function generateMetadata({ params }: EventPageProps): Promise<Meta
       description: event.description,
       images: [event.banner],
     },
-  });
+  }, settings);
 }
 
 export default async function EventDetailPage({ params }: EventPageProps) {
   const { slug } = await params;
-  const event = getEventBySlug(slug);
+  const [event, settings] = await Promise.all([getEventBySlug(slug), getSiteSettings()]);
 
   if (!event) {
     notFound();
   }
 
   const venue = event.location ?? event.platform ?? "Trực tuyến";
-  const canonicalUrl = new URL(`/events/${event.slug}`, siteConfig.siteUrl).toString();
+  const canonicalUrl = new URL(`/events/${event.slug}`, settings.siteUrl).toString();
   const canJoin =
     event.externalUrl && event.status !== "ended" && event.status !== "cancelled";
 

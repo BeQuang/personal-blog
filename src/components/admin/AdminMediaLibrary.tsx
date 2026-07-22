@@ -57,6 +57,7 @@ async function readImageDimensions(file: File) {
 
 interface AdminMediaLibraryProps {
   data: MediaLibraryPage;
+  showHeader?: boolean;
   filters: {
     query: string;
     mimeType: MediaMimeType | "all";
@@ -64,7 +65,7 @@ interface AdminMediaLibraryProps {
   };
 }
 
-export function AdminMediaLibrary({ data, filters }: AdminMediaLibraryProps) {
+export function AdminMediaLibrary({ data, filters, showHeader = true }: AdminMediaLibraryProps) {
   const { message, modal } = App.useApp();
   const router = useRouter();
   const [query, setQuery] = useState(filters.query);
@@ -158,10 +159,10 @@ export function AdminMediaLibrary({ data, filters }: AdminMediaLibraryProps) {
 
   return (
     <>
-      <AdminPageHeader
+      {showHeader ? <AdminPageHeader
         title="Media Library"
         description="Upload ảnh trực tiếp lên Cloudflare R2 bằng presigned URL và quản lý media thật trong PostgreSQL."
-      />
+      /> : null}
 
       <section className="admin-panel admin-media-upload-panel" aria-labelledby="media-upload-title">
         <div>

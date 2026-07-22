@@ -19,8 +19,8 @@ export const metadata: Metadata = withSocialMetadata({
   },
 });
 
-export default function GalleryPage() {
-  const items = getGalleryItems();
+export default async function GalleryPage() {
+  const items = await getGalleryItems();
   const categories = Array.from(new Set(items.map((item) => item.category))).sort(
     (a, b) => a.localeCompare(b, "vi-VN"),
   );

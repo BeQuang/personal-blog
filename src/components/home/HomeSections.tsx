@@ -23,12 +23,12 @@ import { HeroMedia } from "@/components/home/HeroMedia";
 import { NewsletterForm } from "@/components/home/NewsletterForm";
 import { SocialLinksDialog } from "@/components/layout/SocialLinksDialog";
 import { homepageConfig } from "@/config/homepage.config";
-import { siteConfig } from "@/config/site.config";
 import type {
   BlogPost,
   EventItem,
   GalleryItem,
   SocialLink,
+  SiteConfig,
   VideoItem,
 } from "@/types";
 import { formatDate, formatDateTime, formatDay, formatMonthYear } from "@/utils/date";
@@ -49,7 +49,7 @@ const eventStatusLabels: Record<EventItem["status"], string> = {
   cancelled: "Đã hủy",
 };
 
-export function HeroSection({ links }: { links: readonly SocialLink[] }) {
+export function HeroSection({ links, settings }: { links: readonly SocialLink[]; settings: SiteConfig }) {
   const config = homepageConfig.hero;
 
   return (
@@ -57,8 +57,8 @@ export function HeroSection({ links }: { links: readonly SocialLink[] }) {
       <Container className="hero-grid">
         <div className="hero-copy">
           <p className="hero-eyebrow"><Sparkles size={16} aria-hidden="true" />{config.eyebrow}</p>
-          <h1 id="hero-title">Xin chào, mình là <span>{siteConfig.creatorName}</span>.</h1>
-          <p className="hero-username">{siteConfig.username}</p>
+          <h1 id="hero-title">Xin chào, mình là <span>{settings.creatorName}</span>.</h1>
+          <p className="hero-username">{settings.username}</p>
           <p className="hero-description">{config.description}</p>
 
           <ul className="hero-topics" aria-label="Chủ đề nội dung">
@@ -83,9 +83,9 @@ export function HeroSection({ links }: { links: readonly SocialLink[] }) {
         </div>
 
         <HeroMedia
-          avatar={siteConfig.avatar}
-          coverImage={siteConfig.coverImage}
-          creatorName={siteConfig.creatorName}
+          avatar={settings.avatar}
+          coverImage={settings.coverImage}
+          creatorName={settings.creatorName}
         />
       </Container>
     </section>

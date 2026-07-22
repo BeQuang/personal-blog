@@ -3,10 +3,9 @@ import Link from "next/link";
 import { Container } from "@/components/common/Container";
 import { SocialIcon } from "@/components/common/SocialIcon";
 import { footerNavigation, legalNavigation } from "@/config/navigation.config";
-import { siteConfig } from "@/config/site.config";
-import type { SocialLink } from "@/types";
+import type { SiteConfig, SocialLink } from "@/types";
 
-export function Footer({ socialLinks }: { socialLinks: readonly SocialLink[] }) {
+export function Footer({ socialLinks, settings }: { socialLinks: readonly SocialLink[]; settings: SiteConfig }) {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -22,11 +21,11 @@ export function Footer({ socialLinks }: { socialLinks: readonly SocialLink[] }) 
                 Q
               </span>
               <span className="font-bold text-[var(--text-primary)]">
-                {siteConfig.siteName}
+                {settings.siteName}
               </span>
             </Link>
             <p className="mt-4 text-sm leading-6 text-[var(--text-secondary)]">
-              {siteConfig.siteDescription}
+              {settings.siteDescription}
             </p>
             <ul className="mt-5 flex flex-wrap gap-2" aria-label="Mạng xã hội">
               {socialLinks.map((link) => (
@@ -35,7 +34,7 @@ export function Footer({ socialLinks }: { socialLinks: readonly SocialLink[] }) 
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={`${link.label} của ${siteConfig.creatorName}`}
+                    aria-label={`${link.label} của ${settings.creatorName}`}
                     className="grid size-10 place-items-center rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] transition-colors hover:border-[var(--primary)] hover:text-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]"
                   >
                     <SocialIcon platform={link.platform} size={18} />
@@ -80,13 +79,13 @@ export function Footer({ socialLinks }: { socialLinks: readonly SocialLink[] }) 
               ))}
             </ul>
             <p className="mt-5 text-xs leading-5 text-[var(--text-muted)]">
-              Liên hệ hợp tác: {siteConfig.contactEmail}
+              Liên hệ hợp tác: {settings.contactEmail}
             </p>
           </div>
         </div>
 
         <div className="mt-10 flex flex-col gap-2 border-t border-[var(--border)] pt-6 text-xs text-[var(--text-muted)] sm:flex-row sm:items-center sm:justify-between">
-          <p>© {currentYear} {siteConfig.siteName}. Mọi quyền được bảo lưu.</p>
+          <p>© {currentYear} {settings.siteName}. Mọi quyền được bảo lưu.</p>
           <p>Nội dung được xây dựng với sự tôn trọng cộng đồng.</p>
         </div>
       </Container>
