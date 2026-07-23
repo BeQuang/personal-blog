@@ -2,6 +2,16 @@
 
 Quang Official là website cá nhân dành cho content creator, tập trung vào bài viết, video, hình ảnh, sự kiện và chiến dịch cộng đồng. Dự án gồm website public, Admin CMS, PostgreSQL/Drizzle, Supabase Authentication/RBAC, R2 media, Mux video, form/email và analytics nội bộ.
 
+## Bắt đầu cho thành viên mới và AI
+
+```bash
+npm run ai:start
+```
+
+Sau đó đọc `PROJECT_SPEC.md`, `docs/ai-map/SYSTEM_MAP.md` và tài liệu domain tương ứng trong `docs/features/`. Lệnh start quét lại source để lập inventory route, component, Server Action, service, repository, schema, environment và reverse dependencies, rồi in checklist mở đầu phiên. Dùng `npm run ai:check` trong CI để phát hiện map đã cũ.
+
+Prompt mẫu cho AI không tự đọc `AGENTS.md` nằm trong `AI_START_HERE.md`. Trên PowerShell bị chặn `npm.ps1`, dùng `npm.cmd run ai:start`.
+
 ## Giao diện
 
 Phần public sử dụng phong cách creator hiện đại, hỗ trợ light/dark/system theme, card nội dung giàu hình ảnh và bố cục responsive. Phần admin có sidebar, bảng dữ liệu Ant Design, CRUD có kiểm tra quyền và trình chỉnh giao diện với preview riêng. Ảnh minh họa fallback được đặt trong `public/images/creator/`.
