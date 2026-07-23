@@ -90,6 +90,7 @@ Anonymous session trong DB là SHA-256 hash. Referrer chỉ giữ domain. Metada
 - hỗ trợ date range
 - hiển thị totals/trend/breakdown/recent events
 - dùng uPlot cho chart
+- chart lắng nghe `ResizeObserver`, co theo content container và bị chặn overflow để không phá chiều ngang dashboard
 
 Dashboard ghi “ước tính phiên duy nhất”; không mô tả hash session là user identity.
 

@@ -1,6 +1,6 @@
 # Environment map
 
-> Generated artifact — source fingerprint: `4d689e1cad1696a94e78ce4e1931bca6d670fb8bbbc18b1ecb89c7509e31fa15`
+> Generated artifact — source fingerprint: `8252c88eef46471c254b01d8b5d8224d2f9e547cf7019f773dc7147e06d07749`
 
 Không ghi giá trị secret vào tài liệu hoặc log. “Có trong .env.example” chỉ nói biến đã được tài liệu hóa, không có nghĩa là biến luôn bắt buộc trong mọi chế độ.
 

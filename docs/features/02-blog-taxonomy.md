@@ -16,6 +16,8 @@ Tại `/admin/posts`:
 - Bật/tắt featured.
 - Quản lý category và tag.
 
+Page dùng `getAdminPostsPageData` để kiểm tra `content:view` đúng một lần và tạo toàn bộ DTO cho manager. Bốn lượt đọc repository được thực hiện tuần tự theo thứ tự posts → categories → tags → media; không đổi thành một `Promise.all` khi production vẫn dùng pool serverless nhỏ.
+
 Editor có `content:write` nhưng không publish/schedule. Admin/super admin có `content:publish`.
 
 ## Source ownership
@@ -27,7 +29,7 @@ Editor có `content:write` nhưng không publish/schedule. Admin/super admin có
 | Public facade | `src/services/post.service.ts` |
 | Actions | `posts.actions.ts`, `taxonomies.actions.ts` |
 | Validation | `src/server/validation/posts.validation.ts` |
-| Services | `posts.service.ts`, `taxonomies.service.ts` |
+| Services | `admin-posts-page.service.ts`, `posts.service.ts`, `taxonomies.service.ts` |
 | Repositories | `posts.repository.ts`, `categories.repository.ts`, `tags.repository.ts` |
 | Mapper/types | `posts.mapper.ts`, `types/post.ts`, `types/content-admin.ts` |
 | Schema | `schema/posts.ts` |
@@ -72,6 +74,7 @@ Post/taxonomy mutation revalidate:
 - Dùng `AdminPostEditorModal`, `AdminTaxonomyManager`, `AdminMediaPicker`.
 - Dùng `createSlug/parseSlug/slugSchema`; không tự viết slug helper mới.
 - Public page chỉ gọi facade `@/services/post.service`.
+- Admin Posts page chỉ gọi `getAdminPostsPageData`; không ghép lại bốn service read riêng ở page.
 
 ## Kiểm tra
 
@@ -84,3 +87,4 @@ npm run type-check
 
 Kiểm tra thêm metadata/404 cho slug, scheduled date, duplicate slug và permission editor.
 
+Khi thay đổi page loader, mô phỏng `NODE_ENV=production` với `DATABASE_POOL_MAX=2`; loader phải hoàn tất và không phát sinh nhóm từ ba database query song song.

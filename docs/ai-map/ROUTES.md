@@ -1,6 +1,6 @@
 # Route map
 
-> Generated artifact — source fingerprint: `4d689e1cad1696a94e78ce4e1931bca6d670fb8bbbc18b1ecb89c7509e31fa15`
+> Generated artifact — source fingerprint: `8252c88eef46471c254b01d8b5d8224d2f9e547cf7019f773dc7147e06d07749`
 
 Route group như `(protected)` không tạo URL segment. Route Handler của Next.js 16 dùng Web Request/Response API và không cache mặc định.
 
@@ -14,7 +14,7 @@ Route group như `(protected)` không tạo URL segment. Route Handler của Nex
 | `/admin/events` | Admin page | PAGE | `src/app/admin/(protected)/events/page.tsx` | `src/components/admin/AdminEventsManager.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/events.service.ts`<br>`src/server/services/media.service.ts` |
 | `/admin/gallery` | Admin page | PAGE | `src/app/admin/(protected)/gallery/page.tsx` | `src/components/admin/AdminGalleryManager.tsx`<br>`src/components/admin/AdminMediaLibrary.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/gallery.service.ts`<br>`src/server/services/media.service.ts`<br>`src/types/index.ts` |
 | `/admin/login` | Admin page | PAGE | `src/app/admin/login/page.tsx` | `src/actions/auth.actions.ts`<br>`src/components/admin/AdminLoginForm.tsx`<br>`src/server/auth/index.ts` |
-| `/admin/posts` | Admin page | PAGE | `src/app/admin/(protected)/posts/page.tsx` | `src/components/admin/AdminPostsManager.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/posts.service.ts`<br>`src/server/services/taxonomies.service.ts` |
+| `/admin/posts` | Admin page | PAGE | `src/app/admin/(protected)/posts/page.tsx` | `src/components/admin/AdminPostsManager.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/admin-posts-page.service.ts` |
 | `/admin/settings` | Admin page | PAGE | `src/app/admin/(protected)/settings/page.tsx` | `src/components/admin/AdminSettingsForm.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/media.service.ts`<br>`src/server/services/settings.service.ts` |
 | `/admin/social-links` | Admin page | PAGE | `src/app/admin/(protected)/social-links/page.tsx` | `src/components/admin/AdminSocialLinksManager.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/social-links.service.ts` |
 | `/admin/submissions` | Admin page | PAGE | `src/app/admin/(protected)/submissions/page.tsx` | `src/components/admin/AdminSubmissionsManager.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/submissions.service.ts`<br>`src/types/index.ts` |

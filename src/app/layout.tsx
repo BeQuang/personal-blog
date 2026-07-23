@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Be_Vietnam_Pro } from "next/font/google";
+import { Suspense } from "react";
 
 import { AnalyticsProvider } from "@/components/analytics/AnalyticsProvider";
+import { NavigationProgressProvider } from "@/components/providers/NavigationProgressProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
@@ -117,6 +119,9 @@ export default async function RootLayout({
       </head>
       <body>
         <ThemeProvider defaultTheme={settings.theme.mode}>
+          <Suspense fallback={null}>
+            <NavigationProgressProvider />
+          </Suspense>
           <AnalyticsProvider />
           <a href="#main-content" className="skip-link">
             Chuyển đến nội dung chính

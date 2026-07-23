@@ -208,7 +208,7 @@ Không commit `.env.local` hoặc secret. Các biến bắt đầu bằng `NEXT_
 
 ### Biến Backend production
 
-- `DATABASE_POOL_MAX=1` là mặc định an toàn cho mỗi instance serverless. `DATABASE_URL` nên là Supavisor Transaction Pooler; `DIRECT_DATABASE_URL` nên là Direct connection hoặc Supavisor Session Pooler.
+- `DATABASE_POOL_MAX=2` là mặc định production cho mỗi instance serverless. Mức này giữ pool nhỏ nhưng cho phép các Server Component/layout đọc dữ liệu đồng thời; các page có từ ba lượt đọc DB trở lên phải dùng page-data service hoặc chạy tuần tự. `DATABASE_URL` nên là Supavisor Transaction Pooler; `DIRECT_DATABASE_URL` nên là Direct connection hoặc Supavisor Session Pooler.
 - R2 cần `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_PUBLIC_BASE_URL`. `MEDIA_ORPHAN_MIN_AGE_HOURS` mặc định là `24` để tránh xóa upload vừa cấp URL nhưng chưa confirm.
 - Mux cần `MUX_TOKEN_ID`, `MUX_TOKEN_SECRET`, `MUX_WEBHOOK_SECRET`.
 - Form thật cần `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `CONTACT_NOTIFICATION_EMAIL`.

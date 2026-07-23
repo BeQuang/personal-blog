@@ -21,6 +21,7 @@ import {
   allowedVideoMimeTypes,
   maximumVideoSizeBytes,
 } from "@/components/admin/AdminVideoUploadPanel";
+import { beginRequestProgress } from "@/lib/loading-progress";
 import type {
   ActionFieldErrors,
   AdminVideo,
@@ -140,6 +141,7 @@ export function AdminVideosManager({ videos, mediaOptions, canWrite, canPublish 
     }
     setUploadingId(stateId);
     setProgress(0);
+    const finishProgress = beginRequestProgress();
     try {
       const response = await fetch("/api/uploads/video-url", {
         method: "POST",
@@ -160,6 +162,7 @@ export function AdminVideosManager({ videos, mediaOptions, canWrite, canPublish 
       void message.error(error instanceof Error ? error.message : "Upload video thất bại.");
       return false;
     } finally {
+      finishProgress();
       setUploadingId(null);
       setProgress(null);
     }

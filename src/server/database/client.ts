@@ -24,7 +24,7 @@ const configuredPoolMaximum = z.coerce
   .int()
   .min(1)
   .max(10)
-  .default(process.env.NODE_ENV === "production" ? 1 : 5)
+  .default(process.env.NODE_ENV === "production" ? 2 : 5)
   .parse(process.env.DATABASE_POOL_MAX);
 
 export const postgresClient =

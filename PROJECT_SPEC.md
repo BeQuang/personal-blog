@@ -48,6 +48,7 @@ Backend là modular monolith chạy trong Next.js App Router:
 - Radix Dialog, Lucide icons.
 - Mux Player React cho video nội bộ.
 - uPlot cho biểu đồ analytics.
+- NProgress `0.2` cho phản hồi chuyển route và request client kéo dài; `loading.tsx`/Suspense cung cấp skeleton theo segment.
 
 ### Backend
 
@@ -64,7 +65,7 @@ Backend là modular monolith chạy trong Next.js App Router:
 
 - Node.js `>= 20.9.0`.
 - Route upload/video webhook dùng Node.js runtime.
-- `DATABASE_POOL_MAX` mặc định 1 ở production và 5 ở development.
+- `DATABASE_POOL_MAX` mặc định 2 ở production và 5 ở development; range hợp lệ 1–10.
 - PostgreSQL client dùng `prepare: false`, phù hợp transaction pooler.
 
 ## 4. Cấu trúc repository
@@ -157,6 +158,8 @@ Quy tắc:
 - Theme có layout `creator|minimal|magazine`, card style, button style, ba màu chủ đạo và border radius.
 - Script khởi tạo theme chạy trước hydrate để giảm flash sai theme.
 - `RouteChrome` kiểm soát chrome theo route.
+- `NavigationProgressProvider` theo dõi link nội bộ/history và kết thúc thanh progress khi pathname/search mới được commit; helper dùng chung bao quanh upload/API client có thời gian chờ đáng kể.
+- `src/app/loading.tsx` là fallback public dùng chung; admin protected có skeleton riêng để giữ shared shell trong lúc route stream.
 - `AnalyticsProvider` được đặt ở root và chỉ thu thập sau consent.
 
 ### 6.2. Trang chủ
@@ -280,6 +283,8 @@ Contact attachment hiện chưa đi vào server contract; không được mô t�
 
 Protected layout yêu cầu `dashboard:view`; từng page tiếp tục kiểm tra permission chuyên biệt.
 
+`/admin/posts` dùng `admin-posts-page.service.ts`: kiểm tra `content:view` một lần rồi đọc posts, categories, tags và media tuần tự để không làm nghẽn pool serverless. Audit Admin page không cho phép từ ba database operation độc lập trở lên chạy trong cùng một `Promise.all`; Gallery cũng tải ba nguồn theo thứ tự. Các page còn lại hiện có tối đa hai lượt đọc đồng thời, phù hợp pool production mặc định 2.
+
 ### 7.2. Khả năng quản trị
 
 - Search/filter/table pagination.
@@ -293,6 +298,8 @@ Protected layout yêu cầu `dashboard:view`; từng page tiếp tục kiểm tr
 - Site Settings/Appearance ghi PostgreSQL thật.
 
 Client chỉ dùng `canWrite/canPublish/canManage` để ẩn/vô hiệu UI; service vẫn kiểm tra lại permission.
+
+Admin desktop giữ sidebar cố định theo viewport và content chừa chiều rộng tương ứng; sidebar có vùng cuộn riêng. Toàn bộ route admin có nền sáng độc lập với public theme, chart/card bị giới hạn overflow nên dashboard dài hoặc resize không làm lộ nền dark hay phá layout.
 
 ## 8. Authentication và authorization
 

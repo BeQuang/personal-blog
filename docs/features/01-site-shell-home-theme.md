@@ -4,6 +4,7 @@
 
 - Mở `/` để xem hero, social, bài viết/video mới, gallery, events, campaign, newsletter và CTA hợp tác.
 - Dùng header/footer để điều hướng.
+- Khi chuyển route nội bộ, thanh NProgress ở mép trên và `loading.tsx` cung cấp phản hồi ngay nếu Server Component/API của route chưa hoàn tất.
 - Dùng theme toggle để chọn light/dark/system; lựa chọn được lưu ở browser.
 - Mobile menu và social dialog là interaction client-side dùng chung.
 
@@ -22,6 +23,7 @@
 | Layout UI | `src/components/layout/*` |
 | Homepage sections | `src/components/home/*` |
 | Theme provider | `src/components/providers/ThemeProvider.tsx` |
+| Route/API loading | `NavigationProgressProvider.tsx`, `src/lib/loading-progress.ts`, `src/app/loading.tsx` |
 | Static fallback | `src/config/site.config.ts`, `theme.config.ts`, `homepage.config.ts` |
 | Admin editors | `AdminSettingsForm.tsx`, `AdminAppearanceEditor.tsx` |
 | Mutation | `src/actions/settings.actions.ts` |
@@ -37,6 +39,19 @@ RootLayout/Home
 -> Server Components render section
 -> interaction boundary hydrate riêng
 ```
+
+Loading flow:
+
+```text
+Click link / router.push
+-> startNavigationProgress
+-> NProgress xuất hiện sau 120 ms nếu tác vụ chưa xong
+-> loading.tsx hiển thị fallback có ngữ nghĩa trong lúc route stream
+-> pathname/search mới được commit
+-> NavigationProgressProvider kết thúc progress
+```
+
+Các request client kéo dài có thể dùng `beginRequestProgress` hoặc `withLoadingProgress`. Không bọc analytics beacon nền để tránh làm phiền người đọc.
 
 Save flow:
 
@@ -65,6 +80,7 @@ Admin form
 - Navigation: `DesktopNavigation`, `MobileMenu`.
 - Social UI: `SocialIcon`, `SocialLinksDialog`.
 - Theme state: `ThemeProvider`/`useTheme`; không tạo store theme thứ hai.
+- Loading dùng `LoadingState`, `NavigationProgressProvider` và helper `loading-progress`; không tạo progress singleton khác.
 
 ## Kiểm tra khi thay đổi
 
@@ -72,5 +88,5 @@ Admin form
 - Header/footer nhận settings mới sau save.
 - Tắt từng homepage section không để khoảng trống.
 - Avatar/cover R2 render qua `next/image`.
+- Route nội bộ chậm có progress, fallback không làm mất shared layout và progress luôn kết thúc khi URL mới được commit.
 - Chạy `npm run type-check`, `npm run build` và test responsive.
-

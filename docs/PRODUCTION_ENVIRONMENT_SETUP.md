@@ -32,7 +32,7 @@ NEXT_PUBLIC_ANALYTICS_ENABLED=false
 
 # PostgreSQL runtime — Supavisor Transaction Pooler
 DATABASE_URL=postgresql://replace-runtime-pooler-url
-DATABASE_POOL_MAX=1
+DATABASE_POOL_MAX=2
 
 # Chỉ cần trong migration job/runner, không cần ở app runtime bình thường
 DIRECT_DATABASE_URL=postgresql://replace-direct-or-session-pooler-url
@@ -88,7 +88,7 @@ Hai biến `AUTH_TEST_PROTECTED_PATH` và `AUTH_TEST_PROTECTED_STATUS` chỉ là
 | Content | `USE_DATABASE_CONTENT` | Bắt buộc `true` |
 | Analytics | `NEXT_PUBLIC_ANALYTICS_ENABLED` | Đặt rõ `true` hoặc `false` |
 | Database | `DATABASE_URL` | Bắt buộc ở runtime |
-| Database | `DATABASE_POOL_MAX` | Khuyến nghị `1` trên serverless |
+| Database | `DATABASE_POOL_MAX` | Khuyến nghị `2` trên serverless |
 | Migration | `DIRECT_DATABASE_URL` | Bắt buộc ở migration runner |
 | Supabase | `NEXT_PUBLIC_SUPABASE_URL` | Bắt buộc |
 | Supabase | Một public/publishable key | Bắt buộc |
@@ -163,7 +163,7 @@ Không bật bootstrap thường trực trên serverless instances.
 - Supabase public và server keys.
 - R2, Mux, Turnstile, Resend, Upstash.
 - `DATABASE_URL`.
-- `DATABASE_POOL_MAX=1`.
+- `DATABASE_POOL_MAX=2`.
 - `BOOTSTRAP_ADMIN_ENABLED=false`.
 
 `R2_PUBLIC_BASE_URL` phải có ngay lúc build vì `next.config.ts` dùng nó để tạo remote image pattern.
@@ -269,7 +269,7 @@ Không dùng wildcard rộng cho production nếu không cần.
 
 ```env
 DATABASE_URL=postgresql://...
-DATABASE_POOL_MAX=1
+DATABASE_POOL_MAX=2
 ```
 
 ### Migration connection
@@ -481,4 +481,3 @@ Cập nhật:
 - DNS, SSL và redirect canonical.
 
 Sau đó rebuild/redeploy và chạy lại toàn bộ smoke checklist.
-

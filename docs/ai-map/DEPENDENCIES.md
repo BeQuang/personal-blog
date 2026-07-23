@@ -1,6 +1,6 @@
 # Package dependency map
 
-> Generated artifact — source fingerprint: `4d689e1cad1696a94e78ce4e1931bca6d670fb8bbbc18b1ecb89c7509e31fa15`
+> Generated artifact — source fingerprint: `8252c88eef46471c254b01d8b5d8224d2f9e547cf7019f773dc7147e06d07749`
 
 ## Runtime dependencies
 
@@ -20,6 +20,7 @@
 | `drizzle-orm` | `^0.45.2` |
 | `lucide-react` | `^1.24.0` |
 | `next` | `16.2.10` |
+| `nprogress` | `^0.2.0` |
 | `postgres` | `^3.4.9` |
 | `react` | `19.2.4` |
 | `react-dom` | `19.2.4` |
@@ -33,6 +34,7 @@
 | --- | --- |
 | `@tailwindcss/postcss` | `^4` |
 | `@types/node` | `^20` |
+| `@types/nprogress` | `^0.2.3` |
 | `@types/react` | `^19` |
 | `@types/react-dom` | `^19` |
 | `drizzle-kit` | `^0.31.10` |

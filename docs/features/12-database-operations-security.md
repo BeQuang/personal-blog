@@ -4,8 +4,14 @@
 
 - `DATABASE_URL`: runtime app, ưu tiên Supavisor transaction pooler.
 - `DIRECT_DATABASE_URL`: migration direct/session pooler.
-- `DATABASE_POOL_MAX`: 1 production, 5 development mặc định; range 1–10.
+- `DATABASE_POOL_MAX`: 2 production, 5 development mặc định; range 1–10. Mức 2 đã được xác minh với Supavisor transaction pooler và các route Admin.
 - Drizzle client dùng global reuse trong development và `prepare:false`.
+
+Quy tắc pool:
+
+- Không chạy từ ba database operation độc lập trở lên trong cùng một `Promise.all` ở Server page.
+- Page cần nhiều read model phải dùng page-data service, kiểm tra quyền một lần và điều phối repository tuần tự.
+- `/admin/posts` và `/admin/gallery` là regression cases bắt buộc kiểm tra khi đổi pool hoặc data-loading.
 
 Không import `database/client.ts` từ UI, page, action hoặc mapper; repository là boundary duy nhất.
 

@@ -12,6 +12,10 @@ import {
   deleteMediaAssetAction,
 } from "@/actions/media.actions";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import {
+  startNavigationProgress,
+  withLoadingProgress,
+} from "@/lib/loading-progress";
 import type {
   MediaAssetItem,
   MediaLibraryPage,
@@ -86,6 +90,7 @@ export function AdminMediaLibrary({ data, filters, showHeader = true }: AdminMed
     for (const [key, value] of Object.entries(values)) {
       if (value && value !== "all" && value !== 1) parameters.set(key, String(value));
     }
+    startNavigationProgress();
     router.replace(`/admin/gallery${parameters.size > 0 ? `?${parameters}` : ""}`);
   };
 
@@ -113,17 +118,18 @@ export function AdminMediaLibrary({ data, filters, showHeader = true }: AdminMed
         void message.error(upload.message);
         return;
       }
+      const uploadData = upload.data;
 
       try {
-        const response = await fetch(upload.data.uploadUrl, {
+        const response = await withLoadingProgress(() => fetch(uploadData.uploadUrl, {
           method: "PUT",
-          headers: upload.data.headers,
+          headers: uploadData.headers,
           body: file,
-        });
+        }));
         if (!response.ok) throw new Error(`R2 upload failed with HTTP ${response.status}`);
         const dimensions = await readImageDimensions(file);
         const confirmed = await confirmMediaUploadAction({
-          uploadTicket: upload.data.uploadTicket,
+          uploadTicket: uploadData.uploadTicket,
           alt: alt.trim() || null,
           ...dimensions,
         });

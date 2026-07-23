@@ -18,6 +18,7 @@ import { useState, useTransition } from "react";
 
 import { updateSubmissionStatusAction } from "@/actions/submissions.actions";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { startNavigationProgress } from "@/lib/loading-progress";
 import type {
   AdminCampaignSubmission,
   AdminContactSubmission,
@@ -97,6 +98,7 @@ export function AdminSubmissionsManager(props: Props) {
       if (value === undefined || value === "") params.delete(key);
       else params.set(key, String(value));
     }
+    startNavigationProgress();
     router.push(`/admin/submissions?${params.toString()}`);
   }
 
@@ -192,7 +194,10 @@ export function AdminSubmissionsManager(props: Props) {
             { key: "newsletter", label: "Newsletter" },
             { key: "campaign", label: "Người tham gia chiến dịch" },
           ]}
-          onChange={(resource) => router.push(`/admin/submissions?resource=${resource}`)}
+          onChange={(resource) => {
+            startNavigationProgress();
+            router.push(`/admin/submissions?resource=${resource}`);
+          }}
         />
 
         <Space wrap className="admin-submission-toolbar">

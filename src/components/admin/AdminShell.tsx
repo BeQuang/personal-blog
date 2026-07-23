@@ -31,6 +31,7 @@ import { useState } from "react";
 
 import { logoutAction } from "@/actions/auth.actions";
 import { adminNavigation } from "@/config/admin.config";
+import { startNavigationProgress } from "@/lib/loading-progress";
 import {
   hasPermission,
   type Permission,
@@ -131,6 +132,8 @@ export function AdminShell({
 
   const navigate = (href: string) => {
     setDrawerOpen(false);
+    if (href === pathname) return;
+    startNavigationProgress();
     router.push(href);
   };
 

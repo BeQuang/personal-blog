@@ -13,7 +13,7 @@ export function RouteChrome({ children, header, footer }: RouteChromeProps) {
   const isAdminRoute = pathname === "/admin" || pathname.startsWith("/admin/");
 
   if (isAdminRoute) {
-    return <main id="main-content">{children}</main>;
+    return <main id="main-content" className="admin-route-root">{children}</main>;
   }
 
   return (

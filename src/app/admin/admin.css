@@ -1,16 +1,34 @@
+.admin-route-root {
+  min-width: 0;
+  min-height: 100dvh;
+  color: #172033;
+  background: #f5f7fb;
+}
+
 .admin-shell {
-  min-height: 100vh;
+  display: block;
+  min-width: 0;
+  min-height: 100dvh;
   color: #172033;
   background: #f5f7fb;
 }
 
 .admin-desktop-sider {
-  position: sticky !important;
-  top: 0;
+  position: fixed !important;
   z-index: 20;
-  height: 100vh;
+  inset: 0 auto 0 0;
+  height: 100dvh;
+  overflow-y: auto;
   border-right: 1px solid #e7eaf0;
   box-shadow: 8px 0 30px rgba(15, 23, 42, 0.04);
+}
+
+.admin-shell > .ant-layout {
+  width: calc(100% - 252px);
+  min-width: 0;
+  min-height: 100dvh;
+  margin-inline-start: 252px;
+  background: #f5f7fb;
 }
 
 .admin-brand {
@@ -244,7 +262,9 @@
 
 .admin-content {
   min-width: 0;
+  overflow-x: clip;
   padding: 24px 28px 48px;
+  background: #f5f7fb;
 }
 
 .admin-content > .ant-breadcrumb {
@@ -407,8 +427,14 @@
 }
 
 .admin-dashboard-card {
+  min-width: 0;
   height: 100%;
   border-color: #e7eaf0 !important;
+}
+
+.admin-dashboard-card .ant-card-body {
+  min-width: 0;
+  overflow: hidden;
 }
 
 .admin-chart {
@@ -471,6 +497,11 @@
 @media (max-width: 991px) {
   .admin-desktop-sider {
     display: none;
+  }
+
+  .admin-shell > .ant-layout {
+    width: 100%;
+    margin-inline-start: 0;
   }
 
   .admin-menu-button {
@@ -1107,8 +1138,13 @@
 
 .admin-analytics-chart {
   width: 100%;
+  max-width: 100%;
   min-height: 320px;
-  overflow-x: auto;
+  overflow: hidden;
+}
+
+.admin-analytics-chart .uplot {
+  max-width: 100%;
 }
 
 .admin-ranked-list {
@@ -1161,4 +1197,112 @@
   .admin-analytics-filters,
   .admin-analytics-custom-range { align-items: stretch; }
   .admin-analytics-custom-range { display: grid; width: 100%; grid-template-columns: 1fr; }
+}
+
+.admin-route-loading {
+  display: grid;
+  min-height: calc(100dvh - 120px);
+  align-content: start;
+  gap: 18px;
+}
+
+.admin-loading-heading {
+  display: grid;
+  gap: 9px;
+}
+
+.admin-loading-heading span,
+.admin-loading-toolbar,
+.admin-loading-card span,
+.admin-loading-card strong,
+.admin-loading-card small,
+.admin-loading-panel {
+  overflow: hidden;
+  border-radius: 8px;
+  background:
+    linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, .8) 48%, transparent 66%),
+    #e8ebf2;
+  background-size: 220% 100%;
+  animation: admin-loading-shimmer 1.4s ease-in-out infinite;
+}
+
+.admin-loading-heading span:first-child {
+  width: min(340px, 70%);
+  height: 34px;
+}
+
+.admin-loading-heading span:last-child {
+  width: min(620px, 90%);
+  height: 16px;
+}
+
+.admin-loading-toolbar {
+  height: 66px;
+  border: 1px solid #eaecf0;
+  border-radius: 12px;
+}
+
+.admin-loading-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-loading-card {
+  display: grid;
+  min-height: 148px;
+  gap: 15px;
+  padding: 24px;
+  border: 1px solid #e7eaf0;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.admin-loading-card span {
+  width: 42%;
+  height: 14px;
+}
+
+.admin-loading-card strong {
+  width: 28%;
+  height: 32px;
+}
+
+.admin-loading-card small {
+  width: 62%;
+  height: 12px;
+}
+
+.admin-loading-panel {
+  min-height: 330px;
+  border: 1px solid #e7eaf0;
+  border-radius: 12px;
+}
+
+@keyframes admin-loading-shimmer {
+  from { background-position: 120% 0; }
+  to { background-position: -120% 0; }
+}
+
+@media (max-width: 1199px) {
+  .admin-loading-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575px) {
+  .admin-loading-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-loading-heading span,
+  .admin-loading-toolbar,
+  .admin-loading-card span,
+  .admin-loading-card strong,
+  .admin-loading-card small,
+  .admin-loading-panel {
+    animation: none;
+  }
 }

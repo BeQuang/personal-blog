@@ -16,6 +16,7 @@ import { useState } from "react";
 
 import { AdminAnalyticsChart } from "@/components/admin/AdminAnalyticsChart";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { startNavigationProgress } from "@/lib/loading-progress";
 import type {
   AnalyticsDashboardData,
   AnalyticsRankedItem,
@@ -80,6 +81,7 @@ export function AdminDashboard({
 
   function navigate(from: string, to: string, page = 1) {
     const params = new URLSearchParams({ from, to, page: String(page) });
+    startNavigationProgress();
     router.push(`/admin?${params.toString()}`);
   }
 

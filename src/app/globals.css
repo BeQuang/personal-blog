@@ -132,6 +132,39 @@ body {
     color var(--transition-base);
 }
 
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  position: fixed;
+  z-index: 99999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+  box-shadow: 0 0 12px color-mix(in srgb, var(--primary) 70%, transparent);
+}
+
+#nprogress .peg {
+  position: absolute;
+  right: 0;
+  display: block;
+  width: 110px;
+  height: 100%;
+  transform: rotate(2deg) translateY(-1px);
+  opacity: 1;
+  box-shadow:
+    0 0 10px var(--primary),
+    0 0 5px var(--primary);
+}
+
+#nprogress .spinner {
+  display: none;
+}
+
 button,
 input,
 textarea,

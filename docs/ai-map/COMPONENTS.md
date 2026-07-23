@@ -1,6 +1,6 @@
 # Component catalog
 
-> Generated artifact — source fingerprint: `4d689e1cad1696a94e78ce4e1931bca6d670fb8bbbc18b1ecb89c7509e31fa15`
+> Generated artifact — source fingerprint: `8252c88eef46471c254b01d8b5d8224d2f9e547cf7019f773dc7147e06d07749`
 
 Tra bảng này trước khi tạo component mới. “Client” chỉ ra module có directive `"use client"`; Server Component không có directive.
 
@@ -45,7 +45,7 @@ Tra bảng này trước khi tạo component mới. “Client” chỉ ra module
 | `src/components/common/Button.tsx` | `Button`, `LinkButton` | Server-compatible | `src/app/about/page.tsx`<br>`src/app/blog/[slug]/page.tsx`<br>`src/app/campaigns/[slug]/page.tsx`<br>`src/app/events/[slug]/page.tsx`<br>`src/app/newsletter/unsubscribe/page.tsx`<br>`src/app/not-found.tsx`<br>`src/components/analytics/AnalyticsProvider.tsx`<br>`src/components/blog/BlogExplorer.tsx`<br>`src/components/blog/FeaturedPost.tsx`<br>`src/components/blog/PostContent.tsx`<br>`src/components/campaigns/CampaignRegistrationForm.tsx`<br>`src/components/common/ThemeToggle.tsx`<br>`src/components/contact/ContactForm.tsx`<br>`src/components/events/EventExplorer.tsx`<br>`src/components/gallery/GalleryExplorer.tsx`<br>`src/components/home/GalleryLightbox.tsx`<br>`src/components/home/HomeSections.tsx`<br>`src/components/home/NewsletterForm.tsx`<br>`src/components/layout/MobileMenu.tsx`<br>`src/components/layout/SocialLinksDialog.tsx`<br>`src/components/videos/VideoExplorer.tsx`<br>`src/components/videos/VideoPlaybackTrigger.tsx` |
 | `src/components/common/Container.tsx` | `Container` | Server-compatible | `src/app/about/page.tsx`<br>`src/app/blog/[slug]/page.tsx`<br>`src/app/blog/page.tsx`<br>`src/app/campaigns/[slug]/page.tsx`<br>`src/app/campaigns/page.tsx`<br>`src/app/contact/page.tsx`<br>`src/app/events/[slug]/page.tsx`<br>`src/app/events/page.tsx`<br>`src/app/gallery/page.tsx`<br>`src/app/newsletter/unsubscribe/page.tsx`<br>`src/app/not-found.tsx`<br>`src/app/videos/page.tsx`<br>`src/components/home/ActiveCampaignSection.tsx`<br>`src/components/home/HomeSections.tsx`<br>`src/components/layout/Footer.tsx`<br>`src/components/layout/Header.tsx`<br>`src/components/legal/LegalDocument.tsx` |
 | `src/components/common/EmptyState.tsx` | `EmptyState` | Server-compatible | `src/components/blog/BlogExplorer.tsx`<br>`src/components/campaigns/CampaignGroup.tsx`<br>`src/components/events/EventExplorer.tsx`<br>`src/components/gallery/GalleryExplorer.tsx`<br>`src/components/videos/VideoExplorer.tsx` |
-| `src/components/common/LoadingState.tsx` | `LoadingState` | Server-compatible | Chưa có import nội bộ |
+| `src/components/common/LoadingState.tsx` | `LoadingState` | Server-compatible | `src/app/loading.tsx` |
 | `src/components/common/SectionHeader.tsx` | `SectionHeader` | Server-compatible | `src/app/about/page.tsx`<br>`src/components/home/HomeSections.tsx` |
 | `src/components/common/SocialIcon.tsx` | `SocialIcon` | Server-compatible | `src/app/about/page.tsx`<br>`src/app/contact/page.tsx`<br>`src/components/home/HomeSections.tsx`<br>`src/components/layout/Footer.tsx`<br>`src/components/layout/SocialLinksDialog.tsx` |
 | `src/components/common/ThemeToggle.tsx` | `ThemeToggle` | Client | `src/components/layout/Header.tsx` |
@@ -71,6 +71,7 @@ Tra bảng này trước khi tạo component mới. “Client” chỉ ra module
 | `src/components/layout/RouteChrome.tsx` | `RouteChrome` | Client | `src/app/layout.tsx` |
 | `src/components/layout/SocialLinksDialog.tsx` | `SocialLinksDialog` | Client | `src/components/home/HomeSections.tsx`<br>`src/components/layout/Header.tsx`<br>`src/components/layout/MobileMenu.tsx` |
 | `src/components/legal/LegalDocument.tsx` | `LegalDocument` | Server-compatible | `src/app/privacy/page.tsx`<br>`src/app/terms/page.tsx` |
+| `src/components/providers/NavigationProgressProvider.tsx` | `NavigationProgressProvider` | Client | `src/app/layout.tsx` |
 | `src/components/providers/ThemeProvider.tsx` | `ThemeProvider` | Client | `src/app/layout.tsx`<br>`src/components/common/ThemeToggle.tsx` |
 | `src/components/videos/FeaturedVideo.tsx` | `FeaturedVideo` | Server-compatible | `src/app/videos/page.tsx` |
 | `src/components/videos/VideoCard.tsx` | `VideoCard` | Server-compatible | `src/components/videos/FeaturedVideo.tsx`<br>`src/components/videos/VideoExplorer.tsx` |

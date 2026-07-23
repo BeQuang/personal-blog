@@ -4,6 +4,10 @@
 
 `AdminShell` cung cấp sidebar/navigation, current user, responsive behavior và logout. Ant Design được đăng ký trong admin layout để SSR style đúng; uPlot stylesheet chỉ được nạp ở admin.
 
+Sidebar desktop dùng vị trí cố định theo viewport, có vùng cuộn riêng và phần content chừa đúng 252 px. `admin-route-root`, shell và content cùng dùng nền admin sáng nên khi dashboard dài hơn viewport không lộ nền dark của website public. Dưới 992 px, sidebar desktop được thay bằng Drawer và content trở về toàn chiều rộng.
+
+Điều hướng menu gọi `startNavigationProgress` trước `router.push`; `app/admin/(protected)/loading.tsx` hiển thị skeleton trong content nhưng giữ nguyên sidebar/header tương tác được. Filter/pagination dùng router theo cùng quy ước. Upload R2/Mux kéo dài cũng tham gia NProgress, đồng thời vẫn giữ progress/nút pending chuyên biệt.
+
 Admin navigation hiện có:
 
 - Tổng quan
@@ -27,6 +31,7 @@ Tra các module này trước khi tạo UI CRUD:
 - `AdminMediaPicker`
 - `AdminMediaLibrary`
 - `AdminTaxonomyManager`
+- `NavigationProgressProvider` và helper `src/lib/loading-progress.ts`
 - các manager/editor chuyên domain
 - `admin-table-columns.tsx`
 - `admin-table.config.ts`
@@ -68,6 +73,7 @@ Cả hai form merge phần contract không hiển thị để tránh ghi mất s
 
 ## Server contract
 
+- Pool database mặc định production là 2. Admin page có từ ba nguồn DB độc lập trở lên phải gom vào page-data service hoặc await tuần tự; audit hiện tại đã áp dụng cho Posts và Gallery.
 - Settings/social mutation cần `settings:manage`.
 - Media picker cần `media:manage`; settings page hiện gọi picker nên role thực tế cần thỏa cả luồng dữ liệu. Admin/super admin có cả hai.
 - Settings là singleton `settingsKey=default`.
@@ -100,4 +106,7 @@ Không:
 - Reload vẫn còn dữ liệu.
 - Public route phản ánh revalidation.
 - Admin mobile/sidebar.
-
+- Cuộn dashboard dài: sidebar/header vẫn bám viewport, không xuất hiện khoảng đen hoặc tràn ngang.
+- Chuyển từng tab trên mạng chậm: NProgress/skeleton xuất hiện và tab mới được selected sau khi route hoàn tất.
+- Upload R2/Mux: progress toàn cục kết thúc cả khi request thành công lẫn lỗi; phần trăm upload video vẫn hoạt động.
+- Với `DATABASE_POOL_MAX=2`, `/admin/posts` và `/admin/gallery` phải render xong; không khôi phục `Promise.all` chứa ba hoặc bốn lượt đọc DB ở hai page này.
