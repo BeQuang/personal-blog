@@ -1,6 +1,6 @@
 # Route map
 
-> Generated artifact — source fingerprint: `c8d846849d6e498486c1365f5fddd909d4845af50346697582045d75492d953f`
+> Generated artifact — source fingerprint: `4d689e1cad1696a94e78ce4e1931bca6d670fb8bbbc18b1ecb89c7509e31fa15`
 
 Route group như `(protected)` không tạo URL segment. Route Handler của Next.js 16 dùng Web Request/Response API và không cache mặc định.
 

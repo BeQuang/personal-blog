@@ -9,6 +9,25 @@
 
 Không import `database/client.ts` từ UI, page, action hoặc mapper; repository là boundary duy nhất.
 
+## Các cờ môi trường quan trọng
+
+### `USE_DATABASE_CONTENT`
+
+- `false`: public pages đọc fixture mock; phù hợp khi phát triển UI không cần database.
+- `true`: public pages đọc PostgreSQL; bắt buộc cho staging/production và khi kiểm thử Backend thật.
+- Không khai báo/rỗng: tương đương `false`.
+- Giá trị ngoài lowercase `true|false`: ứng dụng fail fast.
+
+Admin/private reads và mutations vẫn cần database dù cờ này là `false`.
+
+### `BOOTSTRAP_ADMIN_ENABLED`
+
+- `true`: `predev`/`prestart` có thể tạo Admin đầu tiên, nhưng chỉ khi Supabase Auth chưa có user.
+- `false`: bỏ qua bootstrap; đây là giá trị bình thường sau khi Admin đầu tiên đã tồn tại.
+- Chỉ bật tạm thời trong lần khởi tạo project; sau đó tắt và xóa/rotate bootstrap password.
+
+Không bật lại trên environment đã có người dùng.
+
 ## Schema domains
 
 - Auth: `profiles`.
@@ -45,6 +64,8 @@ Nếu direct hostname không kết nối nhưng runtime pooler hoạt động, d
 - Fixture mock vẫn được giữ cho `USE_DATABASE_CONTENT=false`.
 
 ## Provider production setup
+
+Xem runbook đầy đủ và template production tại [`docs/PRODUCTION_ENVIRONMENT_SETUP.md`](../PRODUCTION_ENVIRONMENT_SETUP.md).
 
 ### R2
 
@@ -112,4 +133,3 @@ Chạy migration bằng job khóa riêng trước deploy, không chạy từ req
 - Data backfill strategy.
 - Rollout order tương thích app version cũ/mới.
 - Feature docs và `npm run ai:setup`.
-

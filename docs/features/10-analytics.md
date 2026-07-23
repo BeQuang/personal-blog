@@ -30,6 +30,27 @@ Client allowlist là subset phù hợp cho browser; conversion form được ghi
 
 Không dùng analytics helper khác hoặc gọi `fetch` trực tiếp nếu event hiện có đã hỗ trợ.
 
+## Cấu hình cờ analytics
+
+`NEXT_PUBLIC_ANALYTICS_ENABLED` là master switch cho cả client ingest và server conversion:
+
+- `true`: consent UI hoạt động; event client chỉ gửi sau khi user đồng ý; server conversion được ghi.
+- `false`: không hiển thị/thu thập analytics và server conversion cũng bỏ qua.
+- Không khai báo: implementation hiện tại xem như `true`.
+- Chỉ chuỗi lowercase chính xác `"false"` mới tắt; không dùng `0`, `FALSE`, `off` hoặc chuỗi rỗng.
+
+Khuyến nghị:
+
+| Environment | Giá trị |
+| --- | --- |
+| Local thông thường | `false` để không tạo dữ liệu nhiễu |
+| Local đang test analytics | `true` với database test |
+| Preview dùng chung production DB | `false` |
+| Staging có database riêng | `true` nếu cần test end-to-end |
+| Production | `true` sau privacy/consent review và khi retention scheduler đã cấu hình; nếu chưa thì `false` |
+
+Vì đây là biến `NEXT_PUBLIC_*`, thay đổi giá trị cần restart development server hoặc rebuild/redeploy.
+
 ## Ingest flow
 
 ```text
@@ -103,4 +124,3 @@ Dashboard ghi “ước tính phiên duy nhất”; không mô tả hash session
 npm run analytics:test
 npm run test:security
 ```
-

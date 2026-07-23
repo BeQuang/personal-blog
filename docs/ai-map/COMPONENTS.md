@@ -1,6 +1,6 @@
 # Component catalog
 
-> Generated artifact — source fingerprint: `c8d846849d6e498486c1365f5fddd909d4845af50346697582045d75492d953f`
+> Generated artifact — source fingerprint: `4d689e1cad1696a94e78ce4e1931bca6d670fb8bbbc18b1ecb89c7509e31fa15`
 
 Tra bảng này trước khi tạo component mới. “Client” chỉ ra module có directive `"use client"`; Server Component không có directive.
 

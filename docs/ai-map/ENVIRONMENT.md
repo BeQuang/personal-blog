@@ -1,13 +1,13 @@
 # Environment map
 
-> Generated artifact — source fingerprint: `c8d846849d6e498486c1365f5fddd909d4845af50346697582045d75492d953f`
+> Generated artifact — source fingerprint: `4d689e1cad1696a94e78ce4e1931bca6d670fb8bbbc18b1ecb89c7509e31fa15`
 
 Không ghi giá trị secret vào tài liệu hoặc log. “Có trong .env.example” chỉ nói biến đã được tài liệu hóa, không có nghĩa là biến luôn bắt buộc trong mọi chế độ.
 
 | Biến | Exposure | Trong .env.example | Được tham chiếu bởi |
 | --- | --- | --- | --- |
-| `AUTH_TEST_PROTECTED_PATH` | Server only | Không | `scripts/test-auth-flow.mjs` |
-| `AUTH_TEST_PROTECTED_STATUS` | Server only | Không | `scripts/test-auth-flow.mjs` |
+| `AUTH_TEST_PROTECTED_PATH` | Server only | Có | `scripts/test-auth-flow.mjs` |
+| `AUTH_TEST_PROTECTED_STATUS` | Server only | Có | `scripts/test-auth-flow.mjs` |
 | `BOOTSTRAP_ADMIN_DISPLAY_NAME` | Server only | Có | `scripts/bootstrap-admin.mjs` |
 | `BOOTSTRAP_ADMIN_EMAIL` | Server only | Có | `scripts/bootstrap-admin.mjs`<br>`scripts/test-auth-flow.mjs`<br>`src/server/services/seed.service.ts` |
 | `BOOTSTRAP_ADMIN_ENABLED` | Server only | Có | `scripts/bootstrap-admin.mjs` |

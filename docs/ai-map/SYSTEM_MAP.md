@@ -1,10 +1,10 @@
 # System map
 
-> Generated artifact — source fingerprint: `c8d846849d6e498486c1365f5fddd909d4845af50346697582045d75492d953f`
+> Generated artifact — source fingerprint: `4d689e1cad1696a94e78ce4e1931bca6d670fb8bbbc18b1ecb89c7509e31fa15`
 
 ## Snapshot
 
-- 308 file source/config đã quét, 61,989 dòng.
+- 308 file source/config đã quét, 62,006 dòng.
 - 25 page route.
 - 5 Route Handler.
 - 2 metadata route.

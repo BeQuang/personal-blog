@@ -1,6 +1,6 @@
 # Backend module map
 
-> Generated artifact — source fingerprint: `c8d846849d6e498486c1365f5fddd909d4845af50346697582045d75492d953f`
+> Generated artifact — source fingerprint: `4d689e1cad1696a94e78ce4e1931bca6d670fb8bbbc18b1ecb89c7509e31fa15`
 
 Luồng chuẩn: `page/client component → Server Action hoặc Route Handler → service → repository → Drizzle/PostgreSQL`. Public read có thêm facade `src/services`; DTO được chuẩn hóa ở mapper.
 

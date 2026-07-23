@@ -1,12 +1,12 @@
 # Full source index
 
-> Generated artifact — source fingerprint: `c8d846849d6e498486c1365f5fddd909d4845af50346697582045d75492d953f`
+> Generated artifact — source fingerprint: `4d689e1cad1696a94e78ce4e1931bca6d670fb8bbbc18b1ecb89c7509e31fa15`
 
 Index này bao phủ `src/`, `scripts/` và các file cấu hình gốc ảnh hưởng đến build/runtime. Hash ngắn giúp nhận ra file đổi; “Imported by” là reverse dependency nội bộ trực tiếp.
 
 | File | Loại | Dòng | Hash | Exports | Imported by |
 | --- | --- | --- | --- | --- | --- |
-| `.env.example` | project-config | 54 | `869c34612139` | — | — |
+| `.env.example` | project-config | 71 | `c44d201c86b4` | — | — |
 | `AGENTS.md` | project-config | 49 | `30b9cb65e5c3` | — | — |
 | `drizzle.config.ts` | project-config | 34 | `7f975d156148` | — | — |
 | `eslint.config.mjs` | project-config | 19 | `275a07c13fc7` | — | — |

@@ -482,8 +482,8 @@ Anonymous session là UUID trong `sessionStorage`; server lưu SHA-256 hash. Das
 ### App/public
 
 - `NEXT_PUBLIC_SITE_URL`: canonical origin.
-- `USE_DATABASE_CONTENT`: mock/database switch.
-- `NEXT_PUBLIC_ANALYTICS_ENABLED`: bật/tắt analytics collection.
+- `USE_DATABASE_CONTENT`: `false` dùng mock, `true` dùng PostgreSQL; production bắt buộc `true`.
+- `NEXT_PUBLIC_ANALYTICS_ENABLED`: `true` bật consent/collection, `false` tắt cả client và server analytics. Không khai báo hiện tương đương `true`; nên đặt rõ ràng theo environment.
 
 ### Database/Auth
 
@@ -495,6 +495,8 @@ Anonymous session là UUID trong `sessionStorage`; server lưu SHA-256 hash. Das
 - `SUPABASE_SECRET_KEY`
 - legacy: `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
 - bootstrap: `BOOTSTRAP_ADMIN_ENABLED`, `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_DISPLAY_NAME`, `BOOTSTRAP_ADMIN_PASSWORD`
+
+`BOOTSTRAP_ADMIN_ENABLED` chỉ nên là `true` trong lần tạo Admin đầu tiên trên Supabase Auth trống; sau đó luôn trả về `false`.
 
 ### R2
 

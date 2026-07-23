@@ -187,7 +187,7 @@ Chỉnh `src/data/campaigns.ts`. Campaign status `draft` không có route public
 | --- | --- | --- |
 | `NEXT_PUBLIC_SITE_URL` | Cần đặt khi deploy | Origin canonical của website, dùng cho metadata, sitemap và robots. Ví dụ `https://example.com`. |
 | `USE_DATABASE_CONTENT` | Mặc định `false` | Cầu nối migration cho server service mới: `false` đọc mock, `true` đọc PostgreSQL và không silently fallback khi query lỗi. |
-| `NEXT_PUBLIC_ANALYTICS_ENABLED` | Mặc định `true` | Tắt toàn bộ ingest/banner analytics khi đặt `false`; vẫn cần consent trước khi ghi event. |
+| `NEXT_PUBLIC_ANALYTICS_ENABLED` | Không đặt hiện tương đương `true` | `true` bật consent/collection; `false` tắt toàn bộ client và server analytics. Nên dùng `false` cho local/preview để tránh dữ liệu nhiễu và chỉ bật production sau privacy/retention setup. |
 | `NEXT_PUBLIC_GA_ID` | Dự phòng | Chưa tích hợp Google Analytics thật trong MVP. |
 | `NEXT_PUBLIC_META_PIXEL_ID` | Dự phòng | Chưa tích hợp Meta Pixel thật trong MVP. |
 | `NEXT_PUBLIC_TIKTOK_PIXEL_ID` | Dự phòng | Chưa tích hợp TikTok Pixel thật trong MVP. |
@@ -215,6 +215,8 @@ Không commit `.env.local` hoặc secret. Các biến bắt đầu bằng `NEXT_
 - Chỉ `NEXT_PUBLIC_SUPABASE_URL`, publishable/anon key, `NEXT_PUBLIC_SITE_URL`, Turnstile site key và cờ analytics được phép có tiền tố `NEXT_PUBLIC_`. Không đặt secret Supabase, R2, Mux, Resend, Turnstile hoặc Upstash dưới tiền tố này.
 
 ## Thiết lập Backend production
+
+Runbook đầy đủ theo thứ tự triển khai, template biến môi trường và checklist provider nằm tại [`docs/PRODUCTION_ENVIRONMENT_SETUP.md`](docs/PRODUCTION_ENVIRONMENT_SETUP.md).
 
 ### Supabase, migration và seed
 
