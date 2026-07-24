@@ -1,13 +1,15 @@
 "use client";
 
-import { App, Button, Form, Input, InputNumber, Modal, Select, Space, Switch, Table, Tag } from "antd";
+import { App, Button, Form, Input, InputNumber, Select, Space, Switch, Table, Tag } from "antd";
 import type { TableColumnsType } from "antd";
 import { Archive, Pencil, Plus } from "lucide-react";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { archiveCampaignAction, createCampaignAction, updateCampaignAction } from "@/actions/campaigns.actions";
+import { AdminDateTimePicker } from "@/components/admin/AdminDatePickers";
 import { AdminMediaPicker } from "@/components/admin/AdminMediaPicker";
+import { AdminModal } from "@/components/admin/AdminModal";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import type { AdminCampaign, CampaignMutationInput, MediaOption } from "@/types";
 
@@ -31,16 +33,16 @@ export function AdminCampaignsManager({ campaigns, mediaOptions, canWrite, canPu
   return <>
     <AdminPageHeader title="Chiến dịch" description="Quản lý chiến dịch, mốc thời gian và cấu hình nhận đăng ký bằng PostgreSQL." action={canWrite ? <Button type="primary" icon={<Plus size={17} />} onClick={() => edit(null)}>Thêm chiến dịch</Button> : undefined} />
     <section className="admin-panel admin-table-panel" aria-label="Danh sách chiến dịch"><Table rowKey="id" columns={columns} dataSource={[...campaigns]} loading={pending} scroll={{ x: 980 }} pagination={{ pageSize: 8, showSizeChanger: false }} locale={{ emptyText: "Chưa có chiến dịch." }} /></section>
-    <Modal width={760} title={editing ? "Sửa chiến dịch" : "Tạo chiến dịch"} open={open} onCancel={() => setOpen(false)} onOk={() => form.submit()} confirmLoading={pending} okText="Lưu" cancelText="Hủy" destroyOnHidden>
+    <AdminModal width={760} title={editing ? "Sửa chiến dịch" : "Tạo chiến dịch"} open={open} onCancel={() => setOpen(false)} onOk={() => form.submit()} confirmLoading={pending} okText="Lưu" cancelText="Hủy" destroyOnHidden>
       <Form form={form} layout="vertical" onFinish={submit} requiredMark="optional">
-        <Form.Item name="bannerMediaId" hidden rules={[{ required: true, message: "Hãy chọn banner." }]}><Input /></Form.Item><Form.Item label="Banner"><AdminMediaPicker items={mediaOptions} value={bannerId} label="Banner chiến dịch" onChange={(selection) => form.setFieldValue("bannerMediaId", selection?.id ?? "")} /></Form.Item>
+        <Form.Item name="bannerMediaId" hidden rules={[{ required: true, message: "Hãy chọn banner." }]}><Input /></Form.Item><Form.Item label="Banner"><AdminMediaPicker items={mediaOptions} value={bannerId} label="Banner chiến dịch" purpose="campaign_banner" onChange={(selection) => form.setFieldValue("bannerMediaId", selection?.id ?? "")} /></Form.Item>
         <Form.Item name="title" label="Tiêu đề" rules={[{ required: true, whitespace: true }]}><Input maxLength={180} /></Form.Item><Form.Item name="slug" label="Slug"><Input placeholder="Tự sinh nếu để trống" /></Form.Item>
         <Form.Item name="description" label="Mô tả" rules={[{ required: true, whitespace: true }]}><Input.TextArea rows={4} maxLength={5000} /></Form.Item>
-        <Space align="start" wrap><Form.Item name="startAt" label="Bắt đầu" rules={[{ required: true }]}><Input type="datetime-local" /></Form.Item><Form.Item name="endAt" label="Kết thúc" rules={[{ required: true }]}><Input type="datetime-local" /></Form.Item><Form.Item name="status" label="Trạng thái"><Select style={{ width: 140 }} disabled={!canPublish} options={["draft", "upcoming", "active", "ended"].map((value) => ({ value, label: value }))} /></Form.Item></Space>
+        <Space align="start" wrap><Form.Item name="startAt" label="Bắt đầu" rules={[{ required: true }]}><AdminDateTimePicker /></Form.Item><Form.Item name="endAt" label="Kết thúc" rules={[{ required: true }]}><AdminDateTimePicker /></Form.Item><Form.Item name="status" label="Trạng thái"><Select style={{ width: 140 }} disabled={!canPublish} options={["draft", "upcoming", "active", "ended"].map((value) => ({ value, label: value }))} /></Form.Item></Space>
         <Space align="start" wrap><Form.Item name="buttonLabel" label="Nhãn CTA" rules={[{ required: true }]}><Input /></Form.Item><Form.Item name="buttonUrl" label="URL CTA"><Input /></Form.Item></Space>
         <Form.Item name="rulesText" label="Thể lệ" extra="Mỗi dòng là một điều lệ" rules={[{ required: true, whitespace: true }]}><Input.TextArea rows={4} /></Form.Item><Form.Item name="termsText" label="Điều khoản" extra="Mỗi dòng là một điều khoản" rules={[{ required: true, whitespace: true }]}><Input.TextArea rows={4} /></Form.Item>
         <Space align="start" wrap><Form.Item name="featured" label="Nổi bật" valuePropName="checked"><Switch /></Form.Item><Form.Item name="submissionEnabled" label="Cho phép đăng ký" valuePropName="checked"><Switch /></Form.Item>{submissionEnabled ? <Form.Item name="submissionLimit" label="Giới hạn (tùy chọn)"><InputNumber min={1} /></Form.Item> : null}</Space>
       </Form>
-    </Modal>
+    </AdminModal>
   </>;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { App, Button, Form, Input, InputNumber, Modal, Select, Space, Table, Tag } from "antd";
+import { App, Button, Form, Input, InputNumber, Select, Space, Table, Tag } from "antd";
 import type { TableColumnsType } from "antd";
 import Image from "next/image";
 import { Pencil, Plus, Trash2 } from "lucide-react";
@@ -8,7 +8,9 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { createGalleryItemAction, deleteGalleryItemAction, updateGalleryItemAction } from "@/actions/gallery.actions";
+import { AdminDateTimePicker } from "@/components/admin/AdminDatePickers";
 import { AdminMediaPicker } from "@/components/admin/AdminMediaPicker";
+import { AdminModal } from "@/components/admin/AdminModal";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import type { AdminGalleryItem, GalleryMutationInput, MediaOption } from "@/types";
 
@@ -49,17 +51,17 @@ export function AdminGalleryManager({ items, mediaOptions, canWrite, canPublish 
   return <>
     <AdminPageHeader title="Hình ảnh" description="Quản lý Gallery public bằng PostgreSQL; file ảnh gốc tiếp tục được quản lý riêng trong Media Library." action={canWrite ? <Button type="primary" icon={<Plus size={17} />} onClick={() => edit(null)}>Thêm ảnh</Button> : undefined} />
     <section className="admin-panel admin-table-panel" aria-label="Danh sách Gallery"><Table rowKey="id" columns={columns} dataSource={[...items]} loading={pending} scroll={{ x: 760 }} pagination={{ pageSize: 12, showSizeChanger: false }} locale={{ emptyText: "Gallery chưa có item." }} /></section>
-    <Modal title={editing ? "Sửa Gallery item" : "Thêm Gallery item"} open={open} onCancel={() => setOpen(false)} onOk={() => form.submit()} confirmLoading={pending} okText="Lưu" cancelText="Hủy" destroyOnHidden>
+    <AdminModal title={editing ? "Sửa Gallery item" : "Thêm Gallery item"} open={open} onCancel={() => setOpen(false)} onOk={() => form.submit()} confirmLoading={pending} okText="Lưu" cancelText="Hủy" destroyOnHidden>
       <Form form={form} layout="vertical" onFinish={submit} requiredMark="optional">
         <Form.Item name="mediaAssetId" label="Ảnh" rules={[{ required: true, message: "Hãy chọn ảnh." }]}><Input hidden /></Form.Item>
-        <AdminMediaPicker items={mediaOptions} value={mediaId} label="Ảnh Gallery" onChange={(selection) => form.setFieldValue("mediaAssetId", selection?.id)} />
+        <AdminMediaPicker items={mediaOptions} value={mediaId} label="Ảnh Gallery" purpose="gallery" onChange={(selection) => form.setFieldValue("mediaAssetId", selection?.id)} />
         <Form.Item name="title" label="Tiêu đề" rules={[{ required: true, whitespace: true }]}><Input maxLength={180} /></Form.Item>
         <Form.Item name="alt" label="Alt text" rules={[{ required: true, whitespace: true }]}><Input maxLength={300} /></Form.Item>
         <Form.Item name="caption" label="Caption"><Input.TextArea rows={3} maxLength={500} /></Form.Item>
         <Space align="start" wrap><Form.Item name="category" label="Danh mục" rules={[{ required: true, whitespace: true }]}><Input /></Form.Item><Form.Item name="sortOrder" label="Thứ tự" rules={[{ required: true }]}><InputNumber min={0} /></Form.Item></Space>
         <Form.Item name="status" label="Trạng thái" rules={[{ required: true }]}><Select options={["draft", "scheduled", "published", "archived"].map((value) => ({ value, label: value }))} disabled={!canPublish} /></Form.Item>
-        <Form.Item noStyle shouldUpdate={(prev, next) => prev.status !== next.status}>{({ getFieldValue }) => getFieldValue("status") === "scheduled" || getFieldValue("status") === "published" ? <Form.Item name="publishedAt" label="Thời điểm xuất bản" rules={[{ required: getFieldValue("status") === "scheduled" }]} extra={getFieldValue("status") === "published" ? "Để trống để xuất bản ngay." : undefined}><Input type="datetime-local" /></Form.Item> : null}</Form.Item>
+        <Form.Item noStyle shouldUpdate={(prev, next) => prev.status !== next.status}>{({ getFieldValue }) => getFieldValue("status") === "scheduled" || getFieldValue("status") === "published" ? <Form.Item name="publishedAt" label="Thời điểm xuất bản" rules={[{ required: getFieldValue("status") === "scheduled" }]} extra={getFieldValue("status") === "published" ? "Để trống để xuất bản ngay." : undefined}><AdminDateTimePicker /></Form.Item> : null}</Form.Item>
       </Form>
-    </Modal>
+    </AdminModal>
   </>;
 }

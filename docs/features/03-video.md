@@ -6,6 +6,7 @@
 - Card giữ orientation landscape/portrait.
 - External video chỉ mở khi click.
 - Internal video dùng Mux playback; không autoplay.
+- Dialog phát video giới hạn theo viewport và tự cuộn nội dung trên màn hình thấp, không kéo trang nền.
 
 ## Quản trị
 
@@ -13,7 +14,7 @@ Tại `/admin/videos`:
 
 - Tạo external video cho YouTube/TikTok/Instagram/Facebook.
 - Upload video internal trực tiếp lên Mux.
-- Chọn thumbnail từ Media Library.
+- Chọn thumbnail từ Media Library hoặc tải ảnh thumbnail mới từ máy ngay trong picker.
 - Sửa metadata, publish/unpublish, featured và delete.
 - Xem processing state/error của Mux.
 
@@ -81,3 +82,4 @@ npm run type-check
 
 Test thủ công ready/failed/duplicate event, signature sai, external URL và playback mobile.
 
+Thumbnail tải từ picker dùng purpose `post_thumbnail`, được confirm vào Media Library và tự động gắn vào form video; việc này không thay đổi direct-upload flow của file video lên Mux.

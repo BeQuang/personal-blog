@@ -7,10 +7,11 @@
 - Khi chuyển route nội bộ, thanh NProgress ở mép trên và `loading.tsx` cung cấp phản hồi ngay nếu Server Component/API của route chưa hoàn tất.
 - Dùng theme toggle để chọn light/dark/system; lựa chọn được lưu ở browser.
 - Mobile menu và social dialog là interaction client-side dùng chung.
+- Dialog public giới hạn chiều cao theo viewport, khóa cuộn trang nền và dùng vùng cuộn riêng; mobile menu chỉ cuộn phần navigation để header/footer của menu vẫn ổn định.
 
 ## Quản trị
 
-- `/admin/settings`: sửa tên site, mô tả, creator, username, email, avatar, cover và SEO mặc định.
+- `/admin/settings`: sửa tên site, mô tả, creator, username, email, avatar, cover và SEO mặc định; avatar/cover có thể chọn từ Media Library hoặc tải trực tiếp từ máy trong picker.
 - `/admin/appearance`: sửa mode/layout/card/button/colors/border radius và bật/tắt section trang chủ.
 - Cả hai màn hình ghi vào `site_settings` qua `updateSiteSettingsAction`; không còn là local-only demo.
 
@@ -88,5 +89,6 @@ Admin form
 - Header/footer nhận settings mới sau save.
 - Tắt từng homepage section không để khoảng trống.
 - Avatar/cover R2 render qua `next/image`.
+- Tải avatar/cover từ picker phải tạo asset đúng purpose (`avatar`/`site_banner`), tự động chọn ảnh vừa tải và vẫn lưu settings bằng media ID.
 - Route nội bộ chậm có progress, fallback không làm mất shared layout và progress luôn kết thúc khi URL mới được commit.
 - Chạy `npm run type-check`, `npm run build` và test responsive.

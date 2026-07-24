@@ -1,8 +1,9 @@
 "use client";
 
-import { Form, Input, Modal, Select, Switch } from "antd";
+import { Form, Input, Select, Switch } from "antd";
 import { useEffect } from "react";
 
+import { AdminModal } from "@/components/admin/AdminModal";
 import { AdminMediaPicker } from "@/components/admin/AdminMediaPicker";
 import type {
   ActionFieldErrors,
@@ -88,7 +89,7 @@ export function AdminVideoEditorModal({
   };
 
   return (
-    <Modal
+    <AdminModal
       title={video ? "Chỉnh sửa video" : "Thêm video nền tảng ngoài"}
       open={open}
       width={760}
@@ -153,6 +154,7 @@ export function AdminVideoEditorModal({
             items={mediaOptions}
             value={thumbnailMediaId}
             label="Thumbnail"
+            purpose="post_thumbnail"
             onChange={(selection) => form.setFieldValue("thumbnailMediaId", selection?.id)}
           />
         </Form.Item>
@@ -160,6 +162,6 @@ export function AdminVideoEditorModal({
           <Switch />
         </Form.Item>
       </Form>
-    </Modal>
+    </AdminModal>
   );
 }

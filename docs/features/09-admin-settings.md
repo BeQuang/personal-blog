@@ -2,11 +2,13 @@
 
 ## Admin shell
 
-`AdminShell` cung cấp sidebar/navigation, current user, responsive behavior và logout. Ant Design được đăng ký trong admin layout để SSR style đúng; uPlot stylesheet chỉ được nạp ở admin.
+`AdminShell` cung cấp sidebar/navigation, current user, responsive behavior và logout. Ant Design được đăng ký trong admin layout để SSR style đúng, dùng locale `vi_VN`; uPlot stylesheet chỉ được nạp ở admin.
 
-Sidebar desktop dùng vị trí cố định theo viewport, có vùng cuộn riêng và phần content chừa đúng 252 px. `admin-route-root`, shell và content cùng dùng nền admin sáng nên khi dashboard dài hơn viewport không lộ nền dark của website public. Dưới 992 px, sidebar desktop được thay bằng Drawer và content trở về toàn chiều rộng.
+Sidebar desktop dùng vị trí cố định theo viewport, có vùng cuộn riêng và phần content chừa đúng 252 px. `admin-route-root`, shell và content cùng dùng nền admin sáng nên khi dashboard dài hơn viewport không lộ nền dark của website public. Card trong lưới dashboard được cân chiều cao theo hàng, còn card bảng độc lập phải giữ chiều cao tự nhiên theo nội dung để không tạo khoảng trắng và vùng cuộn giả. Dưới 992 px, sidebar desktop được thay bằng Drawer và content trở về toàn chiều rộng.
 
 Điều hướng menu gọi `startNavigationProgress` trước `router.push`; `app/admin/(protected)/loading.tsx` hiển thị skeleton trong content nhưng giữ nguyên sidebar/header tương tác được. Filter/pagination dùng router theo cùng quy ước. Upload R2/Mux kéo dài cũng tham gia NProgress, đồng thời vẫn giữ progress/nút pending chuyên biệt.
+
+Các trường ảnh dùng `AdminMediaPicker` thống nhất hai lựa chọn: chọn asset sẵn có trong Media Library hoặc tải ảnh từ máy. Nhánh tải mới gọi helper direct-to-R2 dùng chung, phân loại theo purpose của trường, confirm asset rồi tự động chọn media ID/URL vào form đang mở.
 
 Admin navigation hiện có:
 
@@ -26,6 +28,10 @@ Admin navigation hiện có:
 Tra các module này trước khi tạo UI CRUD:
 
 - `AdminPageHeader`
+- `AdminDateTimePicker`
+- `AdminDateRangePicker`
+- `AdminAnalyticsDateFilter`
+- `AdminModal`
 - `AdminResourceTable`
 - `AdminResourceEditorModal`
 - `AdminMediaPicker`
@@ -46,6 +52,10 @@ Server page fetch DTO + current permission
 -> toast + router.refresh
 -> Action revalidate server routes
 ```
+
+Mọi trường ngày/giờ trong Admin phải tái sử dụng `AdminDateTimePicker` hoặc `AdminDateRangePicker`. Không dùng `input type="date"`/`datetime-local`; picker hiển thị `DD/MM/YYYY`, hỗ trợ lịch tiếng Việt và chuyển lại chuỗi hiện hành trước khi gửi service để giữ nguyên server contract.
+
+Mọi form popup Ant Design trong Admin phải dùng `AdminModal`, không import `Modal` trực tiếp. Component này bật `scrollLock`, căn giữa và áp dụng trực tiếp semantic `styles` của Ant Design 6: wrapper `overflow: hidden`, container tối đa `80dvh`, header/footer không cuộn và chỉ body cuộn dọc với `overscroll-behavior: contain`. Quy tắc không phụ thuộc thứ tự stylesheet hoặc vị trí portal. Các hộp xác nhận tạo bởi `App.useApp().modal` dùng quy tắc overflow tương đương trong `admin.css`.
 
 ## Site Settings
 
@@ -106,7 +116,10 @@ Không:
 - Reload vẫn còn dữ liệu.
 - Public route phản ánh revalidation.
 - Admin mobile/sidebar.
-- Cuộn dashboard dài: sidebar/header vẫn bám viewport, không xuất hiện khoảng đen hoặc tràn ngang.
+- Date picker: mở lịch, chọn/xóa ngày bằng chuột và bàn phím, hiển thị tiếng Việt; RangePicker không cho chọn ngày analytics sau hôm nay.
+- Modal dài: trang nền bị khóa cuộn; header, nút đóng và footer luôn thấy; con lăn chỉ dịch chuyển body của modal, kể cả viewport thấp và mobile. Modal ngắn không bị kéo giãn tạo khoảng trắng.
+- Cuộn dashboard dài: sidebar/header vẫn bám viewport, không xuất hiện khoảng đen, tràn ngang hoặc khoảng trắng do card bảng bị kéo cao hơn nội dung.
 - Chuyển từng tab trên mạng chậm: NProgress/skeleton xuất hiện và tab mới được selected sau khi route hoàn tất.
 - Upload R2/Mux: progress toàn cục kết thúc cả khi request thành công lẫn lỗi; phần trăm upload video vẫn hoạt động.
+- Media picker tại mọi admin form: tab thư viện tìm/chọn được ảnh cũ; tab tải từ máy validate MIME/size, tự chọn ảnh mới sau confirm và giữ đúng purpose của thumbnail/cover/banner/avatar/Gallery.
 - Với `DATABASE_POOL_MAX=2`, `/admin/posts` và `/admin/gallery` phải render xong; không khôi phục `Promise.all` chứa ba hoặc bốn lượt đọc DB ở hai page này.

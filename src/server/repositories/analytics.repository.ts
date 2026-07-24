@@ -2,7 +2,6 @@ import "server-only";
 
 import {
   and,
-  count,
   desc,
   eq,
   gte,
@@ -241,38 +240,6 @@ export function findUtmCampaigns(range: AnalyticsRepositoryRange, limit: number)
 
 export function findDeviceBreakdown(range: AnalyticsRepositoryRange, limit: number) {
   return findDimensionBreakdown(range, "device_category", "device", limit);
-}
-
-export async function findRecentEvents(
-  range: AnalyticsRepositoryRange,
-  page: number,
-  pageSize: number,
-) {
-  const where = and(
-    gte(analyticsEvents.createdAt, range.startAt),
-    lt(analyticsEvents.createdAt, range.endAtExclusive),
-  );
-  const [items, totals] = await Promise.all([
-    database
-      .select({
-        id: analyticsEvents.id,
-        eventType: analyticsEvents.eventType,
-        entityType: analyticsEvents.entityType,
-        entityId: analyticsEvents.entityId,
-        path: analyticsEvents.path,
-        referrerDomain: analyticsEvents.referrerDomain,
-        deviceCategory: analyticsEvents.deviceCategory,
-        createdAt: analyticsEvents.createdAt,
-      })
-      .from(analyticsEvents)
-      .where(where)
-      .orderBy(desc(analyticsEvents.createdAt))
-      .limit(pageSize)
-      .offset((page - 1) * pageSize),
-    database.select({ total: count() }).from(analyticsEvents).where(where),
-  ]);
-
-  return { items, total: totals[0]?.total ?? 0 };
 }
 
 export function deleteAnalyticsEventsBefore(cutoff: Date) {

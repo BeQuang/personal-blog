@@ -11,8 +11,9 @@
 Tại `/admin/campaigns`:
 
 - Tạo/sửa/archive.
-- Chọn banner.
+- Chọn banner từ Media Library hoặc tải banner mới từ máy ngay trong picker.
 - Đặt start/end, status, featured.
+- Start/end dùng picker ngày giờ tiếng Việt, chọn giờ theo bước 5 phút và chuyển về ISO trước khi gọi Action.
 - Đặt CTA label/URL.
 - Quản lý rules/terms.
 - Bật/tắt submission và đặt giới hạn.
@@ -81,3 +82,4 @@ Duplicate trả `{created:false}`; không tạo record thứ hai.
 
 Kiểm tra boundary start/end, hydration countdown, duplicate email, limit cạnh tranh, Turnstile/rate limit và 404 draft.
 
+Kiểm tra banner tải mới dùng purpose `campaign_banner`, được confirm vào Media Library và tự động gắn vào campaign form.

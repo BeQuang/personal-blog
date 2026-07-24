@@ -1,6 +1,6 @@
 # Route map
 
-> Generated artifact — source fingerprint: `8252c88eef46471c254b01d8b5d8224d2f9e547cf7019f773dc7147e06d07749`
+> Generated artifact — source fingerprint: `b246b7bda3e000266060ac6b0a58503df414df37ba69faf94cc1e6f988fcad2f`
 
 Route group như `(protected)` không tạo URL segment. Route Handler của Next.js 16 dùng Web Request/Response API và không cache mặc định.
 
@@ -8,7 +8,7 @@ Route group như `(protected)` không tạo URL segment. Route Handler của Nex
 | --- | --- | --- | --- | --- |
 | `/` | Public page | PAGE | `src/app/page.tsx` | `src/components/home/ActiveCampaignSection.tsx`<br>`src/components/home/HomeSections.tsx`<br>`src/server/services/settings.service.ts`<br>`src/services/campaign.service.ts`<br>`src/services/event.service.ts`<br>`src/services/gallery.service.ts`<br>`src/services/post.service.ts`<br>`src/services/social.service.ts`<br>`src/services/video.service.ts` |
 | `/about` | Public page | PAGE | `src/app/about/page.tsx` | `src/components/common/Button.tsx`<br>`src/components/common/Container.tsx`<br>`src/components/common/SectionHeader.tsx`<br>`src/components/common/SocialIcon.tsx`<br>`src/components/home/AnalyticsLink.tsx`<br>`src/config/homepage.config.ts`<br>`src/config/site.config.ts`<br>`src/lib/metadata.ts`<br>`src/services/social.service.ts`<br>`src/utils/format.ts` |
-| `/admin` | Admin page | PAGE | `src/app/admin/(protected)/page.tsx` | `src/components/admin/AdminDashboard.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/analytics.service.ts` |
+| `/admin` | Admin page | PAGE | `src/app/admin/(protected)/page.tsx` | `src/components/admin/AdminDashboard.tsx`<br>`src/lib/admin-analytics-query.ts`<br>`src/server/auth/index.ts`<br>`src/server/services/analytics.service.ts` |
 | `/admin/appearance` | Admin page | PAGE | `src/app/admin/(protected)/appearance/page.tsx` | `src/components/admin/AdminAppearanceEditor.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/settings.service.ts` |
 | `/admin/campaigns` | Admin page | PAGE | `src/app/admin/(protected)/campaigns/page.tsx` | `src/components/admin/AdminCampaignsManager.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/campaigns.service.ts`<br>`src/server/services/media.service.ts` |
 | `/admin/events` | Admin page | PAGE | `src/app/admin/(protected)/events/page.tsx` | `src/components/admin/AdminEventsManager.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/events.service.ts`<br>`src/server/services/media.service.ts` |

@@ -1,13 +1,15 @@
 "use client";
 
-import { App, Button, Form, Input, Modal, Select, Space, Switch, Table, Tag } from "antd";
+import { App, Button, Form, Input, Select, Space, Switch, Table, Tag } from "antd";
 import type { TableColumnsType } from "antd";
 import { Archive, Pencil, Plus } from "lucide-react";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { archiveEventAction, createEventAction, updateEventAction } from "@/actions/events.actions";
+import { AdminDateTimePicker } from "@/components/admin/AdminDatePickers";
 import { AdminMediaPicker } from "@/components/admin/AdminMediaPicker";
+import { AdminModal } from "@/components/admin/AdminModal";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import type { AdminEvent, EventMutationInput, MediaOption } from "@/types";
 
@@ -33,18 +35,18 @@ export function AdminEventsManager({ events, mediaOptions, canWrite, canPublish 
   return <>
     <AdminPageHeader title="Sự kiện" description="Tạo, xuất bản và lưu trữ sự kiện bằng dữ liệu PostgreSQL thật." action={canWrite ? <Button type="primary" icon={<Plus size={17} />} onClick={() => edit(null)}>Thêm sự kiện</Button> : undefined} />
     <section className="admin-panel admin-table-panel" aria-label="Danh sách sự kiện"><Table rowKey="id" columns={columns} dataSource={[...events]} loading={pending} scroll={{ x: 900 }} pagination={{ pageSize: 8, showSizeChanger: false }} locale={{ emptyText: "Chưa có sự kiện." }} /></section>
-    <Modal width={760} title={editing ? "Sửa sự kiện" : "Tạo sự kiện"} open={open} onCancel={() => setOpen(false)} onOk={() => form.submit()} confirmLoading={pending} okText="Lưu" cancelText="Hủy" destroyOnHidden>
+    <AdminModal width={760} title={editing ? "Sửa sự kiện" : "Tạo sự kiện"} open={open} onCancel={() => setOpen(false)} onOk={() => form.submit()} confirmLoading={pending} okText="Lưu" cancelText="Hủy" destroyOnHidden>
       <Form form={form} layout="vertical" onFinish={submit} requiredMark="optional">
-        <Form.Item name="bannerMediaId" hidden rules={[{ required: true, message: "Hãy chọn banner." }]}><Input /></Form.Item><Form.Item label="Banner"><AdminMediaPicker items={mediaOptions} value={bannerId} label="Banner sự kiện" onChange={(selection) => form.setFieldValue("bannerMediaId", selection?.id ?? "")} /></Form.Item>
+        <Form.Item name="bannerMediaId" hidden rules={[{ required: true, message: "Hãy chọn banner." }]}><Input /></Form.Item><Form.Item label="Banner"><AdminMediaPicker items={mediaOptions} value={bannerId} label="Banner sự kiện" purpose="event_banner" onChange={(selection) => form.setFieldValue("bannerMediaId", selection?.id ?? "")} /></Form.Item>
         <Form.Item name="title" label="Tiêu đề" rules={[{ required: true, whitespace: true }]}><Input maxLength={180} /></Form.Item><Form.Item name="slug" label="Slug"><Input placeholder="Tự sinh nếu để trống" /></Form.Item>
         <Form.Item name="description" label="Mô tả" rules={[{ required: true, whitespace: true }]}><Input.TextArea rows={4} maxLength={5000} /></Form.Item>
         <Space align="start" wrap><Form.Item name="type" label="Loại" rules={[{ required: true }]}><Select style={{ width: 170 }} options={eventTypes.map((value) => ({ value, label: value }))} /></Form.Item><Form.Item name="eventStatus" label="Trạng thái sự kiện"><Select style={{ width: 150 }} options={["upcoming", "live", "ended", "cancelled"].map((value) => ({ value, label: value }))} /></Form.Item><Form.Item name="contentStatus" label="Xuất bản"><Select style={{ width: 150 }} disabled={!canPublish} options={["draft", "scheduled", "published", "archived"].map((value) => ({ value, label: value }))} /></Form.Item></Space>
-        <Space align="start" wrap><Form.Item name="startAt" label="Bắt đầu" rules={[{ required: true }]}><Input type="datetime-local" /></Form.Item><Form.Item name="endAt" label="Kết thúc"><Input type="datetime-local" /></Form.Item><Form.Item name="timezone" label="Timezone" rules={[{ required: true }]}><Input /></Form.Item></Space>
+        <Space align="start" wrap><Form.Item name="startAt" label="Bắt đầu" rules={[{ required: true }]}><AdminDateTimePicker /></Form.Item><Form.Item name="endAt" label="Kết thúc"><AdminDateTimePicker /></Form.Item><Form.Item name="timezone" label="Timezone" rules={[{ required: true }]}><Input /></Form.Item></Space>
         <Space align="start" wrap><Form.Item name="location" label="Địa điểm"><Input /></Form.Item><Form.Item name="platform" label="Nền tảng"><Input /></Form.Item></Space>
         <Form.Item name="externalUrl" label="External URL" rules={[{ type: "url", warningOnly: false }]}><Input type="url" /></Form.Item>
         <Form.Item name="scheduleText" label="Lịch trình" extra="Mỗi dòng: thời gian|nội dung"><Input.TextArea rows={3} /></Form.Item>
         <Form.Item name="featured" label="Nổi bật" valuePropName="checked"><Switch /></Form.Item>
       </Form>
-    </Modal>
+    </AdminModal>
   </>;
 }

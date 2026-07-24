@@ -46,17 +46,6 @@ export interface AnalyticsCampaignPerformance {
   conversionRate: number;
 }
 
-export interface AnalyticsRecentEvent {
-  id: string;
-  eventType: AnalyticsEventType;
-  entityType?: string;
-  entityId?: string;
-  path: string;
-  referrerDomain?: string;
-  deviceCategory?: AnalyticsDeviceCategory;
-  createdAt: string;
-}
-
 export interface AnalyticsDashboardData {
   range: AnalyticsDateRange;
   totals: {
@@ -75,11 +64,4 @@ export interface AnalyticsDashboardData {
   trafficSources: readonly AnalyticsRankedItem[];
   utmCampaigns: readonly AnalyticsRankedItem[];
   devices: readonly AnalyticsRankedItem[];
-  recentEvents: {
-    items: readonly AnalyticsRecentEvent[];
-    total: number;
-    page: number;
-    pageSize: number;
-  };
 }
-

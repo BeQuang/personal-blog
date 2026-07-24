@@ -102,6 +102,7 @@ export function AdminVideoUploadPanel({
             items={mediaOptions}
             value={thumbnailMediaId}
             label="Thumbnail"
+            purpose="post_thumbnail"
             onChange={(selection) => form.setFieldValue("thumbnailMediaId", selection?.id)}
           />
         </Form.Item>

@@ -1,8 +1,9 @@
 "use client";
 
-import { Input, Modal } from "antd";
+import { Input } from "antd";
 
 import { AdminMediaPicker } from "@/components/admin/AdminMediaPicker";
+import { AdminModal } from "@/components/admin/AdminModal";
 import type { AdminResource, AdminTableRow, MediaOption } from "@/types";
 
 interface AdminResourceEditorModalProps {
@@ -38,7 +39,7 @@ export function AdminResourceEditorModal({
   const errorId = `${inputId}-error`;
 
   return (
-    <Modal
+    <AdminModal
       title={
         editingRow
           ? `Chỉnh sửa ${label.toLocaleLowerCase("vi-VN")}`
@@ -79,11 +80,12 @@ export function AdminResourceEditorModal({
             items={mediaOptions}
             value={selectedMediaId}
             label={resource === "events" ? "Event banner" : "Campaign banner"}
+            purpose={resource === "events" ? "event_banner" : "campaign_banner"}
             onChange={onMediaChange}
           />
         </div>
       ) : null}
       <p className="admin-modal-note">Dữ liệu sẽ mất khi tải lại trang.</p>
-    </Modal>
+    </AdminModal>
   );
 }

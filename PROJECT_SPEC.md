@@ -44,8 +44,9 @@ Backend là modular monolith chạy trong Next.js App Router:
 - React/React DOM `19.2.4`.
 - TypeScript strict mode, alias `@/* -> src/*`.
 - Tailwind CSS 4 kết hợp CSS tùy biến trong `src/app/globals.css`.
-- Ant Design 6 và `@ant-design/nextjs-registry` cho Admin.
-- Radix Dialog, Lucide icons.
+- Ant Design 6 và `@ant-design/nextjs-registry` cho Admin; toàn bộ trường ngày/giờ admin dùng DatePicker/RangePicker với Day.js và locale Việt Nam thay cho input ngày native của trình duyệt.
+- Modal form Admin dùng `AdminModal`: giới hạn theo viewport, khóa cuộn trang nền, giữ header/footer và cho body cuộn độc lập; hộp xác nhận Ant Design tuân theo cùng nguyên tắc overflow.
+- Radix Dialog, Lucide icons; dialog public giới hạn theo viewport và tự cuộn nội dung thay vì kéo trang nền.
 - Mux Player React cho video nội bộ.
 - uPlot cho biểu đồ analytics.
 - NProgress `0.2` cho phản hồi chuyển route và request client kéo dài; `loading.tsx`/Suspense cung cấp skeleton theo segment.
@@ -291,10 +292,12 @@ Protected layout yêu cầu `dashboard:view`; từng page tiếp tục kiểm tr
 - Create/update/archive/publish/featured.
 - Category/tag CRUD.
 - Social link CRUD, enable/disable và sort order.
-- R2 Media Library, upload, picker và xóa có kiểm tra đang được sử dụng.
+- R2 Media Library, upload, picker và xóa có kiểm tra đang được sử dụng. Mọi `AdminMediaPicker` cho thumbnail, cover, banner, avatar và Gallery đều cho phép chọn asset có sẵn hoặc tải ảnh từ máy; ảnh tải mới dùng đúng purpose, được confirm vào Media Library rồi tự động chọn vào form hiện tại.
 - Mux direct upload và external video.
 - Submission status workflow và CSV export tối đa 5.000 dòng.
-- Analytics date range, metrics, breakdown và recent events.
+- Analytics date range, metrics và breakdown tổng hợp trên trang Tổng quan.
+- Date/time UX thống nhất bằng `AdminDateTimePicker` và `AdminDateRangePicker`: định dạng `DD/MM/YYYY`, lịch tiếng Việt, chọn giờ theo bước 5 phút và giá trị server tiếp tục là ISO.
+- Modal/popup dài không vượt viewport: form Admin có chiều cao tối đa `80dvh`, wrapper không cuộn, body cuộn độc lập và scroll không truyền sang trang nền.
 - Site Settings/Appearance ghi PostgreSQL thật.
 
 Client chỉ dùng `canWrite/canPublish/canManage` để ẩn/vô hiệu UI; service vẫn kiểm tra lại permission.
@@ -397,6 +400,7 @@ Admin chọn file
 -> confirmMediaUploadAction
 -> kiểm tra ticket owner, HEAD metadata, size, MIME và magic signature
 -> ghi media_assets ready
+-> picker thêm asset vào danh sách cục bộ và tự động chọn vào form đang mở
 ```
 
 Cho phép JPEG, PNG, WebP, AVIF; ảnh tối đa 10 MB, avatar tối đa 5 MB. Xóa asset chỉ khi provider R2, status ready và không còn tham chiếu; nếu xóa object thất bại thì DB được restore.
@@ -472,7 +476,7 @@ Client event chỉ gửi sau consent. Endpoint `/api/analytics/events`:
 - rate limit
 - không lưu PII/form content/full IP
 
-Anonymous session là UUID trong `sessionStorage`; server lưu SHA-256 hash. Dashboard dùng `daily_analytics` cho aggregate và raw events có retention mặc định 90 ngày.
+Anonymous session là UUID trong `sessionStorage`; server lưu SHA-256 hash. Dashboard chỉ dùng dữ liệu tổng hợp cho totals, trend và breakdown; không hiển thị danh sách raw event. Raw events có retention mặc định 90 ngày.
 
 ## 14. Route Handlers
 

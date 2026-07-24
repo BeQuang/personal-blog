@@ -1,6 +1,6 @@
 "use client";
 
-import { App, Button, Form, Input, List, Modal, Space, Tooltip } from "antd";
+import { App, Button, Form, Input, List, Space, Tooltip } from "antd";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -13,6 +13,7 @@ import {
   updateCategoryAction,
   updateTagAction,
 } from "@/actions/taxonomies.actions";
+import { AdminModal } from "@/components/admin/AdminModal";
 import type { TaxonomyItem, TaxonomyMutationInput } from "@/types";
 
 interface AdminTaxonomyManagerProps {
@@ -123,7 +124,7 @@ export function AdminTaxonomyManager({
       >
         Quản lý {label.toLocaleLowerCase("vi-VN")}
       </Button>
-      <Modal
+      <AdminModal
         title={`Quản lý ${label.toLocaleLowerCase("vi-VN")}`}
         open={open && editing === null}
         footer={null}
@@ -173,9 +174,9 @@ export function AdminTaxonomyManager({
             </List.Item>
           )}
         />
-      </Modal>
+      </AdminModal>
 
-      <Modal
+      <AdminModal
         title={`Chỉnh sửa ${label.toLocaleLowerCase("vi-VN")}`}
         open={open && editing !== null}
         okText="Lưu thay đổi"
@@ -201,7 +202,7 @@ export function AdminTaxonomyManager({
             </Form.Item>
           ) : null}
         </Form>
-      </Modal>
+      </AdminModal>
     </>
   );
 }

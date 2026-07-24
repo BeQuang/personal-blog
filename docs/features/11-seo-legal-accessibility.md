@@ -41,6 +41,7 @@ Nội dung hiện là mẫu sản phẩm, không phải tư vấn pháp lý. Tr�
 - Skip link.
 - Mọi field có label, error association và focus.
 - Dialog/lightbox có accessible title, close và keyboard behavior.
+- Dialog khóa cuộn trang nền khi mở; nội dung dài cuộn bên trong với overscroll được chặn để header/footer hoặc điều khiển chính luôn tiếp cận được.
 - Image có alt; Gallery bắt buộc alt ở service.
 - Controls có focus-visible.
 - Reduced motion được tôn trọng.
@@ -64,4 +65,3 @@ Nội dung hiện là mẫu sản phẩm, không phải tư vấn pháp lý. Tr�
 - Dialog mới: focus trap/title/escape/return focus.
 - Image mới: dimensions/alt và allowed remote origin.
 - Chạy build để bắt metadata/route type issues và test bằng trình duyệt thật.
-

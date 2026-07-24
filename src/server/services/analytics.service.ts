@@ -5,7 +5,6 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 
 import {
-  analyticsEventTypes,
   clientAnalyticsEventTypes,
 } from "@/config/analytics.config";
 import type { PublicRequestContext } from "@/server/anti-spam/request-context";
@@ -114,8 +113,6 @@ const dashboardQuerySchema = z
   .object({
     from: dateSchema,
     to: dateSchema,
-    page: z.coerce.number().int().min(1).max(100_000).default(1),
-    pageSize: z.coerce.number().int().min(1).max(100).default(20),
   })
   .superRefine((value, context) => {
     const from = new Date(`${value.from}T00:00:00.000Z`);
@@ -350,15 +347,6 @@ function fillDailyPoints(
   return result;
 }
 
-function isAnalyticsEventType(value: string): value is AnalyticsEventType {
-  return (analyticsEventTypes as readonly string[]).includes(value);
-}
-
-function isDeviceCategory(value: string | null): value is AnalyticsDeviceCategory {
-  return value !== null
-    && ["desktop", "mobile", "tablet", "unknown"].includes(value);
-}
-
 export async function getAnalyticsDashboard(
   input: unknown,
 ): Promise<AnalyticsDashboardData> {
@@ -381,7 +369,6 @@ export async function getAnalyticsDashboard(
     trafficSources,
     utmCampaigns,
     devices,
-    recent,
   ] = await executeRepository(() =>
     Promise.all([
       repository.findMetricTotals(range),
@@ -393,7 +380,6 @@ export async function getAnalyticsDashboard(
       repository.findTrafficSources(range, 8),
       repository.findUtmCampaigns(range, 8),
       repository.findDeviceBreakdown(range, 8),
-      repository.findRecentEvents(range, parsed.page, parsed.pageSize),
     ]),
   );
   const metrics = new Map(metricRows.map((row) => [row.metric, Number(row.value)]));
@@ -435,25 +421,5 @@ export async function getAnalyticsDashboard(
     trafficSources: ranked(trafficSources),
     utmCampaigns: ranked(utmCampaigns),
     devices: ranked(devices),
-    recentEvents: {
-      items: recent.items.flatMap((row) => {
-        if (!isAnalyticsEventType(row.eventType)) return [];
-        return [{
-          id: row.id,
-          eventType: row.eventType,
-          ...(row.entityType ? { entityType: row.entityType } : {}),
-          ...(row.entityId ? { entityId: row.entityId } : {}),
-          path: row.path,
-          ...(row.referrerDomain ? { referrerDomain: row.referrerDomain } : {}),
-          ...(isDeviceCategory(row.deviceCategory)
-            ? { deviceCategory: row.deviceCategory }
-            : {}),
-          createdAt: row.createdAt.toISOString(),
-        }];
-      }),
-      total: recent.total,
-      page: parsed.page,
-      pageSize: parsed.pageSize,
-    },
   };
 }

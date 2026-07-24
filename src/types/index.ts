@@ -94,7 +94,6 @@ export type {
   AnalyticsEntityType,
   AnalyticsEventType,
   AnalyticsRankedItem,
-  AnalyticsRecentEvent,
   ClientAnalyticsEventInput,
   ClientAnalyticsEventType,
 } from "./analytics";

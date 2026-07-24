@@ -11,8 +11,9 @@
 Tại `/admin/posts`:
 
 - Tạo/sửa post.
-- Chọn category, nhiều tag, thumbnail và cover từ Media Library.
+- Chọn category, nhiều tag; thumbnail và cover có thể dùng asset trong Media Library hoặc tải ảnh mới từ máy ngay trong picker.
 - Chọn `draft`, `scheduled`, `published`, `archived`.
+- Thời điểm lên lịch/xuất bản dùng picker ngày giờ dùng chung, hiển thị `DD/MM/YYYY HH:mm` và tiếp tục gửi ISO cho service.
 - Bật/tắt featured.
 - Quản lý category và tag.
 
@@ -86,5 +87,7 @@ npm run type-check
 ```
 
 Kiểm tra thêm metadata/404 cho slug, scheduled date, duplicate slug và permission editor.
+
+Kiểm tra cả hai nhánh chọn thumbnail/cover có sẵn và tải mới; ảnh tải mới phải dùng purpose `post_thumbnail`/`post_cover`, được thêm vào Media Library và tự động gắn media ID vào post form.
 
 Khi thay đổi page loader, mô phỏng `NODE_ENV=production` với `DATABASE_POOL_MAX=2`; loader phải hoàn tất và không phát sinh nhóm từ ba database query song song.

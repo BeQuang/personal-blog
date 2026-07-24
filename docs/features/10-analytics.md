@@ -88,9 +88,11 @@ Anonymous session trong DB là SHA-256 hash. Referrer chỉ giữ domain. Metada
 - yêu cầu `dashboard:view`
 - nếu thiếu `analytics:view`, không query dashboard chi tiết
 - hỗ trợ date range
-- hiển thị totals/trend/breakdown/recent events
+- hiển thị totals/trend/breakdown tổng hợp; không hiển thị danh sách raw event hoặc hoạt động truy cập gần đây
+- khoảng ngày tùy chỉnh dùng Ant Design `RangePicker`, hiển thị `DD/MM/YYYY`, lịch tiếng Việt và chặn ngày sau hôm nay
 - dùng uPlot cho chart
 - chart lắng nghe `ResizeObserver`, co theo content container và bị chặn overflow để không phá chiều ngang dashboard
+- các card trong lưới cân chiều cao theo hàng; bảng hiệu quả chiến dịch dùng chiều cao tự nhiên để trang kết thúc ngay sau nội dung
 
 Dashboard ghi “ước tính phiên duy nhất”; không mô tả hash session là user identity.
 
@@ -109,7 +111,7 @@ Dashboard ghi “ước tính phiên duy nhất”; không mô tả hash session
 - Route: `app/api/analytics/events/route.ts`.
 - Service/repository: `analytics.service.ts`, `analytics.repository.ts`.
 - Schema: `schema/analytics.ts`.
-- Dashboard: admin page, `AdminDashboard`, `AdminAnalyticsChart`.
+- Dashboard: `/admin`, `AdminDashboard`, `AdminAnalyticsChart`, `AdminAnalyticsDateFilter`.
 
 ## Thêm event mới
 

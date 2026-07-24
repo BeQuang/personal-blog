@@ -3,9 +3,39 @@ import { randomUUID } from "node:crypto";
 import { existsSync } from "node:fs";
 import { loadEnvFile } from "node:process";
 
+import {
+  resolveAdminAnalyticsRange,
+} from "../src/lib/admin-analytics-query";
+
 async function main() {
   if (existsSync(".env.local")) loadEnvFile(".env.local");
 
+  const fixedNow = new Date("2026-07-24T12:00:00.000Z");
+  assert.deepEqual(resolveAdminAnalyticsRange({}, fixedNow), {
+    from: "2026-06-25",
+    to: "2026-07-24",
+  });
+  assert.deepEqual(resolveAdminAnalyticsRange({
+    from: "2026-07-01",
+    to: "2026-07-24",
+  }, fixedNow), {
+    from: "2026-07-01",
+    to: "2026-07-24",
+  });
+  assert.deepEqual(resolveAdminAnalyticsRange({
+    from: "2026-07-24",
+    to: "2026-07-01",
+  }, fixedNow), {
+    from: "2026-06-25",
+    to: "2026-07-24",
+  });
+  assert.deepEqual(resolveAdminAnalyticsRange({
+    from: "2026-02-31",
+    to: "2026-07-24",
+  }, fixedNow), {
+    from: "2026-06-25",
+    to: "2026-07-24",
+  });
   const entityId = randomUUID();
   const path = `/__stage20-test__/${entityId}`;
   const sessionId = randomUUID();

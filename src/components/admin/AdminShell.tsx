@@ -12,6 +12,7 @@ import {
   theme,
 } from "antd";
 import type { MenuProps } from "antd";
+import viVN from "antd/locale/vi_VN";
 import {
   CalendarDays,
   FileText,
@@ -139,6 +140,7 @@ export function AdminShell({
 
   return (
     <ConfigProvider
+      locale={viVN}
       theme={{
         algorithm: theme.defaultAlgorithm,
         token: {

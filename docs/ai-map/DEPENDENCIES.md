@@ -1,6 +1,6 @@
 # Package dependency map
 
-> Generated artifact — source fingerprint: `8252c88eef46471c254b01d8b5d8224d2f9e547cf7019f773dc7147e06d07749`
+> Generated artifact — source fingerprint: `b246b7bda3e000266060ac6b0a58503df414df37ba69faf94cc1e6f988fcad2f`
 
 ## Runtime dependencies
 
@@ -17,6 +17,7 @@
 | `@upstash/ratelimit` | `^2.0.8` |
 | `@upstash/redis` | `^1.38.0` |
 | `antd` | `^6.5.1` |
+| `dayjs` | `^1.11.21` |
 | `drizzle-orm` | `^0.45.2` |
 | `lucide-react` | `^1.24.0` |
 | `next` | `16.2.10` |

@@ -6,31 +6,19 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
-import {
-  confirmMediaUploadAction,
-  createMediaUploadAction,
-  deleteMediaAssetAction,
-} from "@/actions/media.actions";
+import { deleteMediaAssetAction } from "@/actions/media.actions";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { startNavigationProgress } from "@/lib/loading-progress";
 import {
-  startNavigationProgress,
-  withLoadingProgress,
-} from "@/lib/loading-progress";
+  acceptedMediaImageTypes,
+  uploadMediaImage,
+} from "@/lib/media-image-upload";
 import type {
   MediaAssetItem,
   MediaLibraryPage,
   MediaMimeType,
   MediaPurpose,
 } from "@/types";
-
-const maximumImageSizeBytes = 10 * 1024 * 1024;
-const maximumAvatarSizeBytes = 5 * 1024 * 1024;
-const allowedMimeTypes: readonly MediaMimeType[] = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/avif",
-];
 
 const purposeOptions: { value: MediaPurpose; label: string }[] = [
   { value: "gallery", label: "Gallery" },
@@ -46,17 +34,6 @@ function formatBytes(value: number) {
   if (value < 1024) return `${value} B`;
   if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`;
   return `${(value / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-async function readImageDimensions(file: File) {
-  try {
-    const bitmap = await createImageBitmap(file);
-    const dimensions = { width: bitmap.width, height: bitmap.height };
-    bitmap.close();
-    return dimensions;
-  } catch {
-    return { width: null, height: null };
-  }
 }
 
 interface AdminMediaLibraryProps {
@@ -95,50 +72,14 @@ export function AdminMediaLibrary({ data, filters, showHeader = true }: AdminMed
   };
 
   const uploadFile = (file: File) => {
-    if (!allowedMimeTypes.includes(file.type as MediaMimeType)) {
-      void message.error("Chỉ chấp nhận JPEG, PNG, WebP hoặc AVIF.");
-      return;
-    }
-    const maximumSize = purpose === "avatar"
-      ? maximumAvatarSizeBytes
-      : maximumImageSizeBytes;
-    if (file.size <= 0 || file.size > maximumSize) {
-      void message.error(`File phải có dung lượng từ 1 byte đến ${maximumSize / 1024 / 1024} MB.`);
-      return;
-    }
-
     startTransition(async () => {
-      const upload = await createMediaUploadAction({
-        originalFilename: file.name,
-        mimeType: file.type as MediaMimeType,
-        sizeBytes: file.size,
-        purpose,
-      });
-      if (!upload.success || !upload.data) {
-        void message.error(upload.message);
-        return;
-      }
-      const uploadData = upload.data;
-
       try {
-        const response = await withLoadingProgress(() => fetch(uploadData.uploadUrl, {
-          method: "PUT",
-          headers: uploadData.headers,
-          body: file,
-        }));
-        if (!response.ok) throw new Error(`R2 upload failed with HTTP ${response.status}`);
-        const dimensions = await readImageDimensions(file);
-        const confirmed = await confirmMediaUploadAction({
-          uploadTicket: uploadData.uploadTicket,
-          alt: alt.trim() || null,
-          ...dimensions,
-        });
-        if (!confirmed.success) throw new Error(confirmed.message);
-        void message.success(confirmed.message);
+        await uploadMediaImage({ file, purpose, alt });
+        void message.success("Đã tải ảnh lên Media Library.");
         setAlt("");
         router.refresh();
       } catch (error) {
-        void message.error(error instanceof Error ? error.message : "Upload R2 thất bại.");
+        void message.error(error instanceof Error ? error.message : "Tải ảnh thất bại.");
       }
     });
   };
@@ -194,7 +135,7 @@ export function AdminMediaLibrary({ data, filters, showHeader = true }: AdminMed
             {pending ? "Đang upload..." : "Chọn file"}
             <input
               type="file"
-              accept="image/jpeg,image/png,image/webp,image/avif"
+              accept={acceptedMediaImageTypes}
               disabled={pending}
               onChange={(event) => {
                 const file = event.target.files?.[0];

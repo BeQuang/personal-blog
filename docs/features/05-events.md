@@ -11,9 +11,10 @@
 Tại `/admin/events`:
 
 - Tạo/sửa/archive event.
-- Chọn banner từ Media Library.
+- Chọn banner từ Media Library hoặc tải banner mới từ máy ngay trong picker.
 - Đặt event status và content status độc lập.
 - Nhập start/end/timezone, location hoặc platform, external URL và schedule.
+- Start/end dùng picker ngày giờ tiếng Việt, chọn giờ theo bước 5 phút và chuyển về ISO trước khi gọi Action.
 - Đánh dấu featured.
 
 ## Source ownership
@@ -72,3 +73,4 @@ Mutation revalidate `/admin/events`, `/events`, dynamic event page, slug cụ th
 
 Kiểm tra timezone, boundary start/end, 404, metadata, permission editor và featured event trên homepage.
 
+Kiểm tra banner tải mới dùng purpose `event_banner`, được confirm vào Media Library và tự động gắn vào event form.

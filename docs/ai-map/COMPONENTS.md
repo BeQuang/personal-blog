@@ -1,6 +1,6 @@
 # Component catalog
 
-> Generated artifact — source fingerprint: `8252c88eef46471c254b01d8b5d8224d2f9e547cf7019f773dc7147e06d07749`
+> Generated artifact — source fingerprint: `b246b7bda3e000266060ac6b0a58503df414df37ba69faf94cc1e6f988fcad2f`
 
 Tra bảng này trước khi tạo component mới. “Client” chỉ ra module có directive `"use client"`; Server Component không có directive.
 
@@ -9,14 +9,17 @@ Tra bảng này trước khi tạo component mới. “Client” chỉ ra module
 | `src/components/admin/admin-table-columns.tsx` | — | Server-compatible | `src/components/admin/AdminResourceTable.tsx` |
 | `src/components/admin/admin-table.config.ts` | — | Server-compatible | `src/components/admin/AdminPostsManager.tsx`<br>`src/components/admin/AdminResourceTable.tsx`<br>`src/components/admin/admin-table-columns.tsx` |
 | `src/components/admin/AdminAnalyticsChart.tsx` | `AdminAnalyticsChart` | Client | `src/components/admin/AdminDashboard.tsx` |
+| `src/components/admin/AdminAnalyticsDateFilter.tsx` | `AdminAnalyticsDateFilter` | Client | `src/components/admin/AdminDashboard.tsx` |
 | `src/components/admin/AdminAppearanceEditor.tsx` | `AdminAppearanceEditor` | Client | `src/app/admin/(protected)/appearance/page.tsx` |
 | `src/components/admin/AdminCampaignsManager.tsx` | `AdminCampaignsManager` | Client | `src/app/admin/(protected)/campaigns/page.tsx` |
 | `src/components/admin/AdminDashboard.tsx` | `AdminDashboard` | Client | `src/app/admin/(protected)/page.tsx` |
+| `src/components/admin/AdminDatePickers.tsx` | `AdminDateRangePicker`, `AdminDateTimePicker` | Client | `src/components/admin/AdminAnalyticsDateFilter.tsx`<br>`src/components/admin/AdminCampaignsManager.tsx`<br>`src/components/admin/AdminEventsManager.tsx`<br>`src/components/admin/AdminGalleryManager.tsx`<br>`src/components/admin/AdminPostEditorModal.tsx` |
 | `src/components/admin/AdminEventsManager.tsx` | `AdminEventsManager` | Client | `src/app/admin/(protected)/events/page.tsx` |
 | `src/components/admin/AdminGalleryManager.tsx` | `AdminGalleryManager` | Client | `src/app/admin/(protected)/gallery/page.tsx` |
 | `src/components/admin/AdminLoginForm.tsx` | `AdminLoginForm` | Client | `src/app/admin/login/page.tsx` |
 | `src/components/admin/AdminMediaLibrary.tsx` | `AdminMediaLibrary` | Client | `src/app/admin/(protected)/gallery/page.tsx` |
 | `src/components/admin/AdminMediaPicker.tsx` | `AdminMediaPicker` | Client | `src/components/admin/AdminCampaignsManager.tsx`<br>`src/components/admin/AdminEventsManager.tsx`<br>`src/components/admin/AdminGalleryManager.tsx`<br>`src/components/admin/AdminPostEditorModal.tsx`<br>`src/components/admin/AdminResourceEditorModal.tsx`<br>`src/components/admin/AdminSettingsForm.tsx`<br>`src/components/admin/AdminVideoEditorModal.tsx`<br>`src/components/admin/AdminVideoUploadPanel.tsx` |
+| `src/components/admin/AdminModal.tsx` | `AdminModal` | Client | `src/components/admin/AdminCampaignsManager.tsx`<br>`src/components/admin/AdminEventsManager.tsx`<br>`src/components/admin/AdminGalleryManager.tsx`<br>`src/components/admin/AdminMediaPicker.tsx`<br>`src/components/admin/AdminPostEditorModal.tsx`<br>`src/components/admin/AdminResourceEditorModal.tsx`<br>`src/components/admin/AdminSocialLinkEditorModal.tsx`<br>`src/components/admin/AdminTaxonomyManager.tsx`<br>`src/components/admin/AdminVideoEditorModal.tsx` |
 | `src/components/admin/AdminPageHeader.tsx` | `AdminPageHeader` | Server-compatible | `src/components/admin/AdminAppearanceEditor.tsx`<br>`src/components/admin/AdminCampaignsManager.tsx`<br>`src/components/admin/AdminDashboard.tsx`<br>`src/components/admin/AdminEventsManager.tsx`<br>`src/components/admin/AdminGalleryManager.tsx`<br>`src/components/admin/AdminMediaLibrary.tsx`<br>`src/components/admin/AdminPostsManager.tsx`<br>`src/components/admin/AdminResourceTable.tsx`<br>`src/components/admin/AdminSettingsForm.tsx`<br>`src/components/admin/AdminSocialLinksManager.tsx`<br>`src/components/admin/AdminSubmissionsManager.tsx`<br>`src/components/admin/AdminVideosManager.tsx` |
 | `src/components/admin/AdminPostEditorModal.tsx` | `AdminPostEditorModal` | Client | `src/components/admin/AdminPostsManager.tsx` |
 | `src/components/admin/AdminPostsManager.tsx` | `AdminPostsManager` | Client | `src/app/admin/(protected)/posts/page.tsx` |

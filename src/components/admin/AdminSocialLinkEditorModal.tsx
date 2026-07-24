@@ -1,8 +1,9 @@
 "use client";
 
-import { Form, Input, InputNumber, Modal, Select, Switch } from "antd";
+import { Form, Input, InputNumber, Select, Switch } from "antd";
 import { useEffect } from "react";
 
+import { AdminModal } from "@/components/admin/AdminModal";
 import type {
   ActionFieldErrors,
   SocialLink,
@@ -97,7 +98,7 @@ export function AdminSocialLinkEditorModal({
   };
 
   return (
-    <Modal
+    <AdminModal
       title={link ? "Chỉnh sửa social link" : "Tạo social link"}
       open={open}
       okText={link ? "Lưu thay đổi" : "Tạo social link"}
@@ -139,6 +140,6 @@ export function AdminSocialLinkEditorModal({
           <Input.TextArea rows={3} maxLength={300} showCount />
         </Form.Item>
       </Form>
-    </Modal>
+    </AdminModal>
   );
 }

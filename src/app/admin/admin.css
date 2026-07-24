@@ -363,6 +363,71 @@
   font-size: 12px;
 }
 
+.admin-scroll-modal .ant-modal-container,
+.admin-scroll-modal .ant-modal-content {
+  display: flex;
+  max-height: 80vh;
+  max-height: 80dvh;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.admin-scroll-modal .ant-modal-header,
+.admin-scroll-modal .ant-modal-footer {
+  flex: 0 0 auto;
+}
+
+.admin-scroll-modal .ant-modal-body {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.ant-modal-confirm .ant-modal-container,
+.ant-modal-confirm .ant-modal-content {
+  max-height: min(520px, calc(100dvh - 48px));
+  overflow: hidden;
+}
+
+.ant-modal-confirm .ant-modal-confirm-body-wrapper {
+  display: flex;
+  max-height: min(440px, calc(100dvh - 96px));
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ant-modal-confirm .ant-modal-confirm-body {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.ant-modal-confirm .ant-modal-confirm-btns {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 575px) {
+  .admin-scroll-modal .ant-modal-container,
+  .admin-scroll-modal .ant-modal-content {
+    max-height: 80vh;
+    max-height: 80dvh;
+  }
+
+  .ant-modal-confirm .ant-modal-container,
+  .ant-modal-confirm .ant-modal-content {
+    max-height: calc(100dvh - 32px);
+  }
+
+  .ant-modal-confirm .ant-modal-confirm-body-wrapper {
+    max-height: calc(100dvh - 80px);
+  }
+}
+
 .admin-code-input {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   font-size: 12px;
@@ -428,8 +493,11 @@
 
 .admin-dashboard-card {
   min-width: 0;
-  height: 100%;
   border-color: #e7eaf0 !important;
+}
+
+.admin-dashboard-row .admin-dashboard-card {
+  height: 100%;
 }
 
 .admin-dashboard-card .ant-card-body {
@@ -951,6 +1019,7 @@
 
 .admin-media-picker-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
 }
 
@@ -959,6 +1028,27 @@
   margin-top: 16px;
   padding: 3px;
   overflow-y: auto;
+}
+
+.admin-media-picker-upload {
+  display: grid;
+  justify-items: start;
+  gap: 16px;
+  padding: 24px;
+  border: 1px dashed #cfd4dc;
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+.admin-media-picker-upload > div p {
+  max-width: 620px;
+  margin: 6px 0 0;
+  color: #667085;
+  line-height: 1.6;
+}
+
+.admin-media-picker-upload .ant-input {
+  width: min(100%, 620px);
 }
 
 .admin-modal-media-field {
@@ -1119,21 +1209,13 @@
   flex-wrap: wrap;
 }
 
-.admin-analytics-custom-range label {
-  display: grid;
-  gap: 5px;
-  color: #475467;
-  font-size: 12px;
-  font-weight: 600;
+.admin-date-time-picker {
+  min-width: min(220px, 100%);
 }
 
-.admin-analytics-custom-range input {
-  min-height: 32px;
-  padding: 4px 9px;
-  border: 1px solid #d0d5dd;
-  border-radius: 6px;
-  color: #101828;
-  background: #fff;
+.admin-date-range-picker {
+  width: min(340px, 100%);
+  min-height: 34px;
 }
 
 .admin-analytics-chart {

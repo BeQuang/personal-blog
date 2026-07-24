@@ -251,6 +251,8 @@ video {
   width: min(calc(100vw - 32px), 640px);
   max-height: min(82vh, 720px);
   overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   transform: translate(-50%, -50%);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-xl);
@@ -267,8 +269,10 @@ video {
   bottom: 0;
   z-index: 60;
   display: flex;
+  max-height: 100dvh;
   width: min(88vw, 380px);
   flex-direction: column;
+  overflow: hidden;
   border-left: 1px solid var(--border-strong);
   background: var(--background);
   box-shadow: var(--shadow-dialog);
@@ -890,8 +894,10 @@ video {
   position: fixed;
   z-index: 60;
   inset: 50% auto auto 50%;
+  display: flex;
   width: min(calc(100vw - 24px), 1120px);
   max-height: calc(100dvh - 24px);
+  flex-direction: column;
   transform: translate(-50%, -50%);
   overflow: hidden;
   border: 1px solid var(--border-strong);
@@ -901,8 +907,15 @@ video {
   outline: none;
 }
 
-.gallery-dialog-image { position: relative; height: min(74vh, 760px); background: #08080b; }
-.gallery-dialog-caption { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 14px 18px; color: var(--text-muted); font-size: 12px; }
+.mobile-menu-content > nav {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.gallery-dialog-image { position: relative; height: min(74dvh, 760px); min-height: min(48dvh, 360px); flex: 1 1 auto; background: #08080b; }
+.gallery-dialog-caption { display: flex; max-height: min(26dvh, 200px); flex: 0 1 auto; align-items: center; justify-content: space-between; gap: 20px; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 14px 18px; color: var(--text-muted); font-size: 12px; }
 .gallery-dialog-caption div { min-width: 0; }
 .gallery-dialog-caption small { color: var(--primary); font-weight: 800; text-transform: uppercase; }
 .gallery-dialog-caption p { overflow: hidden; margin: 1px 0 0; color: var(--text-primary); font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }

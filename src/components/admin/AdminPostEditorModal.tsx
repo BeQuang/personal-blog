@@ -1,9 +1,11 @@
 "use client";
 
-import { Form, Input, InputNumber, Modal, Select, Switch } from "antd";
+import { Form, Input, InputNumber, Select, Switch } from "antd";
 import { useEffect } from "react";
 
+import { AdminDateTimePicker } from "@/components/admin/AdminDatePickers";
 import { AdminMediaPicker } from "@/components/admin/AdminMediaPicker";
+import { AdminModal } from "@/components/admin/AdminModal";
 import type {
   ActionFieldErrors,
   AdminPost,
@@ -152,7 +154,7 @@ export function AdminPostEditorModal({
   };
 
   return (
-    <Modal
+    <AdminModal
       title={post ? "Chỉnh sửa bài viết" : "Tạo bài viết"}
       open={open}
       width={920}
@@ -207,6 +209,7 @@ export function AdminPostEditorModal({
               items={mediaOptions}
               value={thumbnailMediaId}
               label="Thumbnail"
+              purpose="post_thumbnail"
               onChange={(selection) => form.setFieldValue("thumbnailMediaId", selection?.id)}
             />
           </Form.Item>
@@ -215,6 +218,7 @@ export function AdminPostEditorModal({
               items={mediaOptions}
               value={coverMediaId}
               label="Cover image"
+              purpose="post_cover"
               onChange={(selection) => form.setFieldValue("coverMediaId", selection?.id)}
             />
           </Form.Item>
@@ -239,12 +243,12 @@ export function AdminPostEditorModal({
 
         {status === "scheduled" ? (
           <Form.Item name="scheduledAt" label="Thời gian lên lịch" rules={[{ required: true, message: "Vui lòng chọn thời gian lên lịch." }]}>
-            <Input type="datetime-local" />
+            <AdminDateTimePicker />
           </Form.Item>
         ) : null}
         {status === "published" ? (
           <Form.Item name="publishedAt" label="Thời gian xuất bản" extra="Để trống để dùng thời điểm lưu.">
-            <Input type="datetime-local" />
+            <AdminDateTimePicker />
           </Form.Item>
         ) : null}
 
@@ -261,6 +265,6 @@ export function AdminPostEditorModal({
           </Form.Item>
         </div>
       </Form>
-    </Modal>
+    </AdminModal>
   );
 }

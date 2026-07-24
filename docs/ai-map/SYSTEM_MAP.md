@@ -1,14 +1,14 @@
 # System map
 
-> Generated artifact — source fingerprint: `8252c88eef46471c254b01d8b5d8224d2f9e547cf7019f773dc7147e06d07749`
+> Generated artifact — source fingerprint: `b246b7bda3e000266060ac6b0a58503df414df37ba69faf94cc1e6f988fcad2f`
 
 ## Snapshot
 
-- 313 file source/config đã quét, 62,470 dòng.
+- 318 file source/config đã quét, 62,980 dòng.
 - 25 page route.
 - 5 Route Handler.
 - 2 metadata route.
-- 71 module component, 48 Client Component.
+- 74 module component, 51 Client Component.
 - 19 bảng PostgreSQL, 15 enum.
 - 34 biến môi trường được khai báo hoặc tham chiếu.
 

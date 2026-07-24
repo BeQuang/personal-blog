@@ -3,6 +3,7 @@
 ## Người dùng sử dụng
 
 - `/gallery`: lọc category, mở lightbox, xem caption và điều hướng bằng nút/bàn phím.
+- Lightbox giới hạn theo viewport; vùng caption dài cuộn riêng để ảnh và nút điều hướng không đẩy dialog vượt màn hình.
 - Trang chủ dùng gallery preview giới hạn số item.
 - Chỉ item public/published được render.
 
@@ -10,7 +11,8 @@
 
 `/admin/gallery` gồm hai phần:
 
-- Gallery manager: tạo/sửa/archive item, category, alt, sort order, status.
+- Gallery manager: tạo/sửa/archive item, category, alt, sort order, status; ảnh có thể chọn từ thư viện hoặc tải mới từ máy ngay trong picker.
+- Thời điểm scheduled/published dùng picker ngày giờ dùng chung thay cho input native; contract gửi server vẫn là ISO.
 - Media Library: upload, search/filter, chọn media và xóa asset chưa được sử dụng.
 
 ## Source ownership
@@ -36,6 +38,7 @@
 6. Browser gửi ticket + alt + dimensions để confirm.
 7. Backend kiểm tra ticket owner/expiry, object metadata, size, MIME và magic signature.
 8. Backend ghi `media_assets` status `ready`.
+9. Khi upload bắt đầu từ `AdminMediaPicker`, picker thêm asset vừa confirm vào danh sách hiện tại, tự động chọn media ID/URL vào form và không buộc người dùng tải lại trang.
 
 Allowed:
 
@@ -75,10 +78,13 @@ Purpose: `avatar`, `campaign_banner`, `event_banner`, `gallery`, `post_cover`, `
 
 ## Tránh lặp code và kiểm tra
 
-- Mọi màn hình chọn ảnh dùng `AdminMediaPicker`.
+- Mọi màn hình chọn ảnh dùng `AdminMediaPicker`. Component có hai nhánh `Media Library` và `Tải từ máy`; caller bắt buộc truyền đúng `MediaPurpose`.
+- `AdminMediaLibrary` và `AdminMediaPicker` cùng dùng `uploadMediaImage`; không nhân đôi validate, presign, PUT R2, đọc dimensions hoặc confirm.
 - Không upload binary qua Next.js; giữ direct-to-R2.
 - Không tự tạo presigned URL ngoài `MediaStorage`.
 - Luôn dùng validator signature hiện có.
+
+Kiểm tra picker tại Posts, Videos, Gallery, Events, Campaigns và Settings: chọn asset có sẵn vẫn hoạt động; upload JPEG/PNG/WebP/AVIF hợp lệ tự chọn asset mới; MIME/size sai hiển thị lỗi; avatar giữ giới hạn 5 MB và các purpose khác giữ giới hạn 10 MB.
 
 ```bash
 npm run storage:test
@@ -86,4 +92,3 @@ npm run storage:test:database
 npm run storage:test:security
 npm run type-check
 ```
-

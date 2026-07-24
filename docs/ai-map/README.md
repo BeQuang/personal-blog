@@ -18,4 +18,4 @@ Thư mục này được tạo tự động bởi `npm run ai:setup`. Không s�
 
 Prompt mẫu cho AI không tự đọc `AGENTS.md`: [AI_START_HERE.md](../../AI_START_HERE.md).
 
-Source fingerprint hiện tại: `8252c88eef46471c254b01d8b5d8224d2f9e547cf7019f773dc7147e06d07749`.
+Source fingerprint hiện tại: `b246b7bda3e000266060ac6b0a58503df414df37ba69faf94cc1e6f988fcad2f`.
