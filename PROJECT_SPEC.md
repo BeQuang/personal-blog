@@ -284,13 +284,17 @@ Contact attachment hiện chưa đi vào server contract; không được mô t�
 
 Protected layout yêu cầu `dashboard:view`; từng page tiếp tục kiểm tra permission chuyên biệt.
 
-`/admin/posts` dùng `admin-posts-page.service.ts`: kiểm tra `content:view` một lần rồi đọc posts, categories, tags và media tuần tự để không làm nghẽn pool serverless. Audit Admin page không cho phép từ ba database operation độc lập trở lên chạy trong cùng một `Promise.all`; Gallery cũng tải ba nguồn theo thứ tự. Các page còn lại hiện có tối đa hai lượt đọc đồng thời, phù hợp pool production mặc định 2.
+`/admin/posts` dùng `admin-posts-page.service.ts`: kiểm tra `content:view` một lần, đọc trang post đầu tiên bằng `COUNT + items`, rồi đọc categories, tags và media tuần tự để không làm nghẽn pool serverless. Gallery cũng tải trang Gallery, picker và Media Library theo thứ tự. Video/Event/Campaign tải trang chính trước rồi mới tải media picker; không chạy lookup phụ song song với một paged query vốn đã dùng hai connection trong giới hạn pool production mặc định 2.
 
 ### 7.2. Khả năng quản trị
 
-- Search/filter/table pagination.
+- Mọi Admin table dùng cấu hình pagination chung: mặc định 10 dòng, cho chọn 10/20/50, luôn hiển thị tổng bản ghi; cụm số dòng + tổng bám trái và nút chuyển trang bám phải. Danh sách tăng trưởng truyền `page/pageSize/sortBy/sortOrder` xuyên suốt Route Handler → service → repository và trả `{ items, total, page, pageSize, sortBy, sortOrder }`; repository áp dụng filter trước `COUNT + LIMIT + OFFSET + ORDER BY`, `pageSize` tối đa 100 và `sortBy` là allowlist có tie-breaker ổn định.
+- `npm run table:audit`, `npm run api:list-audit` và completion gate `npm run ai:check` ngăn Table mới thiếu pagination hoặc GET collection mới bỏ qua contract phân trang/sắp xếp.
+- Admin table dùng header và vùng pagination tím nhạt theo màu nhận diện `Admin MVP`; pagination active dùng tím đậm có độ tương phản rõ và vùng pagination bám sát hàng cuối, không tạo khoảng trắng bên trong khung.
+- Bảng bài viết có STT dạng số thường, liên tục qua pagination. Trên desktop, search và trạng thái nằm cùng một hàng trong cụm bên trái của toolbar nền trong suốt, còn toggle **Hiện bài đã lưu trữ** nằm bên phải; bài `archived` bị ẩn mặc định và chỉ xuất hiện khi bật toggle.
 - Create/update/archive/publish/featured.
-- Category/tag CRUD.
+- Post editor mặc định dùng trình soạn thảo trực quan cho 9 loại content block, hỗ trợ thêm/xóa/nhân bản/đổi thứ tự và trường tiếng Việt theo từng loại. Chế độ JSON nâng cao hiển thị dữ liệu parser tạo ra, cho phép developer sửa và chỉ đồng bộ ngược sau khi schema dùng chung kiểm tra hợp lệ.
+- Category/tag CRUD dùng modal table rộng; UI quản lý đọc lười qua API phân trang thay vì nhúng toàn bộ danh sách vào popup. Mặc định người dùng chọn 10, 20 hoặc 50 dòng mỗi trang; footer tách thành cụm bộ chọn số dòng + tổng bản ghi bám trái và cụm nút chuyển trang bám phải; component cho phép truyền mảng lựa chọn khác và server giới hạn `pageSize` tối đa 100.
 - Social link CRUD, enable/disable và sort order.
 - R2 Media Library, upload, picker và xóa có kiểm tra đang được sử dụng. Mọi `AdminMediaPicker` cho thumbnail, cover, banner, avatar và Gallery đều cho phép chọn asset có sẵn hoặc tải ảnh từ máy; ảnh tải mới dùng đúng purpose, được confirm vào Media Library rồi tự động chọn vào form hiện tại.
 - Mux direct upload và external video.
@@ -312,6 +316,7 @@ Admin desktop giữ sidebar cố định theo viewport và content chừa chiề
 - `src/proxy.ts` làm mới session cookie qua Supabase SSR.
 - `/auth/callback` exchange code, sync profile và redirect tới admin path an toàn.
 - Login giới hạn 10 lần/15 phút theo request fingerprint.
+- Nút đăng xuất trong header Admin yêu cầu xác nhận; hủy hộp thoại giữ nguyên phiên và chỉ xác nhận mới gọi logout action.
 - Account `disabled` bị sign out/từ chối.
 - `predev` và `prestart` chạy bootstrap script; script chỉ tạo super admin khi được bật và Auth chưa có user.
 
@@ -366,7 +371,7 @@ Không silently fallback sang mock khi database mode lỗi. Server Actions dùng
 | Analytics | `analytics_events`, `daily_analytics` |
 | Audit | `audit_logs` |
 
-Tất cả bảng application bật RLS. Migration nằm trong `src/server/database/migrations`; migration production hardening hiện tại là `0009_stage21-production-hardening.sql`.
+Tất cả bảng application bật RLS. Migration nằm trong `src/server/database/migrations`; `0010_hot_gravity.sql` bổ sung index phục vụ phân trang/order Admin cho post/video/taxonomy/Gallery/social link, kế tiếp migration production hardening `0009_stage21-production-hardening.sql`.
 
 ### 10.2. Quy tắc dữ liệu quan trọng
 
@@ -487,6 +492,15 @@ Anonymous session là UUID trong `sessionStorage`; server lưu SHA-256 hash. Das
 | `POST /api/uploads/video-url` | Cấp Mux direct upload URL |
 | `POST /api/webhooks/mux` | Mux signed webhook |
 | `GET /api/admin/submissions/export` | CSV export có permission |
+| `GET /api/admin/posts` | Trang bài viết có search/status/archive/order, yêu cầu `content:view` |
+| `GET /api/admin/videos` | Trang video có search/status/order, yêu cầu `media:manage` |
+| `GET /api/admin/gallery` | Trang Gallery có order, yêu cầu `media:manage` |
+| `GET /api/admin/events` | Trang sự kiện có order, yêu cầu `content:view` |
+| `GET /api/admin/campaigns` | Trang chiến dịch có order, yêu cầu `content:view` |
+| `GET /api/admin/social-links` | Trang social links có search/order, yêu cầu `settings:manage` |
+| `GET /api/admin/taxonomies` | Trang category/tag có order, yêu cầu `content:view` |
+
+Mọi GET collection ở trên dùng `Cache-Control: private, no-store` và cùng hợp đồng `page/pageSize/sortBy/sortOrder`. CSV export là ngoại lệ có chủ đích, giới hạn tối đa 5.000 dòng và không dùng response JSON phân trang.
 
 ## 15. Environment variables
 

@@ -1,5 +1,38 @@
 import type { AdminResource, AdminTableRow } from "@/types";
 
+export const adminTablePageSizeOptions = [10, 20, 50] as const;
+export const defaultAdminTablePageSize: number = adminTablePageSizeOptions[0];
+export const maximumAdminTablePageSize = 100;
+
+export const adminTablePaginationDefaults = {
+  pageSize: defaultAdminTablePageSize,
+  pageSizeOptions: adminTablePageSizeOptions.map(String),
+  showSizeChanger: true,
+  hideOnSinglePage: false,
+  showTotal: (total: number) => `Tổng ${total}`,
+};
+
+export function normalizeAdminTablePageSizeOptions(
+  options: readonly number[] = adminTablePageSizeOptions,
+) {
+  const values = [...new Set(options)].filter((value) =>
+    Number.isInteger(value)
+    && value >= 1
+    && value <= maximumAdminTablePageSize);
+  return values.length > 0 ? values : [...adminTablePageSizeOptions];
+}
+
+export function parseAdminTablePageSize(
+  value: string | undefined,
+  options: readonly number[] = adminTablePageSizeOptions,
+) {
+  const normalizedOptions = normalizeAdminTablePageSizeOptions(options);
+  const parsed = Number(value);
+  return normalizedOptions.includes(parsed)
+    ? parsed
+    : normalizedOptions[0];
+}
+
 export const adminStatusColors: Record<string, string> = {
   published: "green",
   active: "green",

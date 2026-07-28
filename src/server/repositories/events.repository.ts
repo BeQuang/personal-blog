@@ -1,9 +1,10 @@
 import "server-only";
 
-import { and, asc, desc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
 
 import { database } from "@/server/database/client";
 import { auditLogs, events } from "@/server/database/schema";
+import type { AdminEventListQuery } from "@/types";
 
 export type EventRow = typeof events.$inferSelect;
 export type NewEventRow = typeof events.$inferInsert;
@@ -24,6 +25,30 @@ export function findEvents() {
     where: isNull(events.deletedAt),
     with: eventRelations,
   });
+}
+
+export async function findEventPage(query: AdminEventListQuery) {
+  const offset = (query.page - 1) * query.pageSize;
+  const where = isNull(events.deletedAt);
+  const sortColumn = {
+    contentStatus: events.contentStatus,
+    createdAt: events.createdAt,
+    startAt: events.startAt,
+    title: events.title,
+    updatedAt: events.updatedAt,
+  }[query.sortBy];
+  const direction = query.sortOrder === "asc" ? asc : desc;
+  const [items, totals] = await Promise.all([
+    database.query.events.findMany({
+      limit: query.pageSize,
+      offset,
+      orderBy: [direction(sortColumn), desc(events.createdAt), asc(events.id)],
+      where,
+      with: eventRelations,
+    }),
+    database.select({ value: count() }).from(events).where(where),
+  ]);
+  return { items, total: totals[0]?.value ?? 0 };
 }
 
 export async function findEventById(id: string) {

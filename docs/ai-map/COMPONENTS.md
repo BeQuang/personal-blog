@@ -1,13 +1,13 @@
 # Component catalog
 
-> Generated artifact — source fingerprint: `b246b7bda3e000266060ac6b0a58503df414df37ba69faf94cc1e6f988fcad2f`
+> Generated artifact — source fingerprint: `09305027bd2217dec714b6281b0ef07e98308b1880b3e95593ee56ffd35fb888`
 
 Tra bảng này trước khi tạo component mới. “Client” chỉ ra module có directive `"use client"`; Server Component không có directive.
 
 | Module | Exports UI | Runtime | Imported by |
 | --- | --- | --- | --- |
 | `src/components/admin/admin-table-columns.tsx` | — | Server-compatible | `src/components/admin/AdminResourceTable.tsx` |
-| `src/components/admin/admin-table.config.ts` | — | Server-compatible | `src/components/admin/AdminPostsManager.tsx`<br>`src/components/admin/AdminResourceTable.tsx`<br>`src/components/admin/admin-table-columns.tsx` |
+| `src/components/admin/admin-table.config.ts` | — | Server-compatible | `src/app/admin/(protected)/submissions/page.tsx`<br>`src/components/admin/AdminCampaignsManager.tsx`<br>`src/components/admin/AdminDashboard.tsx`<br>`src/components/admin/AdminEventsManager.tsx`<br>`src/components/admin/AdminGalleryManager.tsx`<br>`src/components/admin/AdminPostsManager.tsx`<br>`src/components/admin/AdminResourceTable.tsx`<br>`src/components/admin/AdminSocialLinksManager.tsx`<br>`src/components/admin/AdminSubmissionsManager.tsx`<br>`src/components/admin/AdminTaxonomyManager.tsx`<br>`src/components/admin/AdminVideosManager.tsx`<br>`src/components/admin/admin-table-columns.tsx` |
 | `src/components/admin/AdminAnalyticsChart.tsx` | `AdminAnalyticsChart` | Client | `src/components/admin/AdminDashboard.tsx` |
 | `src/components/admin/AdminAnalyticsDateFilter.tsx` | `AdminAnalyticsDateFilter` | Client | `src/components/admin/AdminDashboard.tsx` |
 | `src/components/admin/AdminAppearanceEditor.tsx` | `AdminAppearanceEditor` | Client | `src/app/admin/(protected)/appearance/page.tsx` |
@@ -21,6 +21,7 @@ Tra bảng này trước khi tạo component mới. “Client” chỉ ra module
 | `src/components/admin/AdminMediaPicker.tsx` | `AdminMediaPicker` | Client | `src/components/admin/AdminCampaignsManager.tsx`<br>`src/components/admin/AdminEventsManager.tsx`<br>`src/components/admin/AdminGalleryManager.tsx`<br>`src/components/admin/AdminPostEditorModal.tsx`<br>`src/components/admin/AdminResourceEditorModal.tsx`<br>`src/components/admin/AdminSettingsForm.tsx`<br>`src/components/admin/AdminVideoEditorModal.tsx`<br>`src/components/admin/AdminVideoUploadPanel.tsx` |
 | `src/components/admin/AdminModal.tsx` | `AdminModal` | Client | `src/components/admin/AdminCampaignsManager.tsx`<br>`src/components/admin/AdminEventsManager.tsx`<br>`src/components/admin/AdminGalleryManager.tsx`<br>`src/components/admin/AdminMediaPicker.tsx`<br>`src/components/admin/AdminPostEditorModal.tsx`<br>`src/components/admin/AdminResourceEditorModal.tsx`<br>`src/components/admin/AdminSocialLinkEditorModal.tsx`<br>`src/components/admin/AdminTaxonomyManager.tsx`<br>`src/components/admin/AdminVideoEditorModal.tsx` |
 | `src/components/admin/AdminPageHeader.tsx` | `AdminPageHeader` | Server-compatible | `src/components/admin/AdminAppearanceEditor.tsx`<br>`src/components/admin/AdminCampaignsManager.tsx`<br>`src/components/admin/AdminDashboard.tsx`<br>`src/components/admin/AdminEventsManager.tsx`<br>`src/components/admin/AdminGalleryManager.tsx`<br>`src/components/admin/AdminMediaLibrary.tsx`<br>`src/components/admin/AdminPostsManager.tsx`<br>`src/components/admin/AdminResourceTable.tsx`<br>`src/components/admin/AdminSettingsForm.tsx`<br>`src/components/admin/AdminSocialLinksManager.tsx`<br>`src/components/admin/AdminSubmissionsManager.tsx`<br>`src/components/admin/AdminVideosManager.tsx` |
+| `src/components/admin/AdminPostContentEditor.tsx` | `AdminPostContentEditor` | Client | `src/components/admin/AdminPostEditorModal.tsx` |
 | `src/components/admin/AdminPostEditorModal.tsx` | `AdminPostEditorModal` | Client | `src/components/admin/AdminPostsManager.tsx` |
 | `src/components/admin/AdminPostsManager.tsx` | `AdminPostsManager` | Client | `src/app/admin/(protected)/posts/page.tsx` |
 | `src/components/admin/AdminResourceEditorModal.tsx` | `AdminResourceEditorModal` | Client | `src/components/admin/AdminResourceTable.tsx` |
@@ -34,6 +35,7 @@ Tra bảng này trước khi tạo component mới. “Client” chỉ ra module
 | `src/components/admin/AdminVideoEditorModal.tsx` | `AdminVideoEditorModal` | Client | `src/components/admin/AdminVideosManager.tsx` |
 | `src/components/admin/AdminVideosManager.tsx` | `AdminVideosManager` | Client | `src/app/admin/(protected)/videos/page.tsx` |
 | `src/components/admin/AdminVideoUploadPanel.tsx` | `AdminVideoUploadPanel` | Client | `src/components/admin/AdminVideosManager.tsx` |
+| `src/components/admin/useAdminListPage.ts` | — | Client | `src/components/admin/AdminCampaignsManager.tsx`<br>`src/components/admin/AdminEventsManager.tsx`<br>`src/components/admin/AdminGalleryManager.tsx`<br>`src/components/admin/AdminPostsManager.tsx`<br>`src/components/admin/AdminSocialLinksManager.tsx`<br>`src/components/admin/AdminVideosManager.tsx` |
 | `src/components/analytics/AnalyticsProvider.tsx` | `AnalyticsProvider` | Client | `src/app/layout.tsx` |
 | `src/components/analytics/AnalyticsView.tsx` | `AnalyticsView` | Client | `src/app/blog/[slug]/page.tsx`<br>`src/app/campaigns/[slug]/page.tsx` |
 | `src/components/blog/BlogExplorer.tsx` | `BlogExplorer` | Client | `src/app/blog/page.tsx` |

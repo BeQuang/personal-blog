@@ -1,9 +1,10 @@
 import "server-only";
 
-import { and, desc, eq, isNull, ne, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, isNull, ne, sql } from "drizzle-orm";
 
 import { database } from "@/server/database/client";
 import { auditLogs, campaigns } from "@/server/database/schema";
+import type { AdminCampaignListQuery } from "@/types";
 
 export type CampaignRow = typeof campaigns.$inferSelect;
 export type NewCampaignRow = typeof campaigns.$inferInsert;
@@ -24,6 +25,31 @@ export function findCampaigns() {
     where: isNull(campaigns.deletedAt),
     with: campaignRelations,
   });
+}
+
+export async function findCampaignPage(query: AdminCampaignListQuery) {
+  const offset = (query.page - 1) * query.pageSize;
+  const where = isNull(campaigns.deletedAt);
+  const sortColumn = {
+    createdAt: campaigns.createdAt,
+    endAt: campaigns.endAt,
+    startAt: campaigns.startAt,
+    status: campaigns.status,
+    title: campaigns.title,
+    updatedAt: campaigns.updatedAt,
+  }[query.sortBy];
+  const direction = query.sortOrder === "asc" ? asc : desc;
+  const [items, totals] = await Promise.all([
+    database.query.campaigns.findMany({
+      limit: query.pageSize,
+      offset,
+      orderBy: [direction(sortColumn), desc(campaigns.createdAt), asc(campaigns.id)],
+      where,
+      with: campaignRelations,
+    }),
+    database.select({ value: count() }).from(campaigns).where(where),
+  ]);
+  return { items, total: totals[0]?.value ?? 0 };
 }
 
 export async function findCampaignById(id: string) {

@@ -1,9 +1,10 @@
 import "server-only";
 
-import { and, asc, desc, eq, isNull, lte, or } from "drizzle-orm";
+import { and, asc, count, desc, eq, isNull, lte, or } from "drizzle-orm";
 
 import { database } from "@/server/database/client";
 import { auditLogs, galleryItems } from "@/server/database/schema";
+import type { AdminGalleryListQuery } from "@/types";
 
 export type GalleryRow = typeof galleryItems.$inferSelect;
 export type NewGalleryRow = typeof galleryItems.$inferInsert;
@@ -29,6 +30,31 @@ export function findGalleryItems() {
     where: isNull(galleryItems.deletedAt),
     with: galleryRelations,
   });
+}
+
+export async function findGalleryItemPage(query: AdminGalleryListQuery) {
+  const offset = (query.page - 1) * query.pageSize;
+  const where = isNull(galleryItems.deletedAt);
+  const sortColumn = {
+    createdAt: galleryItems.createdAt,
+    publishedAt: galleryItems.publishedAt,
+    sortOrder: galleryItems.sortOrder,
+    status: galleryItems.status,
+    title: galleryItems.title,
+    updatedAt: galleryItems.updatedAt,
+  }[query.sortBy];
+  const direction = query.sortOrder === "asc" ? asc : desc;
+  const [items, totals] = await Promise.all([
+    database.query.galleryItems.findMany({
+      limit: query.pageSize,
+      offset,
+      orderBy: [direction(sortColumn), desc(galleryItems.createdAt), asc(galleryItems.id)],
+      where,
+      with: galleryRelations,
+    }),
+    database.select({ value: count() }).from(galleryItems).where(where),
+  ]);
+  return { items, total: totals[0]?.value ?? 0 };
 }
 
 export async function findGalleryItemById(id: string) {

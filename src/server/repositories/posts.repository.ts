@@ -1,9 +1,10 @@
 import "server-only";
 
-import { and, desc, eq, isNull, lte, ne, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, isNull, lte, ne, or, sql } from "drizzle-orm";
 
 import { database } from "@/server/database/client";
-import { auditLogs, posts, postTags, profiles } from "@/server/database/schema";
+import { auditLogs, categories, posts, postTags, profiles } from "@/server/database/schema";
+import type { AdminPostListQuery } from "@/types";
 
 export type PostRow = typeof posts.$inferSelect;
 export type NewPostRow = typeof posts.$inferInsert;
@@ -34,6 +35,52 @@ export function findPosts() {
     where: isNull(posts.deletedAt),
     with: postRelations,
   });
+}
+
+export async function findPostPage(query: AdminPostListQuery) {
+  const offset = (query.page - 1) * query.pageSize;
+  const pattern = `%${query.query}%`;
+  const statusCondition = query.includeArchived
+    ? query.status === "all"
+      ? undefined
+      : or(eq(posts.status, query.status), eq(posts.status, "archived"))
+    : query.status === "all"
+      ? ne(posts.status, "archived")
+      : eq(posts.status, query.status);
+  const searchCondition = query.query
+    ? or(
+        ilike(posts.title, pattern),
+        ilike(posts.slug, pattern),
+        ilike(posts.excerpt, pattern),
+        sql`exists (
+          select 1 from ${categories}
+          where ${categories.id} = ${posts.categoryId}
+            and ${categories.name} ilike ${pattern}
+        )`,
+      )
+    : undefined;
+  const where = and(isNull(posts.deletedAt), statusCondition, searchCondition);
+  const sortColumn = {
+    createdAt: posts.createdAt,
+    publishedAt: posts.publishedAt,
+    status: posts.status,
+    title: posts.title,
+    updatedAt: posts.updatedAt,
+  }[query.sortBy];
+  const direction = query.sortOrder === "asc" ? asc : desc;
+
+  const [items, totals] = await Promise.all([
+    database.query.posts.findMany({
+      limit: query.pageSize,
+      offset,
+      orderBy: [direction(sortColumn), desc(posts.createdAt), asc(posts.id)],
+      where,
+      with: postRelations,
+    }),
+    database.select({ value: count() }).from(posts).where(where),
+  ]);
+
+  return { items, total: totals[0]?.value ?? 0 };
 }
 
 export async function findPostById(id: string) {

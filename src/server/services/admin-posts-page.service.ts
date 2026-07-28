@@ -2,7 +2,11 @@ import "server-only";
 
 import { requireAdminPagePermission } from "@/server/auth";
 import { mapPostRowToAdminPost } from "@/server/mappers/posts.mapper";
-import type { MediaOption, TaxonomyItem } from "@/types";
+import type {
+  AdminPostListQuery,
+  MediaOption,
+  TaxonomyItem,
+} from "@/types";
 
 import { executeRepository } from "./service-helpers";
 
@@ -29,7 +33,17 @@ export async function getAdminPostsPageData() {
 
   // Keep database work sequential. The production pool is intentionally small,
   // and issuing this page's relational reads concurrently can starve the pooler.
-  const postRows = await executeRepository(() => postsRepository.findPosts());
+  const initialQuery: AdminPostListQuery = {
+    page: 1,
+    pageSize: 10,
+    query: "",
+    status: "all",
+    includeArchived: false,
+    sortBy: "updatedAt",
+    sortOrder: "desc",
+  };
+  const postResult = await executeRepository(() =>
+    postsRepository.findPostPage(initialQuery));
   const categoryRows = await executeRepository(() => categoriesRepository.findCategories());
   const tagRows = await executeRepository(() => tagsRepository.findTags());
   const mediaRows = await executeRepository(() => mediaRepository.findAvailablePostMedia());
@@ -46,7 +60,14 @@ export async function getAdminPostsPageData() {
 
   return {
     currentUser,
-    posts: postRows.map(mapPostRowToAdminPost),
+    postsPage: {
+      items: postResult.items.map(mapPostRowToAdminPost),
+      total: postResult.total,
+      page: initialQuery.page,
+      pageSize: initialQuery.pageSize,
+      sortBy: initialQuery.sortBy,
+      sortOrder: initialQuery.sortOrder,
+    },
     categories: categoryRows.map(mapTaxonomyItem),
     tags: tagRows.map(mapTaxonomyItem),
     mediaOptions,

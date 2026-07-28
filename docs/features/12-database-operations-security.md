@@ -47,6 +47,8 @@ Không bật lại trên environment đã có người dùng.
 
 Schema, migration và generated metadata phải thay đổi cùng nhau. Không sửa migration đã chạy trên shared environment; tạo migration mới.
 
+Migration `0010_hot_gravity.sql` bổ sung index cho các thứ tự Admin được dùng thường xuyên: `posts.updated_at`, `videos.updated_at`, `gallery_items.sort_order`, `social_links.sort_order`, `categories.name` và `tags.name`. Khi thêm `sortBy` mới cho list API có dữ liệu tăng trưởng, phải kiểm tra execution plan/index và tạo migration tiếp theo nếu cần.
+
 ## Setup local
 
 ```powershell

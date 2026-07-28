@@ -4,7 +4,7 @@ import { App, Button, Form, Input, InputNumber, Select, Space, Table, Tag } from
 import type { TableColumnsType } from "antd";
 import Image from "next/image";
 import { Pencil, Plus, Trash2 } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useCallback, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { createGalleryItemAction, deleteGalleryItemAction, updateGalleryItemAction } from "@/actions/gallery.actions";
@@ -12,12 +12,20 @@ import { AdminDateTimePicker } from "@/components/admin/AdminDatePickers";
 import { AdminMediaPicker } from "@/components/admin/AdminMediaPicker";
 import { AdminModal } from "@/components/admin/AdminModal";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
-import type { AdminGalleryItem, GalleryMutationInput, MediaOption } from "@/types";
+import { useAdminListPage } from "@/components/admin/useAdminListPage";
+import { adminTablePaginationDefaults } from "@/components/admin/admin-table.config";
+import type {
+  AdminGalleryItem,
+  AdminGalleryListQuery,
+  AdminListPage,
+  GalleryMutationInput,
+  MediaOption,
+} from "@/types";
 
-interface Props { items: readonly AdminGalleryItem[]; mediaOptions: readonly MediaOption[]; canWrite: boolean; canPublish: boolean; }
+interface Props { initialPage: AdminListPage<AdminGalleryItem, AdminGalleryListQuery["sortBy"]>; mediaOptions: readonly MediaOption[]; canWrite: boolean; canPublish: boolean; }
 type FormValues = Omit<GalleryMutationInput, "publishedAt"> & { publishedAt?: string };
 
-export function AdminGalleryManager({ items, mediaOptions, canWrite, canPublish }: Props) {
+export function AdminGalleryManager({ initialPage, mediaOptions, canWrite, canPublish }: Props) {
   const { message, modal } = App.useApp();
   const router = useRouter();
   const [form] = Form.useForm<FormValues>();
@@ -25,6 +33,8 @@ export function AdminGalleryManager({ items, mediaOptions, canWrite, canPublish 
   const [editing, setEditing] = useState<AdminGalleryItem | null>(null);
   const [pending, startTransition] = useTransition();
   const mediaId = Form.useWatch("mediaAssetId", form);
+  const reportListError = useCallback((error: string) => { void message.error(error); }, [message]);
+  const { data, load, loading, reload } = useAdminListPage("/api/admin/gallery", initialPage, reportListError);
 
   const edit = (item: AdminGalleryItem | null) => {
     setEditing(item);
@@ -37,10 +47,10 @@ export function AdminGalleryManager({ items, mediaOptions, canWrite, canPublish 
     const input: GalleryMutationInput = { ...values, caption: values.caption || null, publishedAt: values.publishedAt ? new Date(values.publishedAt).toISOString() : null };
     const result = editing ? await updateGalleryItemAction(editing.id, input) : await createGalleryItemAction(input);
     if (!result.success) { void message.error(result.message); if (result.fieldErrors) form.setFields(Object.entries(result.fieldErrors).map(([name, errors]) => ({ name: name as keyof FormValues, errors: [...errors] }))); return; }
-    void message.success(result.message); setOpen(false); form.resetFields(); router.refresh();
+    void message.success(result.message); setOpen(false); form.resetFields(); await reload(); router.refresh();
   });
 
-  const remove = (item: AdminGalleryItem) => modal.confirm({ title: `Xóa “${item.title}”?`, content: "Chỉ item Gallery bị xóa mềm; file gốc trong Media Library không bị xóa.", okText: "Xóa", okButtonProps: { danger: true }, cancelText: "Hủy", onOk: async () => { const result = await deleteGalleryItemAction(item.id); if (!result.success) throw new Error(result.message); void message.success(result.message); router.refresh(); } });
+  const remove = (item: AdminGalleryItem) => modal.confirm({ title: `Xóa “${item.title}”?`, content: "Chỉ item Gallery bị xóa mềm; file gốc trong Media Library không bị xóa.", okText: "Xóa", okButtonProps: { danger: true }, cancelText: "Hủy", onOk: async () => { const result = await deleteGalleryItemAction(item.id); if (!result.success) throw new Error(result.message); void message.success(result.message); await reload(); router.refresh(); } });
   const columns: TableColumnsType<AdminGalleryItem> = [
     { title: "Ảnh", width: 90, render: (_, item) => <div className="admin-media-thumb">{item.imageUrl ? <Image src={item.imageUrl} alt="" fill sizes="64px" className="object-cover" /> : <span>Chưa có ảnh</span>}</div> },
     { title: "Nội dung", render: (_, item) => <div className="admin-table-title"><strong>{item.title}</strong><span>{item.category} · thứ tự {item.sortOrder}</span></div> },
@@ -50,7 +60,7 @@ export function AdminGalleryManager({ items, mediaOptions, canWrite, canPublish 
 
   return <>
     <AdminPageHeader title="Hình ảnh" description="Quản lý Gallery public bằng PostgreSQL; file ảnh gốc tiếp tục được quản lý riêng trong Media Library." action={canWrite ? <Button type="primary" icon={<Plus size={17} />} onClick={() => edit(null)}>Thêm ảnh</Button> : undefined} />
-    <section className="admin-panel admin-table-panel" aria-label="Danh sách Gallery"><Table rowKey="id" columns={columns} dataSource={[...items]} loading={pending} scroll={{ x: 760 }} pagination={{ pageSize: 12, showSizeChanger: false }} locale={{ emptyText: "Gallery chưa có item." }} /></section>
+    <section className="admin-panel admin-table-panel" aria-label="Danh sách Gallery"><Table rowKey="id" columns={columns} dataSource={[...data.items]} loading={pending || loading} scroll={{ x: 760 }} pagination={{ ...adminTablePaginationDefaults, current: data.page, pageSize: data.pageSize, total: data.total }} onChange={(pagination) => void load({ page: pagination.current ?? 1, pageSize: pagination.pageSize ?? data.pageSize, sortBy: data.sortBy, sortOrder: data.sortOrder })} locale={{ emptyText: "Gallery chưa có item." }} /></section>
     <AdminModal title={editing ? "Sửa Gallery item" : "Thêm Gallery item"} open={open} onCancel={() => setOpen(false)} onOk={() => form.submit()} confirmLoading={pending} okText="Lưu" cancelText="Hủy" destroyOnHidden>
       <Form form={form} layout="vertical" onFinish={submit} requiredMark="optional">
         <Form.Item name="mediaAssetId" label="Ảnh" rules={[{ required: true, message: "Hãy chọn ảnh." }]}><Input hidden /></Form.Item>

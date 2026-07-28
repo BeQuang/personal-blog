@@ -1,0 +1,52 @@
+export type AdminSortOrder = "asc" | "desc";
+
+export interface AdminListQuery<SortField extends string = string> {
+  page: number;
+  pageSize: number;
+  sortBy: SortField;
+  sortOrder: AdminSortOrder;
+}
+
+export interface AdminListPage<Item, SortField extends string = string>
+  extends AdminListQuery<SortField> {
+  items: readonly Item[];
+  total: number;
+}
+
+export interface AdminPostListQuery
+  extends AdminListQuery<"createdAt" | "publishedAt" | "status" | "title" | "updatedAt"> {
+  query: string;
+  status: "all" | "draft" | "scheduled" | "published";
+  includeArchived: boolean;
+}
+
+export interface AdminVideoListQuery
+  extends AdminListQuery<"contentStatus" | "createdAt" | "title" | "updatedAt"> {
+  query: string;
+  status:
+    | "all"
+    | "draft"
+    | "scheduled"
+    | "published"
+    | "archived"
+    | "pending"
+    | "uploading"
+    | "processing"
+    | "ready"
+    | "failed"
+    | "deleted";
+}
+
+export type AdminGalleryListQuery =
+  AdminListQuery<"createdAt" | "publishedAt" | "sortOrder" | "status" | "title" | "updatedAt">;
+
+export type AdminEventListQuery =
+  AdminListQuery<"contentStatus" | "createdAt" | "startAt" | "title" | "updatedAt">;
+
+export type AdminCampaignListQuery =
+  AdminListQuery<"createdAt" | "endAt" | "startAt" | "status" | "title" | "updatedAt">;
+
+export interface AdminSocialLinkListQuery
+  extends AdminListQuery<"createdAt" | "enabled" | "label" | "sortOrder" | "updatedAt"> {
+  query: string;
+}

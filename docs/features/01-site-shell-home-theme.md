@@ -65,6 +65,8 @@ Admin form
 -> revalidate root layout, admin settings/appearance và sitemap
 ```
 
+`/admin/social-links` dùng `GET /api/admin/social-links` cho danh sách quản trị. Search, trang, số dòng và `sortBy/sortOrder` được validate ở service; repository áp dụng `COUNT + LIMIT + OFFSET + ORDER BY`, mặc định theo `sortOrder asc`. Response chỉ chứa trang hiện tại và public vẫn chỉ nhận các link đang bật.
+
 ## Business rules
 
 - Site name 2–100; description 10–300.

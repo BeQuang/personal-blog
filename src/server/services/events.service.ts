@@ -5,13 +5,26 @@ import { z } from "zod";
 import { events as mockEvents } from "@/data/events";
 import { ConflictError, NotFoundError, ValidationError } from "@/server/errors";
 import { mapEventRowToEventItem } from "@/server/mappers/events.mapper";
+import {
+  adminListPageSchema,
+  parseAdminListQuery,
+} from "@/server/validation/admin-list.validation";
 import { httpUrlSchema } from "@/server/validation/url.validation";
-import type { AdminEvent } from "@/types";
+import type {
+  AdminEvent,
+  AdminEventListQuery,
+  AdminListPage,
+} from "@/types";
 
 import { getContentSource } from "./content-source";
 import { assertDateRange, createSlug, executeRepository, parseSlug, slugSchema } from "./service-helpers";
 
 const idSchema = z.uuid("ID sự kiện không hợp lệ");
+const adminEventListQuerySchema = adminListPageSchema.extend({
+  sortBy: z
+    .enum(["contentStatus", "createdAt", "startAt", "title", "updatedAt"])
+    .default("startAt"),
+});
 const eventMutationSchema = z.object({
   title: z.string().trim().min(3).max(180),
   slug: slugSchema.optional(),
@@ -84,6 +97,26 @@ export async function getEventBySlug(slug: string) { const normalized = parseSlu
 export async function requireEventBySlug(slug: string) { const event = await getEventBySlug(slug); if (!event) throw new NotFoundError("Event", slug); return event; }
 
 export async function getAdminEvents() { await requirePermission("content:view"); const repository = await import("@/server/repositories/events.repository"); return executeRepository(async () => (await repository.findEvents()).map(mapAdminEvent)); }
+export async function getAdminEventPage(
+  input: unknown,
+): Promise<AdminListPage<AdminEvent, AdminEventListQuery["sortBy"]>> {
+  await requirePermission("content:view");
+  const query = parseAdminListQuery(
+    adminEventListQuerySchema,
+    input,
+    "Bộ lọc sự kiện chưa hợp lệ",
+  ) as AdminEventListQuery;
+  const repository = await import("@/server/repositories/events.repository");
+  const result = await executeRepository(() => repository.findEventPage(query));
+  return {
+    items: result.items.map(mapAdminEvent),
+    total: result.total,
+    page: query.page,
+    pageSize: query.pageSize,
+    sortBy: query.sortBy,
+    sortOrder: query.sortOrder,
+  };
+}
 export async function createEvent(input: unknown) { const prepared = await prepareEventMutation(input); const repository = await import("@/server/repositories/events.repository"); return executeRepository(() => repository.createEvent(prepared.values, prepared.currentUser.id)); }
 export async function updateEvent(id: string, input: unknown) { const parsedId = idSchema.parse(id); const prepared = await prepareEventMutation(input, parsedId); const repository = await import("@/server/repositories/events.repository"); const row = await executeRepository(() => repository.updateEvent(parsedId, prepared.values, prepared.currentUser.id)); if (!row) throw new NotFoundError("Event", parsedId); return row; }
 export async function archiveEvent(id: string) { const parsedId = idSchema.parse(id); const currentUser = await requirePermission("content:publish"); const repository = await import("@/server/repositories/events.repository"); const row = await executeRepository(() => repository.archiveEvent(parsedId, currentUser.id)); if (!row) throw new NotFoundError("Event", parsedId); return row; }

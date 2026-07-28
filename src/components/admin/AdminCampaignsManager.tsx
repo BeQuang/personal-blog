@@ -3,7 +3,7 @@
 import { App, Button, Form, Input, InputNumber, Select, Space, Switch, Table, Tag } from "antd";
 import type { TableColumnsType } from "antd";
 import { Archive, Pencil, Plus } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useCallback, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { archiveCampaignAction, createCampaignAction, updateCampaignAction } from "@/actions/campaigns.actions";
@@ -11,18 +11,22 @@ import { AdminDateTimePicker } from "@/components/admin/AdminDatePickers";
 import { AdminMediaPicker } from "@/components/admin/AdminMediaPicker";
 import { AdminModal } from "@/components/admin/AdminModal";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
-import type { AdminCampaign, CampaignMutationInput, MediaOption } from "@/types";
+import { useAdminListPage } from "@/components/admin/useAdminListPage";
+import { adminTablePaginationDefaults } from "@/components/admin/admin-table.config";
+import type { AdminCampaign, AdminCampaignListQuery, AdminListPage, CampaignMutationInput, MediaOption } from "@/types";
 
-interface Props { campaigns: readonly AdminCampaign[]; mediaOptions: readonly MediaOption[]; canWrite: boolean; canPublish: boolean; }
+interface Props { initialPage: AdminListPage<AdminCampaign, AdminCampaignListQuery["sortBy"]>; mediaOptions: readonly MediaOption[]; canWrite: boolean; canPublish: boolean; }
 type FormValues = Omit<CampaignMutationInput, "rules" | "terms"> & { rulesText: string; termsText: string };
 const lines = (value: string) => value.split("\n").map((item) => item.trim()).filter(Boolean);
 
-export function AdminCampaignsManager({ campaigns, mediaOptions, canWrite, canPublish }: Props) {
+export function AdminCampaignsManager({ initialPage, mediaOptions, canWrite, canPublish }: Props) {
   const { message, modal } = App.useApp(); const router = useRouter(); const [form] = Form.useForm<FormValues>();
   const [open, setOpen] = useState(false); const [editing, setEditing] = useState<AdminCampaign | null>(null); const [pending, startTransition] = useTransition(); const bannerId = Form.useWatch("bannerMediaId", form); const submissionEnabled = Form.useWatch("submissionEnabled", form);
+  const reportListError = useCallback((error: string) => { void message.error(error); }, [message]);
+  const { data, load, loading, reload } = useAdminListPage("/api/admin/campaigns", initialPage, reportListError);
   const edit = (item: AdminCampaign | null) => { setEditing(item); form.resetFields(); form.setFieldsValue(item ? { title: item.title, slug: item.slug, description: item.description, bannerMediaId: item.bannerMediaId ?? "", startAt: item.startAt.slice(0, 16), endAt: item.endAt.slice(0, 16), status: item.status, buttonLabel: item.buttonLabel, buttonUrl: item.buttonUrl, rulesText: item.rules.join("\n"), termsText: item.terms.join("\n"), featured: item.featured, submissionEnabled: item.submissionEnabled, submissionLimit: item.submissionLimit } : { status: "draft", buttonLabel: "Tham gia ngay", featured: false, submissionEnabled: true, rulesText: "", termsText: "" }); setOpen(true); };
-  const submit = (values: FormValues) => startTransition(async () => { const input: CampaignMutationInput = { ...values, startAt: new Date(values.startAt).toISOString(), endAt: new Date(values.endAt).toISOString(), buttonUrl: values.buttonUrl || null, rules: lines(values.rulesText), terms: lines(values.termsText), submissionLimit: values.submissionEnabled ? values.submissionLimit ?? null : null }; const result = editing ? await updateCampaignAction(editing.id, input) : await createCampaignAction(input); if (!result.success) { void message.error(result.message); if (result.fieldErrors) form.setFields(Object.entries(result.fieldErrors).map(([name, errors]) => ({ name: name as keyof FormValues, errors: [...errors] }))); return; } void message.success(result.message); setOpen(false); router.refresh(); });
-  const archive = (item: AdminCampaign) => modal.confirm({ title: `Lưu trữ “${item.title}”?`, okText: "Lưu trữ", cancelText: "Hủy", okButtonProps: { danger: true }, onOk: async () => { const result = await archiveCampaignAction(item.id); if (!result.success) throw new Error(result.message); void message.success(result.message); router.refresh(); } });
+  const submit = (values: FormValues) => startTransition(async () => { const input: CampaignMutationInput = { ...values, startAt: new Date(values.startAt).toISOString(), endAt: new Date(values.endAt).toISOString(), buttonUrl: values.buttonUrl || null, rules: lines(values.rulesText), terms: lines(values.termsText), submissionLimit: values.submissionEnabled ? values.submissionLimit ?? null : null }; const result = editing ? await updateCampaignAction(editing.id, input) : await createCampaignAction(input); if (!result.success) { void message.error(result.message); if (result.fieldErrors) form.setFields(Object.entries(result.fieldErrors).map(([name, errors]) => ({ name: name as keyof FormValues, errors: [...errors] }))); return; } void message.success(result.message); setOpen(false); await reload(); router.refresh(); });
+  const archive = (item: AdminCampaign) => modal.confirm({ title: `Lưu trữ “${item.title}”?`, okText: "Lưu trữ", cancelText: "Hủy", okButtonProps: { danger: true }, onOk: async () => { const result = await archiveCampaignAction(item.id); if (!result.success) throw new Error(result.message); void message.success(result.message); await reload(); router.refresh(); } });
   const columns: TableColumnsType<AdminCampaign> = [
     { title: "Chiến dịch", render: (_, item) => <div className="admin-table-title"><strong>{item.title}</strong><span>{item.slug}</span></div> },
     { title: "Thời gian", width: 220, render: (_, item) => <span>{new Date(item.startAt).toLocaleDateString("vi-VN")} – {new Date(item.endAt).toLocaleDateString("vi-VN")}</span> },
@@ -32,7 +36,7 @@ export function AdminCampaignsManager({ campaigns, mediaOptions, canWrite, canPu
   ];
   return <>
     <AdminPageHeader title="Chiến dịch" description="Quản lý chiến dịch, mốc thời gian và cấu hình nhận đăng ký bằng PostgreSQL." action={canWrite ? <Button type="primary" icon={<Plus size={17} />} onClick={() => edit(null)}>Thêm chiến dịch</Button> : undefined} />
-    <section className="admin-panel admin-table-panel" aria-label="Danh sách chiến dịch"><Table rowKey="id" columns={columns} dataSource={[...campaigns]} loading={pending} scroll={{ x: 980 }} pagination={{ pageSize: 8, showSizeChanger: false }} locale={{ emptyText: "Chưa có chiến dịch." }} /></section>
+    <section className="admin-panel admin-table-panel" aria-label="Danh sách chiến dịch"><Table rowKey="id" columns={columns} dataSource={[...data.items]} loading={pending || loading} scroll={{ x: 980 }} pagination={{ ...adminTablePaginationDefaults, current: data.page, pageSize: data.pageSize, total: data.total }} onChange={(pagination) => void load({ page: pagination.current ?? 1, pageSize: pagination.pageSize ?? data.pageSize, sortBy: data.sortBy, sortOrder: data.sortOrder })} locale={{ emptyText: "Chưa có chiến dịch." }} /></section>
     <AdminModal width={760} title={editing ? "Sửa chiến dịch" : "Tạo chiến dịch"} open={open} onCancel={() => setOpen(false)} onOk={() => form.submit()} confirmLoading={pending} okText="Lưu" cancelText="Hủy" destroyOnHidden>
       <Form form={form} layout="vertical" onFinish={submit} requiredMark="optional">
         <Form.Item name="bannerMediaId" hidden rules={[{ required: true, message: "Hãy chọn banner." }]}><Input /></Form.Item><Form.Item label="Banner"><AdminMediaPicker items={mediaOptions} value={bannerId} label="Banner chiến dịch" purpose="campaign_banner" onChange={(selection) => form.setFieldValue("bannerMediaId", selection?.id ?? "")} /></Form.Item>

@@ -5,12 +5,26 @@ import { z } from "zod";
 import { galleryItems as mockGalleryItems } from "@/data/gallery";
 import { NotFoundError, ValidationError } from "@/server/errors";
 import { mapGalleryRowToGalleryItem } from "@/server/mappers/gallery.mapper";
-import type { AdminGalleryItem } from "@/types";
+import {
+  adminListPageSchema,
+  parseAdminListQuery,
+} from "@/server/validation/admin-list.validation";
+import type {
+  AdminGalleryItem,
+  AdminGalleryListQuery,
+  AdminListPage,
+} from "@/types";
 
 import { getContentSource } from "./content-source";
 import { executeRepository } from "./service-helpers";
 
 const idSchema = z.uuid("ID không hợp lệ");
+const adminGalleryListQuerySchema = adminListPageSchema.extend({
+  sortBy: z
+    .enum(["createdAt", "publishedAt", "sortOrder", "status", "title", "updatedAt"])
+    .default("sortOrder"),
+  sortOrder: z.enum(["asc", "desc"]).default("asc"),
+});
 const galleryMutationSchema = z.object({
   mediaAssetId: z.uuid("Hãy chọn ảnh từ Media Library"),
   title: z.string().trim().min(2, "Tiêu đề có ít nhất 2 ký tự").max(180),
@@ -90,6 +104,27 @@ export async function getAdminGalleryItems() {
   await requirePermission("media:manage");
   const repository = await import("@/server/repositories/gallery.repository");
   return executeRepository(async () => (await repository.findGalleryItems()).map(mapAdminGallery));
+}
+
+export async function getAdminGalleryItemPage(
+  input: unknown,
+): Promise<AdminListPage<AdminGalleryItem, AdminGalleryListQuery["sortBy"]>> {
+  await requirePermission("media:manage");
+  const query = parseAdminListQuery(
+    adminGalleryListQuerySchema,
+    input,
+    "Bộ lọc thư viện ảnh chưa hợp lệ",
+  ) as AdminGalleryListQuery;
+  const repository = await import("@/server/repositories/gallery.repository");
+  const result = await executeRepository(() => repository.findGalleryItemPage(query));
+  return {
+    items: result.items.map(mapAdminGallery),
+    total: result.total,
+    page: query.page,
+    pageSize: query.pageSize,
+    sortBy: query.sortBy,
+    sortOrder: query.sortOrder,
+  };
 }
 
 export async function createGalleryItem(input: unknown) {

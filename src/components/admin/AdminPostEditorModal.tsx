@@ -6,10 +6,16 @@ import { useEffect } from "react";
 import { AdminDateTimePicker } from "@/components/admin/AdminDatePickers";
 import { AdminMediaPicker } from "@/components/admin/AdminMediaPicker";
 import { AdminModal } from "@/components/admin/AdminModal";
+import { AdminPostContentEditor } from "@/components/admin/AdminPostContentEditor";
+import {
+  createPostContentBlock,
+  validatePostContentBlocks,
+} from "@/lib/post-content-blocks";
 import type {
   ActionFieldErrors,
   AdminPost,
   MediaOption,
+  PostContentBlock,
   PostMutationInput,
   TaxonomyItem,
 } from "@/types";
@@ -18,7 +24,8 @@ interface PostFormValues {
   title: string;
   slug?: string;
   excerpt: string;
-  contentJson: string;
+  content: PostContentBlock[];
+  contentAdvancedError?: string;
   status: PostMutationInput["status"];
   featured: boolean;
   readingTime: number;
@@ -44,17 +51,11 @@ interface AdminPostEditorModalProps {
   onSubmit: (input: PostMutationInput) => Promise<ActionFieldErrors | undefined>;
 }
 
-const starterContent = JSON.stringify(
-  [{ type: "paragraph", text: "Nhập nội dung bài viết tại đây." }],
-  null,
-  2,
-);
-
 const postFieldNames: Readonly<Record<string, keyof PostFormValues>> = {
   title: "title",
   slug: "slug",
   excerpt: "excerpt",
-  content: "contentJson",
+  content: "content",
   status: "status",
   featured: "featured",
   readingTime: "readingTime",
@@ -98,7 +99,12 @@ export function AdminPostEditorModal({
       title: post?.title ?? "",
       slug: post?.slug ?? "",
       excerpt: post?.excerpt ?? "",
-      contentJson: post ? JSON.stringify(post.content, null, 2) : starterContent,
+      content: post
+        ? post.content.map((block) => (
+          block.type === "list" ? { ...block, items: [...block.items] } : { ...block }
+        ))
+        : [createPostContentBlock("paragraph")],
+      contentAdvancedError: undefined,
       status: post?.status === "archived" ? "draft" : (post?.status ?? "draft"),
       featured: post?.featured ?? false,
       readingTime: post?.readingTime ?? 5,
@@ -114,24 +120,23 @@ export function AdminPostEditorModal({
   }, [categories, form, open, post]);
 
   const submit = async (values: PostFormValues) => {
-    let content: unknown;
-    try {
-      content = JSON.parse(values.contentJson);
-    } catch {
-      form.setFields([{ name: "contentJson", errors: ["JSON content blocks không hợp lệ."] }]);
+    if (values.contentAdvancedError) {
+      form.setFields([{ name: "content", errors: [values.contentAdvancedError] }]);
       return;
     }
 
-    if (!Array.isArray(content)) {
-      form.setFields([{ name: "contentJson", errors: ["Content blocks phải là một JSON array."] }]);
+    const parsedContent = validatePostContentBlocks(values.content);
+    if (!parsedContent.success) {
+      form.setFields([{ name: "content", errors: [parsedContent.error] }]);
       return;
     }
+    form.setFields([{ name: "content", errors: [] }]);
 
     const fieldErrors = await onSubmit({
       title: values.title,
       slug: values.slug,
       excerpt: values.excerpt,
-      content,
+      content: parsedContent.data,
       status: values.status,
       featured: values.featured,
       readingTime: values.readingTime,
@@ -186,12 +191,22 @@ export function AdminPostEditorModal({
         </Form.Item>
 
         <Form.Item
-          name="contentJson"
-          label="Content blocks (JSON)"
-          rules={[{ required: true, message: "Vui lòng nhập content blocks." }]}
-          extra='Hỗ trợ: heading, paragraph, image, quote, list, code, video, cta và divider. Dữ liệu được Zod kiểm tra lại trên server.'
+          name="content"
+          label="Nội dung bài viết"
+          required
+          extra="Soạn bằng biểu mẫu trực quan hoặc chuyển sang JSON nâng cao nếu bạn cần chỉnh cấu trúc nhanh."
         >
-          <Input.TextArea rows={14} className="admin-code-input" spellCheck={false} />
+          <AdminPostContentEditor
+            mediaOptions={mediaOptions}
+            disabled={pending}
+            onAdvancedStateChange={(error) => {
+              form.setFieldValue("contentAdvancedError", error ?? undefined);
+              form.setFields([{ name: "content", errors: error ? [error] : [] }]);
+            }}
+          />
+        </Form.Item>
+        <Form.Item name="contentAdvancedError" hidden>
+          <Input />
         </Form.Item>
 
         <div className="admin-form-grid">
@@ -204,6 +219,12 @@ export function AdminPostEditorModal({
         </div>
 
         <div className="admin-form-grid">
+          <Form.Item name="thumbnailMediaId" hidden>
+            <Input />
+          </Form.Item>
+          <Form.Item name="coverMediaId" hidden>
+            <Input />
+          </Form.Item>
           <Form.Item label="Thumbnail" extra="Chọn ảnh đã được xác minh trong Media Library.">
             <AdminMediaPicker
               items={mediaOptions}

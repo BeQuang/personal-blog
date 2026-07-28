@@ -36,6 +36,17 @@ export interface TaxonomyItem {
   description?: string;
 }
 
+export type TaxonomyType = "category" | "tag";
+
+export interface TaxonomyPage {
+  items: readonly TaxonomyItem[];
+  page: number;
+  pageSize: number;
+  total: number;
+  sortBy: "name" | "slug" | "createdAt" | "updatedAt";
+  sortOrder: "asc" | "desc";
+}
+
 export interface MediaOption {
   id: string;
   label: string;

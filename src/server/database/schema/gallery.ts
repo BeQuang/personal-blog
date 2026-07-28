@@ -33,5 +33,6 @@ export const galleryItems = pgTable(
     index("gallery_items_category_status_idx").on(table.category, table.status),
     index("gallery_items_published_at_idx").on(table.publishedAt.desc()),
     index("gallery_items_created_at_idx").on(table.createdAt.desc()),
+    index("gallery_items_sort_order_idx").on(table.sortOrder),
   ],
 ).enableRLS();

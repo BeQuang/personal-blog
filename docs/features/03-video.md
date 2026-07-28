@@ -17,6 +17,7 @@ Tại `/admin/videos`:
 - Chọn thumbnail từ Media Library hoặc tải ảnh thumbnail mới từ máy ngay trong picker.
 - Sửa metadata, publish/unpublish, featured và delete.
 - Xem processing state/error của Mux.
+- Bảng video gọi `GET /api/admin/videos` theo trang, mặc định 10 dòng và cho chọn 10/20/50. Search/trạng thái được áp dụng trước `COUNT`; repository dùng `LIMIT/OFFSET` và `ORDER BY` allowlist, mặc định `updatedAt desc`. Polling trạng thái Mux chỉ tải lại trang hiện tại.
 
 ## Source ownership
 
@@ -25,7 +26,7 @@ Tại `/admin/videos`:
 | Public route/UI | `src/app/videos/page.tsx`, `src/components/videos/*` |
 | Admin UI | `AdminVideosManager`, `AdminVideoEditorModal`, `AdminVideoUploadPanel` |
 | Public facade | `src/services/video.service.ts` |
-| Action/API | `videos.actions.ts`, `/api/uploads/video-url`, `/api/webhooks/mux` |
+| Action/API | `videos.actions.ts`, `GET /api/admin/videos`, `/api/uploads/video-url`, `/api/webhooks/mux` |
 | Service | `src/server/services/videos.service.ts` |
 | Provider | `src/server/video/*` |
 | Validation | `src/server/validation/videos.validation.ts` |

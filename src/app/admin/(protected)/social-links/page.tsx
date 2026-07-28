@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 
 import { AdminSocialLinksManager } from "@/components/admin/AdminSocialLinksManager";
 import { requireAdminPagePermission } from "@/server/auth";
-import { getAdminSocialLinks } from "@/server/services/social-links.service";
+import { getAdminSocialLinkPage } from "@/server/services/social-links.service";
 
 export const metadata: Metadata = { title: "Mạng xã hội" };
 
 export default async function AdminSocialLinksPage() {
   await requireAdminPagePermission("settings:manage");
-  const links = await getAdminSocialLinks();
+  const initialPage = await getAdminSocialLinkPage({});
 
-  return <AdminSocialLinksManager links={links} />;
+  return <AdminSocialLinksManager initialPage={initialPage} />;
 }

@@ -4,7 +4,7 @@
 
 - `/admin/login`: email/password.
 - Login thành công redirect về `next` an toàn trong `/admin`, mặc định `/admin`.
-- Admin shell có logout.
+- Nút logout trong header Admin mở hộp xác nhận; chỉ gọi `logoutAction` sau khi người dùng chọn **Đăng xuất**, còn **Ở lại** giữ nguyên phiên hiện tại.
 - User chưa đăng nhập được redirect về login; account disabled bị từ chối.
 
 ## Source ownership
@@ -77,6 +77,7 @@ Sau lần production đầu: tắt flag, xóa password khỏi environment và đ
 
 - Không dùng service role key trong browser.
 - Không đọc cookie thủ công thay Supabase SSR helper.
+- Kiểm tra nút logout mở hộp xác nhận, nút **Ở lại** không thay đổi phiên và nút **Đăng xuất** kết thúc phiên rồi chuyển về `/admin/login?status=logged_out`.
 - Khi thêm permission: cập nhật constant, matrix, page/service guard, navigation visibility, RLS/test và docs.
 - User-management UI hiện chưa có; không suy luận `users:manage` đã có màn hình.
 
@@ -86,4 +87,3 @@ npm run auth:test:rls
 npm run content:test:authorization
 npm run test:security
 ```
-

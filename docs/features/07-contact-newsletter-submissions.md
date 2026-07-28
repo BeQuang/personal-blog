@@ -22,7 +22,7 @@ Campaign detail nhận họ tên, email, phone, followed platform, social userna
 - Newsletter subscriptions.
 - Campaign submissions.
 
-Hỗ trợ search, status filter, campaign filter, pagination, status update và CSV export nếu có quyền.
+Hỗ trợ search, status filter, campaign filter, pagination, status update và CSV export nếu có quyền. Pagination mặc định 10 dòng, cho chọn 10/20/50; `pageSize` được giữ trong URL, validate tối đa 100 ở service và repository áp dụng `LIMIT/OFFSET` cho đúng resource.
 
 ## Source ownership
 
@@ -98,4 +98,3 @@ npm run submissions:test:security
 npm run analytics:test
 npm run type-check
 ```
-

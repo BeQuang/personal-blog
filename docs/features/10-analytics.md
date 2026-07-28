@@ -90,9 +90,11 @@ Anonymous session trong DB là SHA-256 hash. Referrer chỉ giữ domain. Metada
 - hỗ trợ date range
 - hiển thị totals/trend/breakdown tổng hợp; không hiển thị danh sách raw event hoặc hoạt động truy cập gần đây
 - khoảng ngày tùy chỉnh dùng Ant Design `RangePicker`, hiển thị `DD/MM/YYYY`, lịch tiếng Việt và chặn ngày sau hôm nay
+- `RangePicker` tùy chỉnh và nút **Áp dụng** luôn nằm cùng một hàng; picker co giãn theo chiều rộng còn nút giữ kích thước tự nhiên
 - dùng uPlot cho chart
 - chart lắng nghe `ResizeObserver`, co theo content container và bị chặn overflow để không phá chiều ngang dashboard
 - các card trong lưới cân chiều cao theo hàng; bảng hiệu quả chiến dịch dùng chiều cao tự nhiên để trang kết thúc ngay sau nội dung
+- bảng hiệu quả chiến dịch dùng pagination chuẩn Admin, mặc định 10 dòng và cho chọn 10/20/50 trên tập dữ liệu tổng hợp đã tải
 
 Dashboard ghi “ước tính phiên duy nhất”; không mô tả hash session là user identity.
 

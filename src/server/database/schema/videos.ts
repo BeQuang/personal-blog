@@ -68,6 +68,7 @@ export const videos = pgTable(
     ),
     index("videos_featured_content_status_idx").on(table.featured, table.contentStatus),
     index("videos_created_at_idx").on(table.createdAt.desc()),
+    index("videos_updated_at_idx").on(table.updatedAt.desc()),
     check("videos_duration_non_negative", sql`${table.durationSeconds} is null or ${table.durationSeconds} >= 0`),
     check("videos_view_count_non_negative", sql`${table.viewCount} >= 0`),
     check(

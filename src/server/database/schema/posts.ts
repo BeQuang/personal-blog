@@ -30,7 +30,10 @@ export const categories = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [uniqueIndex("categories_slug_unique_idx").on(sql`lower(${table.slug})`)],
+  (table) => [
+    uniqueIndex("categories_slug_unique_idx").on(sql`lower(${table.slug})`),
+    index("categories_name_idx").on(table.name),
+  ],
 ).enableRLS();
 
 export const tags = pgTable(
@@ -42,7 +45,10 @@ export const tags = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [uniqueIndex("tags_slug_unique_idx").on(sql`lower(${table.slug})`)],
+  (table) => [
+    uniqueIndex("tags_slug_unique_idx").on(sql`lower(${table.slug})`),
+    index("tags_name_idx").on(table.name),
+  ],
 ).enableRLS();
 
 export const posts = pgTable(
@@ -84,6 +90,7 @@ export const posts = pgTable(
     index("posts_category_id_idx").on(table.categoryId),
     index("posts_author_id_idx").on(table.authorId),
     index("posts_created_at_idx").on(table.createdAt.desc()),
+    index("posts_updated_at_idx").on(table.updatedAt.desc()),
     check("posts_reading_time_non_negative", sql`${table.readingTime} >= 0`),
     check("posts_view_count_non_negative", sql`${table.viewCount} >= 0`),
     check(

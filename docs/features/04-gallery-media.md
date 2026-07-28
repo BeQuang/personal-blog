@@ -12,6 +12,7 @@
 `/admin/gallery` gồm hai phần:
 
 - Gallery manager: tạo/sửa/archive item, category, alt, sort order, status; ảnh có thể chọn từ thư viện hoặc tải mới từ máy ngay trong picker.
+- Bảng Gallery gọi `GET /api/admin/gallery` theo trang, mặc định 10 dòng và cho chọn 10/20/50. Service nhận `sortBy/sortOrder` allowlist; repository trả `COUNT + LIMIT/OFFSET`, mặc định theo `sortOrder asc`.
 - Thời điểm scheduled/published dùng picker ngày giờ dùng chung thay cho input native; contract gửi server vẫn là ISO.
 - Media Library: upload, search/filter, chọn media và xóa asset chưa được sử dụng.
 
@@ -21,7 +22,7 @@
 | --- | --- |
 | Public | `src/app/gallery/page.tsx`, `components/gallery/GalleryExplorer.tsx`, `home/GalleryLightbox.tsx` |
 | Admin | `AdminGalleryManager`, `AdminMediaLibrary`, `AdminMediaPicker` |
-| Actions | `gallery.actions.ts`, `media.actions.ts` |
+| Actions/API | `gallery.actions.ts`, `media.actions.ts`, `GET /api/admin/gallery` |
 | Services | `gallery.service.ts`, `media.service.ts` |
 | Storage | `src/server/storage/*` |
 | Validation | `src/server/validation/media.validation.ts` |

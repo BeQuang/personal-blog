@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, eq, isNull, ne, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, isNull, ne, sql } from "drizzle-orm";
 
 import { database } from "@/server/database/client";
 import { auditLogs, categories, posts } from "@/server/database/schema";
@@ -10,6 +10,33 @@ export type NewCategoryRow = typeof categories.$inferInsert;
 
 export function findCategories() {
   return database.select().from(categories).orderBy(asc(categories.name));
+}
+
+export async function findCategoryPage(
+  page: number,
+  pageSize: number,
+  sortBy: "name" | "slug" | "createdAt" | "updatedAt",
+  sortOrder: "asc" | "desc",
+) {
+  const offset = (page - 1) * pageSize;
+  const sortColumn = {
+    createdAt: categories.createdAt,
+    name: categories.name,
+    slug: categories.slug,
+    updatedAt: categories.updatedAt,
+  }[sortBy];
+  const direction = sortOrder === "asc" ? asc : desc;
+  const [items, totals] = await Promise.all([
+    database
+      .select()
+      .from(categories)
+      .orderBy(direction(sortColumn), asc(categories.id))
+      .limit(pageSize)
+      .offset(offset),
+    database.select({ value: count() }).from(categories),
+  ]);
+
+  return { items, total: totals[0]?.value ?? 0 };
 }
 
 export async function findCategoryBySlug(slug: string) {

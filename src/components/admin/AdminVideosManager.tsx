@@ -5,7 +5,7 @@ import type { TableColumnsType } from "antd";
 import { EyeOff, Pencil, Plus, RefreshCw, Search, Send, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 
 import {
   createExternalVideoAction,
@@ -15,16 +15,20 @@ import {
   updateVideoAction,
 } from "@/actions/videos.actions";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { useAdminListPage } from "@/components/admin/useAdminListPage";
 import { AdminVideoEditorModal } from "@/components/admin/AdminVideoEditorModal";
 import {
   AdminVideoUploadPanel,
   allowedVideoMimeTypes,
   maximumVideoSizeBytes,
 } from "@/components/admin/AdminVideoUploadPanel";
+import { adminTablePaginationDefaults } from "@/components/admin/admin-table.config";
 import { beginRequestProgress } from "@/lib/loading-progress";
 import type {
   ActionFieldErrors,
+  AdminListPage,
   AdminVideo,
+  AdminVideoListQuery,
   CreateVideoUploadData,
   CreateVideoUploadInput,
   MediaOption,
@@ -33,7 +37,7 @@ import type {
 import { formatDate } from "@/utils/date";
 
 interface AdminVideosManagerProps {
-  videos: readonly AdminVideo[];
+  initialPage: AdminListPage<AdminVideo, AdminVideoListQuery["sortBy"]>;
   mediaOptions: readonly MediaOption[];
   canWrite: boolean;
   canPublish: boolean;
@@ -100,7 +104,7 @@ function putFile(uploadUrl: string, file: File, onProgress: (value: number) => v
   });
 }
 
-export function AdminVideosManager({ videos, mediaOptions, canWrite, canPublish }: AdminVideosManagerProps) {
+export function AdminVideosManager({ initialPage, mediaOptions, canWrite, canPublish }: AdminVideosManagerProps) {
   const { message, modal } = App.useApp();
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -110,25 +114,39 @@ export function AdminVideosManager({ videos, mediaOptions, canWrite, canPublish 
   const [uploadingId, setUploadingId] = useState<string | null>(null);
   const [progress, setProgress] = useState<number | null>(null);
   const [pending, startTransition] = useTransition();
-  const hasProcessingVideos = videos.some((video) =>
+  const initialFilterRender = useRef(true);
+  const reportListError = useCallback((error: string) => { void message.error(error); }, [message]);
+  const { data, load, loading, reload } = useAdminListPage(
+    "/api/admin/videos",
+    initialPage,
+    reportListError,
+  );
+  const hasProcessingVideos = data.items.some((video) =>
     video.processingStatus === "uploading" || video.processingStatus === "processing");
 
   useEffect(() => {
     if (!hasProcessingVideos) return;
-    const timer = window.setInterval(() => router.refresh(), 10_000);
+    const timer = window.setInterval(() => void reload(), 10_000);
     return () => window.clearInterval(timer);
-  }, [hasProcessingVideos, router]);
+  }, [hasProcessingVideos, reload]);
 
-  const filteredVideos = useMemo(() => {
-    const normalized = query.trim().toLocaleLowerCase("vi-VN");
-    return videos.filter((video) => {
-      const matchesQuery = !normalized || [video.title, video.description, video.topic, video.platform]
-        .some((value) => value?.toLocaleLowerCase("vi-VN").includes(normalized));
-      const matchesStatus = status === "all" ||
-        video.processingStatus === status || video.contentStatus === status;
-      return matchesQuery && matchesStatus;
-    });
-  }, [query, status, videos]);
+  useEffect(() => {
+    if (initialFilterRender.current) {
+      initialFilterRender.current = false;
+      return;
+    }
+    const timeout = window.setTimeout(() => {
+      void load({
+        page: 1,
+        pageSize: data.pageSize,
+        query,
+        status,
+        sortBy: data.sortBy,
+        sortOrder: data.sortOrder,
+      });
+    }, 300);
+    return () => window.clearTimeout(timeout);
+  }, [data.pageSize, data.sortBy, data.sortOrder, load, query, status]);
 
   const requestAndUpload = async (input: CreateVideoUploadInput, file: File, stateId: string) => {
     if (!allowedVideoMimeTypes.includes(file.type as (typeof allowedVideoMimeTypes)[number])) {
@@ -156,6 +174,7 @@ export function AdminVideosManager({ videos, mediaOptions, canWrite, canPublish 
       await putFile(upload.uploadUrl, file, setProgress);
       setProgress(100);
       void message.success("Upload hoàn tất. Mux đang xử lý video; trạng thái sẽ tự cập nhật.");
+      await reload();
       router.refresh();
       return true;
     } catch (error) {
@@ -173,6 +192,7 @@ export function AdminVideosManager({ videos, mediaOptions, canWrite, canPublish 
       const result = await operation();
       if (result.success) {
         void message.success(result.message);
+        await reload();
         router.refresh();
       } else {
         void message.error(result.message);
@@ -196,6 +216,7 @@ export function AdminVideosManager({ videos, mediaOptions, canWrite, canPublish 
           throw new Error(result.message);
         }
         void message.success(result.message);
+        await reload();
         router.refresh();
       },
     });
@@ -358,6 +379,7 @@ export function AdminVideosManager({ videos, mediaOptions, canWrite, canPublish 
         void message.success(result.message);
         setEditorOpen(false);
         setEditing(null);
+        await reload();
         router.refresh();
         resolve(undefined);
       });
@@ -410,10 +432,23 @@ export function AdminVideosManager({ videos, mediaOptions, canWrite, canPublish 
         <Table<AdminVideo>
           rowKey="id"
           columns={columns}
-          dataSource={[...filteredVideos]}
-          loading={pending}
+          dataSource={[...data.items]}
+          loading={pending || loading}
           scroll={{ x: 1280 }}
-          pagination={{ pageSize: 8, showSizeChanger: false }}
+          pagination={{
+            ...adminTablePaginationDefaults,
+            current: data.page,
+            pageSize: data.pageSize,
+            total: data.total,
+          }}
+          onChange={(pagination) => void load({
+            page: pagination.current ?? 1,
+            pageSize: pagination.pageSize ?? data.pageSize,
+            query,
+            status,
+            sortBy: data.sortBy,
+            sortOrder: data.sortOrder,
+          })}
           locale={{ emptyText: "Không có video phù hợp." }}
         />
       </section>

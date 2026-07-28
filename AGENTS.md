@@ -35,6 +35,27 @@ Documentation is part of the feature, not a later cleanup task.
 2. Do not access repositories or the database directly from UI code.
 3. Keep authorization, validation, audit, revalidation, DTO, and provider boundaries described by the feature document and `PROJECT_SPEC.md`.
 
+## Admin table pagination standard
+
+1. Every Ant Design `Table` in Admin must use `adminTablePaginationDefaults` from `src/components/admin/admin-table.config.ts` or an explicit extension of that shared config.
+2. The default page-size choices are 10, 20, and 50 rows. Keep the size changer visible even on a single page, show the total count, and reset to page 1 when filters materially change the result set.
+3. A server-driven paginated table backed by a Route Handler, Server Component query, or another remote read boundary must carry both `page` and `pageSize` through validation, service, and repository layers. The repository must apply database `LIMIT` and `OFFSET`; do not fetch an unbounded collection and slice it after a paginated API/remote read.
+4. A table whose complete bounded DTO collection is intentionally already loaded may paginate locally, but it must still expose the same page-size selector.
+5. If a screen needs custom page-size choices, normalize a caller-provided array through the shared helper, keep values within the server maximum, and document the override.
+6. Sequential row numbers must use the active page and active page size, not a hard-coded constant.
+7. `npm run ai:check` includes the Admin table pagination audit; do not bypass or weaken it when adding a table.
+
+## List API pagination and ordering standard
+
+1. Every API or remote read that returns a collection must accept validated `page`, `pageSize`, `sortBy`, and `sortOrder`. Admin list Route Handlers use `handleAdminListRequest`; default `pageSize` is 10 and the hard maximum is 100.
+2. `sortBy` must be an allowlist owned by the feature service. Never interpolate a client-provided column or SQL fragment. Add a deterministic tie-breaker such as the entity ID after the requested sort.
+3. The response contract is `{ items, total, page, pageSize, sortBy, sortOrder }`. Filters belong in the same validated query object and must be applied before `COUNT`, `LIMIT`, and `OFFSET`.
+4. Repositories must execute bounded database reads with `COUNT + LIMIT + OFFSET + ORDER BY`. Never fetch an unbounded collection and paginate or sort it in UI/service memory.
+5. Server Components call the paginated service directly for the initial render. Client-side page, page-size, filter, and sort changes call the matching Route Handler; do not make a Server Component call its own Route Handler.
+6. An intentionally bounded lookup list, aggregate query, single-resource GET, webhook, or export may be exempt only when its bound/reason is documented in the feature contract. Do not silently turn a list API into an exception.
+7. When adding a sortable field used at scale, review the database indexes and add a migration when needed.
+8. `npm run ai:check` includes the list API contract audit. New GET collection routes must not bypass or weaken it.
+
 ## Completion gate
 
 An AI agent must not report a feature change as complete until:

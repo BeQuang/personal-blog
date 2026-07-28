@@ -17,6 +17,7 @@ Tại `/admin/campaigns`:
 - Đặt CTA label/URL.
 - Quản lý rules/terms.
 - Bật/tắt submission và đặt giới hạn.
+- Bảng chiến dịch gọi `GET /api/admin/campaigns` theo trang, mặc định 10 dòng và cho chọn 10/20/50. API nhận `sortBy/sortOrder` allowlist; repository trả `COUNT + LIMIT/OFFSET`, mặc định theo `startAt desc`.
 
 ## Source ownership
 
@@ -24,7 +25,7 @@ Tại `/admin/campaigns`:
 | --- | --- |
 | Routes/UI | `src/app/campaigns/*`, `src/components/campaigns/*`, `home/ActiveCampaignSection.tsx` |
 | Public facade | `src/services/campaign.service.ts` |
-| Actions | `campaigns.actions.ts`, `submissions.actions.ts` |
+| Actions/API | `campaigns.actions.ts`, `submissions.actions.ts`, `GET /api/admin/campaigns` |
 | Services | `campaigns.service.ts`, `submissions.service.ts` |
 | Repositories | `campaigns.repository.ts`, `submissions.repository.ts` |
 | Schema/type | `schema/campaigns.ts`, `schema/submissions.ts`, `types/campaign.ts` |

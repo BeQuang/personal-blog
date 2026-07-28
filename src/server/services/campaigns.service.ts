@@ -5,13 +5,28 @@ import { z } from "zod";
 import { campaigns as mockCampaigns } from "@/data/campaigns";
 import { ConflictError, NotFoundError, ValidationError } from "@/server/errors";
 import { mapCampaignRowToCampaign } from "@/server/mappers/campaigns.mapper";
+import {
+  adminListPageSchema,
+  parseAdminListQuery,
+} from "@/server/validation/admin-list.validation";
 import { internalOrHttpUrlSchema } from "@/server/validation/url.validation";
-import type { AdminCampaign, Campaign, CampaignStatus } from "@/types";
+import type {
+  AdminCampaign,
+  AdminCampaignListQuery,
+  AdminListPage,
+  Campaign,
+  CampaignStatus,
+} from "@/types";
 
 import { getContentSource } from "./content-source";
 import { assertDateRange, createSlug, executeRepository, parseSlug, slugSchema } from "./service-helpers";
 
 const idSchema = z.uuid("ID chiến dịch không hợp lệ");
+const adminCampaignListQuerySchema = adminListPageSchema.extend({
+  sortBy: z
+    .enum(["createdAt", "endAt", "startAt", "status", "title", "updatedAt"])
+    .default("startAt"),
+});
 const campaignMutationSchema = z.object({
   title: z.string().trim().min(3).max(180), slug: slugSchema.optional(),
   description: z.string().trim().min(10).max(5_000), bannerMediaId: z.uuid("Hãy chọn banner từ Media Library"),
@@ -55,6 +70,26 @@ export async function getCampaignsByStatus(status: CampaignStatus) { return (awa
 export async function requireCampaignBySlug(slug: string) { const item = await getCampaignBySlug(slug); if (!item) throw new NotFoundError("Campaign", slug); return item; }
 
 export async function getAdminCampaigns() { await requirePermission("content:view"); const repository = await import("@/server/repositories/campaigns.repository"); return executeRepository(async () => (await repository.findCampaigns()).map(mapAdminCampaign)); }
+export async function getAdminCampaignPage(
+  input: unknown,
+): Promise<AdminListPage<AdminCampaign, AdminCampaignListQuery["sortBy"]>> {
+  await requirePermission("content:view");
+  const query = parseAdminListQuery(
+    adminCampaignListQuerySchema,
+    input,
+    "Bộ lọc chiến dịch chưa hợp lệ",
+  ) as AdminCampaignListQuery;
+  const repository = await import("@/server/repositories/campaigns.repository");
+  const result = await executeRepository(() => repository.findCampaignPage(query));
+  return {
+    items: result.items.map(mapAdminCampaign),
+    total: result.total,
+    page: query.page,
+    pageSize: query.pageSize,
+    sortBy: query.sortBy,
+    sortOrder: query.sortOrder,
+  };
+}
 export async function createCampaign(input: unknown) { const prepared = await prepareCampaignMutation(input); const repository = await import("@/server/repositories/campaigns.repository"); return executeRepository(() => repository.createCampaign(prepared.values, prepared.currentUser.id)); }
 export async function updateCampaign(id: string, input: unknown) { const parsedId = idSchema.parse(id); const prepared = await prepareCampaignMutation(input, parsedId); const repository = await import("@/server/repositories/campaigns.repository"); const row = await executeRepository(() => repository.updateCampaign(parsedId, prepared.values, prepared.currentUser.id)); if (!row) throw new NotFoundError("Campaign", parsedId); return row; }
 export async function archiveCampaign(id: string) { const parsedId = idSchema.parse(id); const currentUser = await requirePermission("content:publish"); const repository = await import("@/server/repositories/campaigns.repository"); const row = await executeRepository(() => repository.archiveCampaign(parsedId, currentUser.id)); if (!row) throw new NotFoundError("Campaign", parsedId); return row; }

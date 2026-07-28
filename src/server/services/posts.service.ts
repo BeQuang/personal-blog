@@ -12,9 +12,15 @@ import {
   mapPostRowToAdminPost,
   mapPostRowToBlogPost,
 } from "@/server/mappers/posts.mapper";
+import {
+  adminListPageSchema,
+  parseAdminListQuery,
+} from "@/server/validation/admin-list.validation";
 import { parsePostMutationInput } from "@/server/validation/posts.validation";
 import type {
+  AdminListPage,
   AdminPost,
+  AdminPostListQuery,
   BlogPost,
   MediaOption,
   PostMutationInput,
@@ -28,6 +34,17 @@ import {
 } from "./service-helpers";
 
 const idSchema = z.uuid("ID không hợp lệ");
+const adminPostListQuerySchema = adminListPageSchema.extend({
+  query: z.string().trim().max(200).default(""),
+  status: z.enum(["all", "draft", "scheduled", "published"]).default("all"),
+  includeArchived: z.preprocess(
+    (value) => value === "true" ? true : value === "false" ? false : value,
+    z.boolean().default(false),
+  ),
+  sortBy: z
+    .enum(["createdAt", "publishedAt", "status", "title", "updatedAt"])
+    .default("updatedAt"),
+});
 
 function normalizeMockPost(post: BlogPost): BlogPost {
   return { ...post };
@@ -107,6 +124,28 @@ export async function getAdminPosts(): Promise<AdminPost[]> {
   await requireServicePermission("content:view");
   const { findPosts } = await import("@/server/repositories/posts.repository");
   return executeRepository(async () => (await findPosts()).map(mapPostRowToAdminPost));
+}
+
+export async function getAdminPostPage(
+  input: unknown,
+): Promise<AdminListPage<AdminPost, AdminPostListQuery["sortBy"]>> {
+  const { requireServicePermission } = await import("./service-authorization");
+  await requireServicePermission("content:view");
+  const query = parseAdminListQuery(
+    adminPostListQuerySchema,
+    input,
+    "Bộ lọc bài viết chưa hợp lệ",
+  ) as AdminPostListQuery;
+  const repository = await import("@/server/repositories/posts.repository");
+  const result = await executeRepository(() => repository.findPostPage(query));
+  return {
+    items: result.items.map(mapPostRowToAdminPost),
+    total: result.total,
+    page: query.page,
+    pageSize: query.pageSize,
+    sortBy: query.sortBy,
+    sortOrder: query.sortOrder,
+  };
 }
 
 export async function getPostMediaOptions(): Promise<MediaOption[]> {

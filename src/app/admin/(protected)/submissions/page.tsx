@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { AdminSubmissionsManager } from "@/components/admin/AdminSubmissionsManager";
+import { parseAdminTablePageSize } from "@/components/admin/admin-table.config";
 import { hasPermission, requireAdminPagePermission } from "@/server/auth";
 import {
   campaignSubmissionStatuses,
@@ -54,7 +55,7 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
     ? rawCampaignId
     : "";
   const page = parsePage(first(params.page));
-  const pageSize = 20;
+  const pageSize = parseAdminTablePageSize(first(params.pageSize));
   const listQuery = {
     page,
     pageSize,

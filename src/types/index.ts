@@ -1,4 +1,15 @@
 export type {
+  AdminCampaignListQuery,
+  AdminEventListQuery,
+  AdminGalleryListQuery,
+  AdminListPage,
+  AdminListQuery,
+  AdminPostListQuery,
+  AdminSocialLinkListQuery,
+  AdminSortOrder,
+  AdminVideoListQuery,
+} from "./admin-list";
+export type {
   ButtonStyle,
   CardStyle,
   CreatorStatistic,
@@ -49,7 +60,9 @@ export type {
   SocialLinkMutationInput,
   SiteSettingsMutationInput,
   TaxonomyItem,
+  TaxonomyPage,
   TaxonomyMutationInput,
+  TaxonomyType,
 } from "./content-admin";
 export type {
   ConfirmMediaUploadInput,

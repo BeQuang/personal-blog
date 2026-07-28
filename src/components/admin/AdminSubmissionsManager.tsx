@@ -18,6 +18,7 @@ import { useState, useTransition } from "react";
 
 import { updateSubmissionStatusAction } from "@/actions/submissions.actions";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { adminTablePaginationDefaults } from "@/components/admin/admin-table.config";
 import { startNavigationProgress } from "@/lib/loading-progress";
 import type {
   AdminCampaignSubmission,
@@ -93,6 +94,7 @@ export function AdminSubmissionsManager(props: Props) {
     if (props.status) params.set("status", props.status);
     if (props.campaignId) params.set("campaignId", props.campaignId);
     params.set("page", String(props.page));
+    params.set("pageSize", String(props.pageSize));
 
     for (const [key, value] of Object.entries(updates)) {
       if (value === undefined || value === "") params.delete(key);
@@ -164,11 +166,11 @@ export function AdminSubmissionsManager(props: Props) {
   if (props.campaignId) exportParams.set("campaignId", props.campaignId);
 
   const pagination = {
+    ...adminTablePaginationDefaults,
     current: props.page,
     pageSize: props.pageSize,
     total: props.total,
-    showSizeChanger: false,
-    onChange: (page: number) => navigate({ page }),
+    onChange: (page: number, pageSize: number) => navigate({ page, pageSize }),
   };
 
   return (
@@ -196,7 +198,9 @@ export function AdminSubmissionsManager(props: Props) {
           ]}
           onChange={(resource) => {
             startNavigationProgress();
-            router.push(`/admin/submissions?resource=${resource}`);
+            router.push(
+              `/admin/submissions?resource=${resource}&pageSize=${props.pageSize}`,
+            );
           }}
         />
 

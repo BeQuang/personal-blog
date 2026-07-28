@@ -1,9 +1,9 @@
 "use client";
 
 import { App, Button, Flex, Input, Select, Space, Switch, Table, Tag, Tooltip } from "antd";
-import type { TableColumnsType } from "antd";
+import type { TableColumnsType, TableProps } from "antd";
 import { Archive, EyeOff, Pencil, Plus, Search, Send } from "lucide-react";
-import { useMemo, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import {
@@ -16,17 +16,25 @@ import {
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminPostEditorModal } from "@/components/admin/AdminPostEditorModal";
 import { AdminTaxonomyManager } from "@/components/admin/AdminTaxonomyManager";
-import { adminStatusColors, adminStatusLabels, formatAdminDate } from "@/components/admin/admin-table.config";
+import { useAdminListPage } from "@/components/admin/useAdminListPage";
+import {
+  adminStatusColors,
+  adminStatusLabels,
+  adminTablePaginationDefaults,
+  formatAdminDate,
+} from "@/components/admin/admin-table.config";
 import type {
   ActionFieldErrors,
+  AdminListPage,
   AdminPost,
+  AdminPostListQuery,
   MediaOption,
   PostMutationInput,
   TaxonomyItem,
 } from "@/types";
 
 interface AdminPostsManagerProps {
-  posts: readonly AdminPost[];
+  initialPage: AdminListPage<AdminPost, AdminPostListQuery["sortBy"]>;
   categories: readonly TaxonomyItem[];
   tags: readonly TaxonomyItem[];
   mediaOptions: readonly MediaOption[];
@@ -35,7 +43,7 @@ interface AdminPostsManagerProps {
 }
 
 export function AdminPostsManager({
-  posts,
+  initialPage,
   categories,
   tags,
   mediaOptions,
@@ -46,23 +54,114 @@ export function AdminPostsManager({
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
+  const [showArchived, setShowArchived] = useState(false);
+  const [currentPage, setCurrentPage] = useState(initialPage.page);
+  const [pageSize, setPageSize] = useState(initialPage.pageSize);
+  const [sortBy, setSortBy] = useState(initialPage.sortBy);
+  const [sortOrder, setSortOrder] = useState(initialPage.sortOrder);
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<AdminPost | null>(null);
+  const [tableBodyHeight, setTableBodyHeight] = useState(240);
   const [pending, startTransition] = useTransition();
+  const tablePanelRef = useRef<HTMLElement>(null);
+  const initialFilterRender = useRef(true);
+  const reportListError = useCallback((error: string) => {
+    void message.error(error);
+  }, [message]);
+  const {
+    data: postsPage,
+    load: loadPosts,
+    loading: postsLoading,
+    reload: reloadPosts,
+  } = useAdminListPage("/api/admin/posts", initialPage, reportListError);
+  const requestPage = useCallback((
+    page: number,
+    nextPageSize = pageSize,
+    nextSortBy = sortBy,
+    nextSortOrder = sortOrder,
+  ) => loadPosts({
+    page,
+    pageSize: nextPageSize,
+    query,
+    status,
+    includeArchived: showArchived,
+    sortBy: nextSortBy,
+    sortOrder: nextSortOrder,
+  }), [loadPosts, pageSize, query, showArchived, sortBy, sortOrder, status]);
+  const requestPageRef = useRef(requestPage);
+  useEffect(() => {
+    requestPageRef.current = requestPage;
+  }, [requestPage]);
 
-  const filteredPosts = useMemo(() => {
-    const normalizedQuery = query.trim().toLocaleLowerCase("vi-VN");
-    return posts.filter((post) => {
-      const matchesQuery = !normalizedQuery || [post.title, post.excerpt, post.categoryName, post.slug]
-        .some((value) => value.toLocaleLowerCase("vi-VN").includes(normalizedQuery));
-      return matchesQuery && (status === "all" || post.status === status);
-    });
-  }, [posts, query, status]);
+  useEffect(() => {
+    if (initialFilterRender.current) {
+      initialFilterRender.current = false;
+      return;
+    }
+    const timeout = window.setTimeout(() => {
+      setCurrentPage(1);
+      void requestPageRef.current(1);
+    }, 300);
+    return () => window.clearTimeout(timeout);
+  }, [query, showArchived, status]);
+
+  useEffect(() => {
+    const panel = tablePanelRef.current;
+    const page = panel?.parentElement;
+    if (!panel || !page) return;
+
+    const getOuterHeight = (element: HTMLElement | null) => {
+      if (!element) return 0;
+      const styles = window.getComputedStyle(element);
+      return (
+        element.getBoundingClientRect().height +
+        Number.parseFloat(styles.marginTop || "0") +
+        Number.parseFloat(styles.marginBottom || "0")
+      );
+    };
+
+    const measureTableBody = () => {
+      const tableHeader = panel.querySelector<HTMLElement>(".ant-table-header");
+      const pagination = panel.querySelector<HTMLElement>(".ant-pagination");
+      const pageBounds = page.getBoundingClientRect();
+      const panelBounds = panel.getBoundingClientRect();
+      const availablePanelHeight = Math.max(
+        0,
+        pageBounds.bottom - panelBounds.top,
+      );
+      const reservedHeight =
+        getOuterHeight(tableHeader) +
+        getOuterHeight(pagination);
+      const nextHeight = Math.max(
+        48,
+        Math.floor(availablePanelHeight - reservedHeight - 2),
+      );
+
+      setTableBodyHeight((currentHeight) =>
+        currentHeight === nextHeight ? currentHeight : nextHeight,
+      );
+    };
+
+    const observer = new ResizeObserver(measureTableBody);
+    const tableHeader = panel.querySelector<HTMLElement>(".ant-table-header");
+    const pagination = panel.querySelector<HTMLElement>(".ant-pagination");
+
+    observer.observe(page);
+    if (tableHeader) observer.observe(tableHeader);
+    if (pagination) observer.observe(pagination);
+    const frame = window.requestAnimationFrame(measureTableBody);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [postsPage.items.length]);
 
   const runResult = async (operation: () => Promise<{ success: boolean; message: string }>) => {
     const result = await operation();
     if (result.success) {
       void message.success(result.message);
+      await reloadPosts();
       router.refresh();
     } else {
       void message.error(result.message);
@@ -90,6 +189,8 @@ export function AdminPostsManager({
           throw new Error(result.message);
         }
         void message.success(result.message);
+        setCurrentPage(1);
+        await requestPage(1);
         router.refresh();
       },
     });
@@ -97,8 +198,20 @@ export function AdminPostsManager({
 
   const columns: TableColumnsType<AdminPost> = [
     {
+      title: "STT",
+      key: "index",
+      width: 68,
+      align: "center",
+      render: (_, __, rowIndex) =>
+        (currentPage - 1) * pageSize + rowIndex + 1,
+    },
+    {
       title: "Bài viết",
       key: "title",
+      sorter: true,
+      sortOrder: sortBy === "title"
+        ? (sortOrder === "asc" ? "ascend" : "descend")
+        : null,
       width: 330,
       render: (_, post) => (
         <div className="admin-table-title">
@@ -122,6 +235,10 @@ export function AdminPostsManager({
       title: "Trạng thái",
       dataIndex: "status",
       key: "status",
+      sorter: true,
+      sortOrder: sortBy === "status"
+        ? (sortOrder === "asc" ? "ascend" : "descend")
+        : null,
       width: 145,
       render: (value: AdminPost["status"]) => (
         <Tag color={adminStatusColors[value] ?? "default"}>
@@ -132,6 +249,10 @@ export function AdminPostsManager({
     {
       title: "Ngày",
       key: "date",
+      sorter: true,
+      sortOrder: sortBy === "updatedAt"
+        ? (sortOrder === "asc" ? "ascend" : "descend")
+        : null,
       width: 120,
       render: (_, post) => formatAdminDate(post.publishedAt ?? post.scheduledAt ?? post.updatedAt),
     },
@@ -230,20 +351,22 @@ export function AdminPostsManager({
         void message.success(result.message);
         setEditorOpen(false);
         setEditingPost(null);
+        setCurrentPage(1);
+        await requestPage(1);
         router.refresh();
         resolve(undefined);
       });
     });
 
   return (
-    <>
+    <div className="admin-posts-page">
       <AdminPageHeader
         title="Bài viết"
-        description="Quản lý bài viết, lịch xuất bản, category, tag và SEO bằng dữ liệu PostgreSQL thật."
+        description="Quản lý nội dung, lịch xuất bản, phân loại và tối ưu SEO cho bài viết."
         action={
           <Flex gap={8} wrap>
-            <AdminTaxonomyManager type="category" label="Danh mục" items={categories} canWrite={canWrite} />
-            <AdminTaxonomyManager type="tag" label="Thẻ" items={tags} canWrite={canWrite} />
+            <AdminTaxonomyManager type="category" label="Danh mục" canWrite={canWrite} />
+            <AdminTaxonomyManager type="tag" label="Thẻ" canWrite={canWrite} />
             <Button
               type="primary"
               disabled={!canWrite || categories.length === 0}
@@ -263,36 +386,94 @@ export function AdminPostsManager({
         <p className="admin-access-denied">Hãy tạo ít nhất một danh mục trước khi tạo bài viết.</p>
       ) : null}
 
-      <section className="admin-panel admin-table-panel" aria-label="Danh sách bài viết">
-        <Flex className="admin-table-toolbar" gap={12} wrap>
-          <Input
-            allowClear
-            prefix={<Search size={17} aria-hidden="true" />}
-            placeholder="Tìm theo tiêu đề, slug, mô tả hoặc danh mục..."
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            aria-label="Tìm kiếm bài viết"
-          />
-          <Select
-            value={status}
-            onChange={setStatus}
-            aria-label="Lọc bài viết theo trạng thái"
-            options={[
-              { value: "all", label: "Tất cả trạng thái" },
-              { value: "draft", label: "Bản nháp" },
-              { value: "scheduled", label: "Đã lên lịch" },
-              { value: "published", label: "Đã xuất bản" },
-              { value: "archived", label: "Đã lưu trữ" },
-            ]}
-          />
+      <section className="admin-posts-filter-panel" aria-label="Bộ lọc bài viết">
+        <Flex className="admin-table-toolbar" gap={12} justify="space-between" wrap>
+          <Flex className="admin-posts-filter-left" gap={12} wrap>
+            <Input
+              size="large"
+              allowClear
+              prefix={<Search size={17} aria-hidden="true" />}
+              placeholder="Tìm theo tiêu đề, slug, mô tả hoặc danh mục..."
+              value={query}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                setCurrentPage(1);
+              }}
+              aria-label="Tìm kiếm bài viết"
+            />
+            <Select
+              size="large"
+              value={status}
+              onChange={(nextStatus) => {
+                setStatus(nextStatus);
+                setCurrentPage(1);
+              }}
+              aria-label="Lọc bài viết theo trạng thái"
+              options={[
+                { value: "all", label: "Tất cả trạng thái" },
+                { value: "draft", label: "Bản nháp" },
+                { value: "scheduled", label: "Đã lên lịch" },
+                { value: "published", label: "Đã xuất bản" },
+              ]}
+            />
+          </Flex>
+          <div className="admin-archive-filter">
+            <Switch
+              size="small"
+              checked={showArchived}
+              aria-label="Hiện bài viết đã lưu trữ"
+              onChange={(checked) => {
+                setShowArchived(checked);
+                setCurrentPage(1);
+              }}
+            />
+            <span>
+              <strong>Hiện bài đã lưu trữ</strong>
+              <small>Mặc định được ẩn khỏi danh sách</small>
+            </span>
+          </div>
         </Flex>
+      </section>
+
+      <section
+        ref={tablePanelRef}
+        className="admin-panel admin-table-panel admin-posts-table-panel"
+        aria-label="Danh sách bài viết"
+      >
         <Table<AdminPost>
           rowKey="id"
           columns={columns}
-          dataSource={[...filteredPosts]}
-          loading={pending}
-          scroll={{ x: 1100 }}
-          pagination={{ pageSize: 8, showSizeChanger: false }}
+          dataSource={[...postsPage.items]}
+          loading={pending || postsLoading}
+          scroll={{ x: 1168, y: tableBodyHeight }}
+          pagination={{
+            ...adminTablePaginationDefaults,
+            current: currentPage,
+            pageSize,
+            total: postsPage.total,
+          }}
+          onChange={(
+            pagination,
+            _filters,
+            sorter: Parameters<NonNullable<TableProps<AdminPost>["onChange"]>>[2],
+          ) => {
+            const activeSorter = Array.isArray(sorter) ? sorter[0] : sorter;
+            const nextSortBy = activeSorter?.columnKey === "title"
+              ? "title"
+              : activeSorter?.columnKey === "status"
+                ? "status"
+                : activeSorter?.columnKey === "date"
+                  ? "updatedAt"
+                  : sortBy;
+            const nextSortOrder = activeSorter?.order === "ascend" ? "asc" : "desc";
+            const nextPageSize = pagination.pageSize ?? pageSize;
+            const nextPage = nextPageSize !== pageSize ? 1 : (pagination.current ?? 1);
+            setCurrentPage(nextPage);
+            setPageSize(nextPageSize);
+            setSortBy(nextSortBy);
+            setSortOrder(nextSortOrder);
+            void requestPage(nextPage, nextPageSize, nextSortBy, nextSortOrder);
+          }}
           locale={{ emptyText: "Không có bài viết phù hợp." }}
         />
       </section>
@@ -311,6 +492,6 @@ export function AdminPostsManager({
         }}
         onSubmit={submitPost}
       />
-    </>
+    </div>
   );
 }

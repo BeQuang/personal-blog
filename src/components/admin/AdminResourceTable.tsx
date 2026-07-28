@@ -16,6 +16,7 @@ import { AdminResourceEditorModal } from "@/components/admin/AdminResourceEditor
 import { createAdminTableColumns } from "@/components/admin/admin-table-columns";
 import {
   adminStatusLabels,
+  adminTablePaginationDefaults,
   createAdminDemoRow,
 } from "@/components/admin/admin-table.config";
 import { adminResourceLabels } from "@/config/admin.config";
@@ -188,7 +189,7 @@ export function AdminResourceTable({
           columns={columns}
           dataSource={filteredRows}
           scroll={{ x: 900 }}
-          pagination={{ pageSize: 6, showSizeChanger: false }}
+          pagination={adminTablePaginationDefaults}
           locale={{ emptyText: "Không tìm thấy dữ liệu phù hợp." }}
         />
       </section>

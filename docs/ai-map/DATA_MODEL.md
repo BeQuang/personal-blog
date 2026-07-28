@@ -1,6 +1,6 @@
 # Data model map
 
-> Generated artifact — source fingerprint: `b246b7bda3e000266060ac6b0a58503df414df37ba69faf94cc1e6f988fcad2f`
+> Generated artifact — source fingerprint: `09305027bd2217dec714b6281b0ef07e98308b1880b3e95593ee56ffd35fb888`
 
 ## PostgreSQL tables
 
@@ -58,6 +58,7 @@
 - `src/server/database/migrations/0007_silky_robin_chapel.sql`
 - `src/server/database/migrations/0008_illegal_ezekiel.sql`
 - `src/server/database/migrations/0009_stage21-production-hardening.sql`
+- `src/server/database/migrations/0010_hot_gravity.sql`
 - `src/server/database/migrations/meta/_journal.json`
 - `src/server/database/migrations/meta/0000_snapshot.json`
 - `src/server/database/migrations/meta/0001_snapshot.json`
@@ -69,3 +70,4 @@
 - `src/server/database/migrations/meta/0007_snapshot.json`
 - `src/server/database/migrations/meta/0008_snapshot.json`
 - `src/server/database/migrations/meta/0009_snapshot.json`
+- `src/server/database/migrations/meta/0010_snapshot.json`

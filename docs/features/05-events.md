@@ -16,6 +16,7 @@ Tại `/admin/events`:
 - Nhập start/end/timezone, location hoặc platform, external URL và schedule.
 - Start/end dùng picker ngày giờ tiếng Việt, chọn giờ theo bước 5 phút và chuyển về ISO trước khi gọi Action.
 - Đánh dấu featured.
+- Bảng sự kiện gọi `GET /api/admin/events` theo trang, mặc định 10 dòng và cho chọn 10/20/50. API nhận `sortBy/sortOrder` allowlist; repository trả `COUNT + LIMIT/OFFSET`, mặc định sự kiện mới nhất theo `startAt desc`.
 
 ## Source ownership
 
@@ -23,7 +24,7 @@ Tại `/admin/events`:
 | --- | --- |
 | Routes/UI | `src/app/events/*`, `src/components/events/*` |
 | Public facade | `src/services/event.service.ts` |
-| Action | `src/actions/events.actions.ts` |
+| Action/API | `src/actions/events.actions.ts`, `GET /api/admin/events` |
 | Service | `src/server/services/events.service.ts` |
 | Repository/mapper | `events.repository.ts`, `events.mapper.ts` |
 | Schema/type/config | `schema/events.ts`, `types/event.ts`, `config/event.config.ts` |

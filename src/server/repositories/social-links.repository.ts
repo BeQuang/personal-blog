@@ -1,15 +1,48 @@
 import "server-only";
 
-import { asc, eq } from "drizzle-orm";
+import { asc, count, desc, eq, ilike, or } from "drizzle-orm";
 
 import { database } from "@/server/database/client";
 import { auditLogs, socialLinks } from "@/server/database/schema";
+import type { AdminSocialLinkListQuery } from "@/types";
 
 export type SocialLinkRow = typeof socialLinks.$inferSelect;
 export type NewSocialLinkRow = typeof socialLinks.$inferInsert;
 
 export function findSocialLinks() {
   return database.select().from(socialLinks).orderBy(asc(socialLinks.sortOrder));
+}
+
+export async function findSocialLinkPage(query: AdminSocialLinkListQuery) {
+  const offset = (query.page - 1) * query.pageSize;
+  const pattern = `%${query.query}%`;
+  const where = query.query
+    ? or(
+        ilike(socialLinks.label, pattern),
+        ilike(socialLinks.platform, pattern),
+        ilike(socialLinks.username, pattern),
+        ilike(socialLinks.url, pattern),
+      )
+    : undefined;
+  const sortColumn = {
+    createdAt: socialLinks.createdAt,
+    enabled: socialLinks.enabled,
+    label: socialLinks.label,
+    sortOrder: socialLinks.sortOrder,
+    updatedAt: socialLinks.updatedAt,
+  }[query.sortBy];
+  const direction = query.sortOrder === "asc" ? asc : desc;
+  const [items, totals] = await Promise.all([
+    database
+      .select()
+      .from(socialLinks)
+      .where(where)
+      .orderBy(direction(sortColumn), asc(socialLinks.sortOrder), asc(socialLinks.id))
+      .limit(query.pageSize)
+      .offset(offset),
+    database.select({ value: count() }).from(socialLinks).where(where),
+  ]);
+  return { items, total: totals[0]?.value ?? 0 };
 }
 
 export function findEnabledSocialLinks() {

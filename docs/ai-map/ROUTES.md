@@ -1,6 +1,6 @@
 # Route map
 
-> Generated artifact — source fingerprint: `b246b7bda3e000266060ac6b0a58503df414df37ba69faf94cc1e6f988fcad2f`
+> Generated artifact — source fingerprint: `09305027bd2217dec714b6281b0ef07e98308b1880b3e95593ee56ffd35fb888`
 
 Route group như `(protected)` không tạo URL segment. Route Handler của Next.js 16 dùng Web Request/Response API và không cache mặc định.
 
@@ -17,9 +17,16 @@ Route group như `(protected)` không tạo URL segment. Route Handler của Nex
 | `/admin/posts` | Admin page | PAGE | `src/app/admin/(protected)/posts/page.tsx` | `src/components/admin/AdminPostsManager.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/admin-posts-page.service.ts` |
 | `/admin/settings` | Admin page | PAGE | `src/app/admin/(protected)/settings/page.tsx` | `src/components/admin/AdminSettingsForm.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/media.service.ts`<br>`src/server/services/settings.service.ts` |
 | `/admin/social-links` | Admin page | PAGE | `src/app/admin/(protected)/social-links/page.tsx` | `src/components/admin/AdminSocialLinksManager.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/social-links.service.ts` |
-| `/admin/submissions` | Admin page | PAGE | `src/app/admin/(protected)/submissions/page.tsx` | `src/components/admin/AdminSubmissionsManager.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/submissions.service.ts`<br>`src/types/index.ts` |
+| `/admin/submissions` | Admin page | PAGE | `src/app/admin/(protected)/submissions/page.tsx` | `src/components/admin/admin-table.config.ts`<br>`src/components/admin/AdminSubmissionsManager.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/submissions.service.ts`<br>`src/types/index.ts` |
 | `/admin/videos` | Admin page | PAGE | `src/app/admin/(protected)/videos/page.tsx` | `src/components/admin/AdminVideosManager.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/videos.service.ts` |
+| `/api/admin/campaigns` | Route Handler | GET | `src/app/api/admin/campaigns/route.ts` | `src/server/http/admin-list-route.ts`<br>`src/server/services/campaigns.service.ts` |
+| `/api/admin/events` | Route Handler | GET | `src/app/api/admin/events/route.ts` | `src/server/http/admin-list-route.ts`<br>`src/server/services/events.service.ts` |
+| `/api/admin/gallery` | Route Handler | GET | `src/app/api/admin/gallery/route.ts` | `src/server/http/admin-list-route.ts`<br>`src/server/services/gallery.service.ts` |
+| `/api/admin/posts` | Route Handler | GET | `src/app/api/admin/posts/route.ts` | `src/server/http/admin-list-route.ts`<br>`src/server/services/posts.service.ts` |
+| `/api/admin/social-links` | Route Handler | GET | `src/app/api/admin/social-links/route.ts` | `src/server/http/admin-list-route.ts`<br>`src/server/services/social-links.service.ts` |
 | `/api/admin/submissions/export` | Route Handler | GET | `src/app/api/admin/submissions/export/route.ts` | `src/server/export/safe-csv.ts`<br>`src/server/services/submissions.service.ts` |
+| `/api/admin/taxonomies` | Route Handler | GET | `src/app/api/admin/taxonomies/route.ts` | `src/server/http/admin-list-route.ts`<br>`src/server/services/taxonomies.service.ts` |
+| `/api/admin/videos` | Route Handler | GET | `src/app/api/admin/videos/route.ts` | `src/server/http/admin-list-route.ts`<br>`src/server/services/videos.service.ts` |
 | `/api/analytics/events` | Route Handler | POST | `src/app/api/analytics/events/route.ts` | `src/config/analytics.config.ts`<br>`src/server/anti-spam/request-context.ts`<br>`src/server/errors/index.ts`<br>`src/server/services/analytics.service.ts` |
 | `/api/uploads/video-url` | Route Handler | POST | `src/app/api/uploads/video-url/route.ts` | `src/server/errors/index.ts`<br>`src/server/services/videos.service.ts` |
 | `/api/webhooks/mux` | Route Handler | POST | `src/app/api/webhooks/mux/route.ts` | `src/server/services/videos.service.ts` |

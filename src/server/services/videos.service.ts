@@ -11,12 +11,43 @@ import {
   parseCreateVideoUpload,
   parseVideoMutation,
 } from "@/server/validation/videos.validation";
-import type { AdminVideo, MediaOption, VideoMutationInput } from "@/types";
+import {
+  adminListPageSchema,
+  parseAdminListQuery,
+} from "@/server/validation/admin-list.validation";
+import type {
+  AdminListPage,
+  AdminVideo,
+  AdminVideoListQuery,
+  MediaOption,
+  VideoMutationInput,
+} from "@/types";
 
 import { getContentSource } from "./content-source";
 import { executeRepository } from "./service-helpers";
 
 const idSchema = z.uuid("ID video không hợp lệ");
+const adminVideoListQuerySchema = adminListPageSchema.extend({
+  query: z.string().trim().max(200).default(""),
+  status: z
+    .enum([
+      "all",
+      "draft",
+      "scheduled",
+      "published",
+      "archived",
+      "pending",
+      "uploading",
+      "processing",
+      "ready",
+      "failed",
+      "deleted",
+    ])
+    .default("all"),
+  sortBy: z
+    .enum(["contentStatus", "createdAt", "title", "updatedAt"])
+    .default("updatedAt"),
+});
 
 async function requirePermission(permission: "content:write" | "content:publish" | "media:manage") {
   const { requireServicePermission } = await import("./service-authorization");
@@ -110,6 +141,27 @@ export async function getAdminVideos() {
   await requirePermission("media:manage");
   const repository = await import("@/server/repositories/videos.repository");
   return executeRepository(async () => (await repository.findVideos()).map(mapAdminVideo));
+}
+
+export async function getAdminVideoPage(
+  input: unknown,
+): Promise<AdminListPage<AdminVideo, AdminVideoListQuery["sortBy"]>> {
+  await requirePermission("media:manage");
+  const query = parseAdminListQuery(
+    adminVideoListQuerySchema,
+    input,
+    "Bộ lọc video chưa hợp lệ",
+  ) as AdminVideoListQuery;
+  const repository = await import("@/server/repositories/videos.repository");
+  const result = await executeRepository(() => repository.findVideoPage(query));
+  return {
+    items: result.items.map(mapAdminVideo),
+    total: result.total,
+    page: query.page,
+    pageSize: query.pageSize,
+    sortBy: query.sortBy,
+    sortOrder: query.sortOrder,
+  };
 }
 
 export async function getVideoMediaOptions(): Promise<MediaOption[]> {

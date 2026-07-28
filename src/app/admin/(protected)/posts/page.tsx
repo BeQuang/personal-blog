@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Bài viết" };
 export default async function AdminPostsPage() {
   const {
     currentUser,
-    posts,
+    postsPage,
     categories,
     tags,
     mediaOptions,
@@ -17,7 +17,7 @@ export default async function AdminPostsPage() {
 
   return (
     <AdminPostsManager
-      posts={posts}
+      initialPage={postsPage}
       categories={categories}
       tags={tags}
       mediaOptions={mediaOptions}

@@ -2,9 +2,17 @@
 
 ## Admin shell
 
-`AdminShell` cung cấp sidebar/navigation, current user, responsive behavior và logout. Ant Design được đăng ký trong admin layout để SSR style đúng, dùng locale `vi_VN`; uPlot stylesheet chỉ được nạp ở admin.
+`AdminShell` cung cấp sidebar/navigation, current user, responsive behavior và logout. Nút logout trong header dùng hộp xác nhận Ant Design, ưu tiên focus vào **Ở lại** và chỉ gọi Server Action khi người dùng xác nhận **Đăng xuất**. Ant Design được đăng ký trong admin layout để SSR style đúng, dùng locale `vi_VN`; uPlot stylesheet chỉ được nạp ở admin.
 
-Sidebar desktop dùng vị trí cố định theo viewport, có vùng cuộn riêng và phần content chừa đúng 252 px. `admin-route-root`, shell và content cùng dùng nền admin sáng nên khi dashboard dài hơn viewport không lộ nền dark của website public. Card trong lưới dashboard được cân chiều cao theo hàng, còn card bảng độc lập phải giữ chiều cao tự nhiên theo nội dung để không tạo khoảng trắng và vùng cuộn giả. Dưới 992 px, sidebar desktop được thay bằng Drawer và content trở về toàn chiều rộng.
+Sidebar desktop dùng vị trí cố định theo viewport, có vùng cuộn riêng và phần content chừa đúng 252 px. `admin-route-root`, shell và content cùng dùng nền admin sáng nên khi dashboard dài hơn viewport không lộ nền dark của website public. Mọi vùng cuộn trong Admin, kể cả body trang, sidebar, table, modal/confirm, drawer và popup Ant Design, dùng chung track trắng xám nhẹ cùng thumb xám trung tính thay cho scrollbar tối của hệ điều hành. Card trong lưới dashboard được cân chiều cao theo hàng, còn card bảng độc lập phải giữ chiều cao tự nhiên theo nội dung để không tạo khoảng trắng và vùng cuộn giả. Dưới 992 px, sidebar desktop được thay bằng Drawer và content trở về toàn chiều rộng.
+
+Mọi `.admin-table-panel` dùng header cột và vùng pagination tím nhạt theo bảng màu badge **Admin MVP**; trang active dùng nền tím đậm và chữ trắng để dễ nhận biết. Pagination bỏ margin mặc định của Ant Design để bám sát nội dung và viền đáy panel.
+
+Mọi Ant Design `Table` trong Admin phải dùng `adminTablePaginationDefaults`: mặc định 10 dòng, cho chọn 10/20/50, luôn hiển thị tổng; cụm số dòng + tổng nằm trái và cụm chuyển trang nằm phải. Table có dữ liệu tăng trưởng phải truyền `page/pageSize/sortBy/sortOrder` qua Route Handler → service → repository; repository áp dụng filter trước `COUNT + LIMIT + OFFSET + ORDER BY`, response chuẩn là `{ items, total, page, pageSize, sortBy, sortOrder }`. `sortBy` luôn là allowlist, `pageSize` tối đa 100 và có tie-breaker ID ổn định. Tập DTO nhỏ có bound được ghi rõ mới được phân trang cục bộ. Mảng lựa chọn riêng phải qua helper normalize dùng chung và không vượt giới hạn server.
+
+`npm run table:audit` quét toàn bộ TSX trong `src`; `npm run api:list-audit` kiểm tra GET collection Route Handler dùng boundary phân trang chung. `npm run ai:check` gọi cả hai audit để từ chối Table thiếu pagination hoặc list API mới không có contract phân trang/sắp xếp.
+
+Riêng `/admin/posts`, content được giới hạn theo chiều cao còn lại dưới header để document không cuộn dọc; page heading, toolbar lọc và pagination ở ngoài vùng cuộn. Manager đo khoảng tối đa từ đầu table panel đến đáy page rồi truyền phần dành cho row vào `Table.scroll.y`; panel co theo số row thực tế, chỉ body row cuộn khi vượt giới hạn, còn header cột và pagination luôn hiển thị.
 
 Điều hướng menu gọi `startNavigationProgress` trước `router.push`; `app/admin/(protected)/loading.tsx` hiển thị skeleton trong content nhưng giữ nguyên sidebar/header tương tác được. Filter/pagination dùng router theo cùng quy ước. Upload R2/Mux kéo dài cũng tham gia NProgress, đồng thời vẫn giữ progress/nút pending chuyên biệt.
 
@@ -32,6 +40,7 @@ Tra các module này trước khi tạo UI CRUD:
 - `AdminDateRangePicker`
 - `AdminAnalyticsDateFilter`
 - `AdminModal`
+- `AdminPostContentEditor`
 - `AdminResourceTable`
 - `AdminResourceEditorModal`
 - `AdminMediaPicker`
@@ -116,10 +125,16 @@ Không:
 - Reload vẫn còn dữ liệu.
 - Public route phản ánh revalidation.
 - Admin mobile/sidebar.
+- Logout header: click lần đầu chỉ mở hộp xác nhận; **Ở lại**, nút đóng hoặc click ra ngoài không kết thúc phiên; **Đăng xuất** mới gọi action và chuyển về trang login.
 - Date picker: mở lịch, chọn/xóa ngày bằng chuột và bàn phím, hiển thị tiếng Việt; RangePicker không cho chọn ngày analytics sau hôm nay.
 - Modal dài: trang nền bị khóa cuộn; header, nút đóng và footer luôn thấy; con lăn chỉ dịch chuyển body của modal, kể cả viewport thấp và mobile. Modal ngắn không bị kéo giãn tạo khoảng trắng.
+- Scrollbar Admin: trang, sidebar, table, modal/confirm, drawer, dropdown/select/date picker và editor block đều dùng track sáng, thumb xám nhẹ; hover chỉ đậm hơn vừa đủ và không xuất hiện track đen.
+- Table Admin: header và toàn bộ vùng pagination có nền tím nhạt; trang active tím đậm/chữ trắng, fixed column không tạo mảng màu lệch; pagination không có khoảng trắng trên/dưới và bám sát hàng cuối cùng cùng viền đáy.
+- Pagination table: mọi bảng có selector 10/20/50 và tổng kể cả chỉ có một trang; đổi page size phải cập nhật row count, STT và `pageSize` của server query nếu có, không chỉ cắt response đã tải từ API.
 - Cuộn dashboard dài: sidebar/header vẫn bám viewport, không xuất hiện khoảng đen, tràn ngang hoặc khoảng trắng do card bảng bị kéo cao hơn nội dung.
+- `/admin/posts`: document không có thanh cuộn dọc; danh sách row cuộn trong table, header cột sticky, toolbar và pagination vẫn thấy trong viewport.
 - Chuyển từng tab trên mạng chậm: NProgress/skeleton xuất hiện và tab mới được selected sau khi route hoàn tất.
 - Upload R2/Mux: progress toàn cục kết thúc cả khi request thành công lẫn lỗi; phần trăm upload video vẫn hoạt động.
 - Media picker tại mọi admin form: tab thư viện tìm/chọn được ảnh cũ; tab tải từ máy validate MIME/size, tự chọn ảnh mới sau confirm và giữ đúng purpose của thumbnail/cover/banner/avatar/Gallery.
+- Post content editor: admin không cần biết JSON vẫn tạo được đủ 9 loại block; tab JSON phản ánh dữ liệu trực quan, chỉ áp dụng thay đổi hợp lệ và chặn lưu khi bản JSON đang sai hoặc chưa được áp dụng.
 - Với `DATABASE_POOL_MAX=2`, `/admin/posts` và `/admin/gallery` phải render xong; không khôi phục `Promise.all` chứa ba hoặc bốn lượt đọc DB ở hai page này.

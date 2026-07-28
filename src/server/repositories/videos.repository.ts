@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, desc, eq, isNotNull, isNull, lte, ne, or } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, isNotNull, isNull, lte, ne, or } from "drizzle-orm";
 
 import { database } from "@/server/database/client";
 import {
@@ -9,6 +9,7 @@ import {
   videos,
 } from "@/server/database/schema";
 import type { VerifiedVideoEvent } from "@/server/video";
+import type { AdminVideoListQuery } from "@/types";
 
 export type VideoRow = typeof videos.$inferSelect;
 export type NewVideoRow = typeof videos.$inferInsert;
@@ -42,6 +43,46 @@ export function findVideos() {
     where: isNull(videos.deletedAt),
     with: videoRelations,
   });
+}
+
+export async function findVideoPage(query: AdminVideoListQuery) {
+  const offset = (query.page - 1) * query.pageSize;
+  const pattern = `%${query.query}%`;
+  const contentStatuses = new Set(["draft", "scheduled", "published", "archived"]);
+  const statusCondition = query.status === "all"
+    ? undefined
+    : contentStatuses.has(query.status)
+      ? eq(videos.contentStatus, query.status as VideoRow["contentStatus"])
+      : eq(videos.processingStatus, query.status as VideoRow["processingStatus"]);
+  const where = and(
+    isNull(videos.deletedAt),
+    statusCondition,
+    query.query
+      ? or(
+          ilike(videos.title, pattern),
+          ilike(videos.description, pattern),
+          ilike(videos.topic, pattern),
+        )
+      : undefined,
+  );
+  const sortColumn = {
+    contentStatus: videos.contentStatus,
+    createdAt: videos.createdAt,
+    title: videos.title,
+    updatedAt: videos.updatedAt,
+  }[query.sortBy];
+  const direction = query.sortOrder === "asc" ? asc : desc;
+  const [items, totals] = await Promise.all([
+    database.query.videos.findMany({
+      limit: query.pageSize,
+      offset,
+      orderBy: [direction(sortColumn), desc(videos.createdAt), asc(videos.id)],
+      where,
+      with: videoRelations,
+    }),
+    database.select({ value: count() }).from(videos).where(where),
+  ]);
+  return { items, total: totals[0]?.value ?? 0 };
 }
 
 export async function findVideoById(id: string) {

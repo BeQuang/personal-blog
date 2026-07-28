@@ -5,12 +5,28 @@ import { z } from "zod";
 import { socialLinks as mockSocialLinks } from "@/data/social-links";
 import { NotFoundError, ValidationError } from "@/server/errors";
 import { mapSocialLinkRow } from "@/server/mappers/social-links.mapper";
-import type { SocialLink, SocialLinkMutationInput } from "@/types";
+import {
+  adminListPageSchema,
+  parseAdminListQuery,
+} from "@/server/validation/admin-list.validation";
+import type {
+  AdminListPage,
+  AdminSocialLinkListQuery,
+  SocialLink,
+  SocialLinkMutationInput,
+} from "@/types";
 
 import { getContentSource } from "./content-source";
 import { executeRepository } from "./service-helpers";
 
 const idSchema = z.uuid("ID không hợp lệ");
+const adminSocialLinkListQuerySchema = adminListPageSchema.extend({
+  query: z.string().trim().max(200).default(""),
+  sortBy: z
+    .enum(["createdAt", "enabled", "label", "sortOrder", "updatedAt"])
+    .default("sortOrder"),
+  sortOrder: z.enum(["asc", "desc"]).default("asc"),
+});
 const socialLinkSchema = z
   .object({
     platform: z.enum(["facebook", "youtube", "tiktok", "instagram", "x", "threads", "zalo", "telegram", "discord", "website", "email"]),
@@ -64,6 +80,28 @@ export async function getAdminSocialLinks() {
   await requireServicePermission("settings:manage");
   const { findSocialLinks } = await import("@/server/repositories/social-links.repository");
   return executeRepository(async () => (await findSocialLinks()).map(mapSocialLinkRow));
+}
+
+export async function getAdminSocialLinkPage(
+  input: unknown,
+): Promise<AdminListPage<SocialLink, AdminSocialLinkListQuery["sortBy"]>> {
+  const { requireServicePermission } = await import("./service-authorization");
+  await requireServicePermission("settings:manage");
+  const query = parseAdminListQuery(
+    adminSocialLinkListQuerySchema,
+    input,
+    "Bộ lọc mạng xã hội chưa hợp lệ",
+  ) as AdminSocialLinkListQuery;
+  const repository = await import("@/server/repositories/social-links.repository");
+  const result = await executeRepository(() => repository.findSocialLinkPage(query));
+  return {
+    items: result.items.map(mapSocialLinkRow),
+    total: result.total,
+    page: query.page,
+    pageSize: query.pageSize,
+    sortBy: query.sortBy,
+    sortOrder: query.sortOrder,
+  };
 }
 
 async function parseMutation(input: SocialLinkMutationInput) {

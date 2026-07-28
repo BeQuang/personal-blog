@@ -3,7 +3,11 @@ import "server-only";
 import { z } from "zod";
 
 import { ConflictError, NotFoundError, ValidationError } from "@/server/errors";
-import type { TaxonomyItem, TaxonomyMutationInput } from "@/types";
+import type {
+  TaxonomyItem,
+  TaxonomyMutationInput,
+  TaxonomyPage,
+} from "@/types";
 
 import { createSlug, executeRepository, parseSlug, slugSchema } from "./service-helpers";
 
@@ -12,6 +16,13 @@ const taxonomySchema = z.object({
   name: z.string().trim().min(2, "Tên phải có ít nhất 2 ký tự").max(100),
   slug: z.union([slugSchema, z.literal("")]).optional(),
   description: z.string().trim().max(300).nullable().optional(),
+});
+const taxonomyPageQuerySchema = z.object({
+  type: z.enum(["category", "tag"]),
+  page: z.coerce.number().int().positive().default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(10),
+  sortBy: z.enum(["name", "slug", "createdAt", "updatedAt"]).default("name"),
+  sortOrder: z.enum(["asc", "desc"]).default("asc"),
 });
 
 function parseMutation(input: TaxonomyMutationInput) {
@@ -48,6 +59,63 @@ export async function getCategories(): Promise<TaxonomyItem[]> {
       ...(row.description ? { description: row.description } : {}),
     })),
   );
+}
+
+export async function getTaxonomyPage(input: unknown): Promise<TaxonomyPage> {
+  const { requireServicePermission } = await import("./service-authorization");
+  await requireServicePermission("content:view");
+  const parsed = taxonomyPageQuerySchema.safeParse(input);
+  if (!parsed.success) {
+    throw new ValidationError(
+      "Bộ lọc phân loại chưa hợp lệ",
+      parsed.error.flatten().fieldErrors,
+    );
+  }
+
+  if (parsed.data.type === "category") {
+    const repository = await import("@/server/repositories/categories.repository");
+    const result = await executeRepository(() =>
+      repository.findCategoryPage(
+        parsed.data.page,
+        parsed.data.pageSize,
+        parsed.data.sortBy,
+        parsed.data.sortOrder,
+      ));
+    return {
+      items: result.items.map((row) => ({
+        id: row.id,
+        name: row.name,
+        slug: row.slug,
+        ...(row.description ? { description: row.description } : {}),
+      })),
+      page: parsed.data.page,
+      pageSize: parsed.data.pageSize,
+      total: result.total,
+      sortBy: parsed.data.sortBy,
+      sortOrder: parsed.data.sortOrder,
+    };
+  }
+
+  const repository = await import("@/server/repositories/tags.repository");
+  const result = await executeRepository(() =>
+    repository.findTagPage(
+      parsed.data.page,
+      parsed.data.pageSize,
+      parsed.data.sortBy,
+      parsed.data.sortOrder,
+    ));
+  return {
+    items: result.items.map((row) => ({
+      id: row.id,
+      name: row.name,
+      slug: row.slug,
+    })),
+    page: parsed.data.page,
+    pageSize: parsed.data.pageSize,
+    total: result.total,
+    sortBy: parsed.data.sortBy,
+    sortOrder: parsed.data.sortOrder,
+  };
 }
 
 export async function createCategory(input: TaxonomyMutationInput) {

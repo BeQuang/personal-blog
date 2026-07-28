@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, eq, isNull, ne, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, isNull, ne, sql } from "drizzle-orm";
 
 import { database } from "@/server/database/client";
 import { auditLogs, posts, postTags, tags } from "@/server/database/schema";
@@ -10,6 +10,33 @@ export type NewTagRow = typeof tags.$inferInsert;
 
 export function findTags() {
   return database.select().from(tags).orderBy(asc(tags.name));
+}
+
+export async function findTagPage(
+  page: number,
+  pageSize: number,
+  sortBy: "name" | "slug" | "createdAt" | "updatedAt",
+  sortOrder: "asc" | "desc",
+) {
+  const offset = (page - 1) * pageSize;
+  const sortColumn = {
+    createdAt: tags.createdAt,
+    name: tags.name,
+    slug: tags.slug,
+    updatedAt: tags.updatedAt,
+  }[sortBy];
+  const direction = sortOrder === "asc" ? asc : desc;
+  const [items, totals] = await Promise.all([
+    database
+      .select()
+      .from(tags)
+      .orderBy(direction(sortColumn), asc(tags.id))
+      .limit(pageSize)
+      .offset(offset),
+    database.select({ value: count() }).from(tags),
+  ]);
+
+  return { items, total: totals[0]?.value ?? 0 };
 }
 
 export async function findTagBySlug(slug: string) {

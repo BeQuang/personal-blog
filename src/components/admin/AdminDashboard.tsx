@@ -13,6 +13,7 @@ import {
 import { AdminAnalyticsChart } from "@/components/admin/AdminAnalyticsChart";
 import { AdminAnalyticsDateFilter } from "@/components/admin/AdminAnalyticsDateFilter";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { adminTablePaginationDefaults } from "@/components/admin/admin-table.config";
 import type {
   AnalyticsDashboardData,
   AnalyticsRankedItem,
@@ -180,11 +181,14 @@ export function AdminDashboard({
         </Col>
       </Row>
 
-      <Card title="Hiệu quả chiến dịch" className="admin-dashboard-card">
+      <Card
+        title="Hiệu quả chiến dịch"
+        className="admin-dashboard-card admin-table-panel"
+      >
         <Table
           rowKey="id"
           dataSource={[...data.campaigns]}
-          pagination={false}
+          pagination={adminTablePaginationDefaults}
           scroll={{ x: 760 }}
           locale={{ emptyText: "Chưa có dữ liệu chiến dịch." }}
           columns={[

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { AdminGalleryManager } from "@/components/admin/AdminGalleryManager";
 import { AdminMediaLibrary } from "@/components/admin/AdminMediaLibrary";
 import { hasPermission, requireAdminPagePermission } from "@/server/auth";
-import { getAdminGalleryItems } from "@/server/services/gallery.service";
+import { getAdminGalleryItemPage } from "@/server/services/gallery.service";
 import { getMediaLibrary, getMediaPickerItems } from "@/server/services/media.service";
 import type { MediaMimeType, MediaPurpose } from "@/types";
 
@@ -21,7 +21,7 @@ export default async function AdminGalleryPage({ searchParams }: Props) {
   const filters = { query: single(parameters.q)?.trim() ?? "", mimeType: rawMime && mimeTypes.has(rawMime as MediaMimeType) ? rawMime as MediaMimeType : "all" as const, purpose: rawPurpose && purposes.has(rawPurpose as MediaPurpose) ? rawPurpose as MediaPurpose : "all" as const };
   // This route has three independent database reads. Keep them sequential so a
   // small serverless pool cannot be exhausted by one page render.
-  const items = await getAdminGalleryItems();
+  const initialPage = await getAdminGalleryItemPage({});
   const mediaRows = await getMediaPickerItems();
   const mediaLibrary = await getMediaLibrary({
     page: Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1,
@@ -31,5 +31,5 @@ export default async function AdminGalleryPage({ searchParams }: Props) {
     purpose: filters.purpose,
   });
   const mediaOptions = mediaRows.map((item) => ({ id: item.id, label: item.alt || item.originalFilename, publicUrl: item.publicUrl }));
-  return <><AdminGalleryManager items={items} mediaOptions={mediaOptions} canWrite canPublish={hasPermission(currentUser.role, "content:publish")} /><AdminMediaLibrary data={mediaLibrary} filters={filters} showHeader={false} /></>;
+  return <><AdminGalleryManager initialPage={initialPage} mediaOptions={mediaOptions} canWrite canPublish={hasPermission(currentUser.role, "content:publish")} /><AdminMediaLibrary data={mediaLibrary} filters={filters} showHeader={false} /></>;
 }

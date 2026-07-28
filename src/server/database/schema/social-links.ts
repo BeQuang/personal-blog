@@ -31,6 +31,7 @@ export const socialLinks = pgTable(
   (table) => [
     index("social_links_enabled_sort_order_idx").on(table.enabled, table.sortOrder),
     index("social_links_platform_idx").on(table.platform),
+    index("social_links_sort_order_idx").on(table.sortOrder),
     check(
       "social_links_follower_count_non_negative",
       sql`${table.followerCount} is null or ${table.followerCount} >= 0`,

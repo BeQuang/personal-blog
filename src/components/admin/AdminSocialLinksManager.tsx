@@ -3,7 +3,7 @@
 import { App, Button, Flex, Input, Space, Switch, Table, Tooltip } from "antd";
 import type { TableColumnsType } from "antd";
 import { Pencil, Plus, Search, Trash2 } from "lucide-react";
-import { useMemo, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import {
@@ -14,24 +14,52 @@ import {
 } from "@/actions/social-links.actions";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminSocialLinkEditorModal } from "@/components/admin/AdminSocialLinkEditorModal";
-import type { ActionFieldErrors, SocialLink, SocialLinkMutationInput } from "@/types";
+import { useAdminListPage } from "@/components/admin/useAdminListPage";
+import { adminTablePaginationDefaults } from "@/components/admin/admin-table.config";
+import type {
+  ActionFieldErrors,
+  AdminListPage,
+  AdminSocialLinkListQuery,
+  SocialLink,
+  SocialLinkMutationInput,
+} from "@/types";
 import { formatViewCount } from "@/utils/format";
 
-export function AdminSocialLinksManager({ links }: { links: readonly SocialLink[] }) {
+export function AdminSocialLinksManager({
+  initialPage,
+}: {
+  initialPage: AdminListPage<SocialLink, AdminSocialLinkListQuery["sortBy"]>;
+}) {
   const { message, modal } = App.useApp();
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<SocialLink | null>(null);
   const [pending, startTransition] = useTransition();
+  const initialSearchRender = useRef(true);
+  const reportListError = useCallback((error: string) => { void message.error(error); }, [message]);
+  const { data, load, loading, reload } = useAdminListPage(
+    "/api/admin/social-links",
+    initialPage,
+    reportListError,
+  );
 
-  const filteredLinks = useMemo(() => {
-    const normalized = query.trim().toLocaleLowerCase("vi-VN");
-    return links.filter((link) =>
-      !normalized || [link.label, link.platform, link.username, link.url]
-        .some((value) => value?.toLocaleLowerCase("vi-VN").includes(normalized)),
-    );
-  }, [links, query]);
+  useEffect(() => {
+    if (initialSearchRender.current) {
+      initialSearchRender.current = false;
+      return;
+    }
+    const timeout = window.setTimeout(() => {
+      void load({
+        page: 1,
+        pageSize: data.pageSize,
+        query,
+        sortBy: data.sortBy,
+        sortOrder: data.sortOrder,
+      });
+    }, 300);
+    return () => window.clearTimeout(timeout);
+  }, [data.pageSize, data.sortBy, data.sortOrder, load, query]);
 
   const submit = (input: SocialLinkMutationInput): Promise<ActionFieldErrors | undefined> =>
     new Promise((resolve) => {
@@ -47,6 +75,7 @@ export function AdminSocialLinksManager({ links }: { links: readonly SocialLink[
         void message.success(result.message);
         setOpen(false);
         setEditing(null);
+        await reload();
         router.refresh();
         resolve(undefined);
       });
@@ -66,6 +95,7 @@ export function AdminSocialLinksManager({ links }: { links: readonly SocialLink[
           throw new Error(result.message);
         }
         void message.success(result.message);
+        await reload();
         router.refresh();
       },
     });
@@ -109,6 +139,7 @@ export function AdminSocialLinksManager({ links }: { links: readonly SocialLink[
               const result = await setSocialLinkEnabledAction(link.id, checked);
               if (result.success) {
                 void message.success(result.message);
+                await reload();
                 router.refresh();
               } else {
                 void message.error(result.message);
@@ -182,10 +213,22 @@ export function AdminSocialLinksManager({ links }: { links: readonly SocialLink[
         <Table<SocialLink>
           rowKey="id"
           columns={columns}
-          dataSource={[...filteredLinks]}
-          loading={pending}
+          dataSource={[...data.items]}
+          loading={pending || loading}
           scroll={{ x: 850 }}
-          pagination={{ pageSize: 8, showSizeChanger: false }}
+          pagination={{
+            ...adminTablePaginationDefaults,
+            current: data.page,
+            pageSize: data.pageSize,
+            total: data.total,
+          }}
+          onChange={(pagination) => void load({
+            page: pagination.current ?? 1,
+            pageSize: pagination.pageSize ?? data.pageSize,
+            query,
+            sortBy: data.sortBy,
+            sortOrder: data.sortOrder,
+          })}
           locale={{ emptyText: "Không có social link phù hợp." }}
         />
       </section>

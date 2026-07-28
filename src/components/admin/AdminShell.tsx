@@ -28,7 +28,7 @@ import {
   Video,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { logoutAction } from "@/actions/auth.actions";
 import { adminNavigation } from "@/config/admin.config";
@@ -38,6 +38,7 @@ import {
   type Permission,
   type UserRole,
 } from "@/server/auth/permissions";
+import { cn } from "@/utils/cn";
 
 const { Header, Sider, Content } = Layout;
 
@@ -105,6 +106,36 @@ function AdminMenu({
       onClick={({ key }) => onNavigate(key)}
       aria-label="Điều hướng quản trị"
     />
+  );
+}
+
+function AdminLogoutButton() {
+  const { modal } = AntdApp.useApp();
+  const logoutFormRef = useRef<HTMLFormElement>(null);
+
+  const confirmLogout = () => {
+    modal.confirm({
+      title: "Xác nhận đăng xuất",
+      content:
+        "Bạn có chắc muốn đăng xuất khỏi khu vực quản trị? Bạn sẽ cần đăng nhập lại để tiếp tục.",
+      okText: "Đăng xuất",
+      cancelText: "Ở lại",
+      okButtonProps: { danger: true },
+      focusable: { autoFocusButton: "cancel" },
+      onOk: () => logoutFormRef.current?.requestSubmit(),
+    });
+  };
+
+  return (
+    <form ref={logoutFormRef} action={logoutAction}>
+      <Button
+        htmlType="button"
+        type="text"
+        icon={<LogOut aria-hidden="true" size={18} />}
+        aria-label="Đăng xuất"
+        onClick={confirmLogout}
+      />
+    </form>
   );
 }
 
@@ -221,16 +252,15 @@ export function AdminShell({
                 <span>{currentUser.displayName}</span>
                 <small>{roleLabels[currentUser.role]}</small>
               </div>
-              <form action={logoutAction}>
-                <Button
-                  htmlType="submit"
-                  type="text"
-                  icon={<LogOut aria-hidden="true" size={18} />}
-                  aria-label="Đăng xuất"
-                />
-              </form>
+              <AdminLogoutButton />
             </Header>
-            <Content className="admin-content">
+            <Content
+              className={cn(
+                "admin-content",
+                pathname.startsWith("/admin/posts") &&
+                  "admin-content-posts",
+              )}
+            >
               <Breadcrumb
                 items={[
                   { title: "Admin", href: "/admin" },
