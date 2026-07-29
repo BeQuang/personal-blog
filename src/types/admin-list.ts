@@ -47,6 +47,19 @@ export type AdminCampaignListQuery =
   AdminListQuery<"createdAt" | "endAt" | "startAt" | "status" | "title" | "updatedAt">;
 
 export interface AdminSocialLinkListQuery
-  extends AdminListQuery<"createdAt" | "enabled" | "label" | "sortOrder" | "updatedAt"> {
+  extends AdminListQuery<"createdAt" | "enabled" | "followerCount" | "label" | "sortOrder" | "updatedAt"> {
   query: string;
+  platform:
+    | "all"
+    | "facebook"
+    | "youtube"
+    | "tiktok"
+    | "instagram"
+    | "x"
+    | "threads"
+    | "zalo"
+    | "telegram"
+    | "discord"
+    | "website"
+    | "email";
 }

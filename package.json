@@ -27,6 +27,7 @@
     "content:test": "node scripts/test-stage15-content.mjs",
     "content:test:authorization": "node scripts/test-stage15-authorization.mjs",
     "content:test:service": "node --conditions=react-server --import tsx scripts/test-stage15-services.ts",
+    "social:test": "node --conditions=react-server --import tsx scripts/test-social-audience.ts",
     "storage:test": "node --conditions=react-server --import tsx scripts/test-stage16-storage.ts",
     "storage:test:database": "node --conditions=react-server --import tsx scripts/test-stage16-database.ts",
     "storage:test:security": "node --conditions=react-server --import tsx scripts/test-stage16-security.ts",

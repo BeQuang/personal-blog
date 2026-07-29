@@ -1,6 +1,6 @@
 # Component catalog
 
-> Generated artifact — source fingerprint: `09305027bd2217dec714b6281b0ef07e98308b1880b3e95593ee56ffd35fb888`
+> Generated artifact — source fingerprint: `55ceb5b157e9b21b46be3e9fa9ef7e3a55eabc32423a6bbbc4fd73c104f01fb8`
 
 Tra bảng này trước khi tạo component mới. “Client” chỉ ra module có directive `"use client"`; Server Component không có directive.
 
@@ -36,6 +36,7 @@ Tra bảng này trước khi tạo component mới. “Client” chỉ ra module
 | `src/components/admin/AdminVideosManager.tsx` | `AdminVideosManager` | Client | `src/app/admin/(protected)/videos/page.tsx` |
 | `src/components/admin/AdminVideoUploadPanel.tsx` | `AdminVideoUploadPanel` | Client | `src/components/admin/AdminVideosManager.tsx` |
 | `src/components/admin/useAdminListPage.ts` | — | Client | `src/components/admin/AdminCampaignsManager.tsx`<br>`src/components/admin/AdminEventsManager.tsx`<br>`src/components/admin/AdminGalleryManager.tsx`<br>`src/components/admin/AdminPostsManager.tsx`<br>`src/components/admin/AdminSocialLinksManager.tsx`<br>`src/components/admin/AdminVideosManager.tsx` |
+| `src/components/admin/useAdminViewportTable.ts` | — | Client | `src/components/admin/AdminPostsManager.tsx`<br>`src/components/admin/AdminSocialLinksManager.tsx` |
 | `src/components/analytics/AnalyticsProvider.tsx` | `AnalyticsProvider` | Client | `src/app/layout.tsx` |
 | `src/components/analytics/AnalyticsView.tsx` | `AnalyticsView` | Client | `src/app/blog/[slug]/page.tsx`<br>`src/app/campaigns/[slug]/page.tsx` |
 | `src/components/blog/BlogExplorer.tsx` | `BlogExplorer` | Client | `src/app/blog/page.tsx` |

@@ -83,6 +83,7 @@ export interface SocialLinkMutationInput {
   username?: string | null;
   url: string;
   followerCount?: number | null;
+  likesCount?: number | null;
   description?: string | null;
   enabled: boolean;
   order: number;

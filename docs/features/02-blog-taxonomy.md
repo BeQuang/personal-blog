@@ -16,6 +16,7 @@ Tại `/admin/posts`:
 - Bảng bài viết dùng pagination server-side: mặc định 10 dòng, cho chọn 10/20/50, hiển thị tổng và tính STT theo `pageSize` đang chọn. Search, trạng thái, toggle lưu trữ, trang, số dòng và thứ tự đều được gửi tới `GET /api/admin/posts`; service validate và repository thực hiện filter + `COUNT + LIMIT + OFFSET + ORDER BY`. Filter đưa bảng về trang 1. Mặc định bài mới chỉnh sửa đứng trước (`updatedAt desc`); header tiêu đề, trạng thái và ngày cho phép đổi thứ tự bằng allowlist server.
 - Tiêu đề trang dùng mô tả hướng người quản trị: **Quản lý nội dung, lịch xuất bản, phân loại và tối ưu SEO cho bài viết.** Cụm toggle lưu trữ có viền tím-xám nhẹ để tách khỏi nền toolbar nhưng không dùng bóng hoặc nền card.
 - Chọn category, nhiều tag; thumbnail và cover có thể dùng asset trong Media Library hoặc tải ảnh mới từ máy ngay trong picker.
+- Form tạo/sửa bài viết cung cấp placeholder theo ngữ cảnh cho toàn bộ trường nhập và trường chọn có thể để trống, gồm thông tin chính, taxonomy, trạng thái, thời gian đọc, lịch xuất bản, SEO và các field trong 9 loại content block.
 - Chọn `draft`, `scheduled`, `published`, `archived`.
 - Thời điểm lên lịch/xuất bản dùng picker ngày giờ dùng chung, hiển thị `DD/MM/YYYY HH:mm` và tiếp tục gửi ISO cho service.
 - Bật/tắt featured.
@@ -99,6 +100,8 @@ npm run type-check
 Kiểm tra thêm metadata/404 cho slug, scheduled date, duplicate slug và permission editor.
 
 Kiểm tra đủ 9 block trong editor trực quan: thêm, nhập trường bắt buộc, nhân bản, đổi thứ tự và xóa. Chuyển sang JSON phải thấy đúng thứ tự/dữ liệu; JSON sai hiển thị lỗi, JSON hợp lệ nhưng chưa áp dụng chặn submit, còn **Áp dụng & xem trực quan** phải cập nhật lại toàn bộ block mà không mất dữ liệu.
+
+Kiểm tra placeholder của form tạo mới khi các field chưa có giá trị: tiêu đề, slug, mô tả, danh mục, thẻ, trạng thái, thời gian đọc, ngày giờ, SEO và mọi input/select trong editor phải gợi ý rõ loại dữ liệu hoặc ví dụ cần nhập; placeholder không thay thế label và không xuất hiện ở field ẩn.
 
 Kiểm tra visual hierarchy của editor ở desktop/mobile: hai tab và body dùng chung một khung viền nhẹ; phần tóm tắt **Nội dung bài viết** cùng nút **Thêm nội dung** liền sát tab, không có viền riêng và nằm ngoài vùng cuộn. Danh sách block có chiều cao tối đa theo viewport, chỉ danh sách này cuộn với overscroll được chặn; sau khi thêm block, vùng cuộn tự đưa block mới vào cuối danh sách. Danh sách block/JSON chỉ thụt vào bằng padding nhỏ. Nút **Thêm nội dung** luôn có chữ/icon trắng tương phản trên nền tím và chỉ dùng bóng ngắn; mỗi block có một viền xám nhẹ, một bóng đồng nhất, trạng thái focus tím nhạt và padding đủ để input không dính sát cạnh card.
 

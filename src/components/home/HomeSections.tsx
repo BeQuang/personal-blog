@@ -117,7 +117,14 @@ export function SocialLinksSection({ links }: SocialLinksSectionProps) {
                 <span className="social-card-copy">
                   <strong>{link.label}</strong>
                   <small>{link.username ?? "Xem trang cá nhân"}</small>
-                  {link.followerCount ? <span>{formatViewCount(link.followerCount)} người theo dõi</span> : null}
+                  {link.followerCount !== undefined ? (
+                    <span>
+                      {formatViewCount(link.followerCount)} người theo dõi
+                      {link.platform === "tiktok" && link.likesCount !== undefined
+                        ? ` · ${formatViewCount(link.likesCount)} lượt thích`
+                        : ""}
+                    </span>
+                  ) : null}
                 </span>
                 <ExternalLink className="social-card-arrow" size={17} aria-hidden="true" />
               </AnalyticsLink>

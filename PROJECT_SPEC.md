@@ -295,7 +295,8 @@ Protected layout yêu cầu `dashboard:view`; từng page tiếp tục kiểm tr
 - Create/update/archive/publish/featured.
 - Post editor mặc định dùng trình soạn thảo trực quan cho 9 loại content block, hỗ trợ thêm/xóa/nhân bản/đổi thứ tự và trường tiếng Việt theo từng loại. Chế độ JSON nâng cao hiển thị dữ liệu parser tạo ra, cho phép developer sửa và chỉ đồng bộ ngược sau khi schema dùng chung kiểm tra hợp lệ.
 - Category/tag CRUD dùng modal table rộng; UI quản lý đọc lười qua API phân trang thay vì nhúng toàn bộ danh sách vào popup. Mặc định người dùng chọn 10, 20 hoặc 50 dòng mỗi trang; footer tách thành cụm bộ chọn số dòng + tổng bản ghi bám trái và cụm nút chuyển trang bám phải; component cho phép truyền mảng lựa chọn khác và server giới hạn `pageSize` tối đa 100.
-- Social link CRUD, enable/disable và sort order.
+- Social link CRUD, enable/disable và sort order; danh sách Admin có search, lọc platform, sort Followers phía server và vùng row cuộn nội bộ để giữ toàn màn hình trong viewport. Modal social link rộng 760px trên desktop; ghi chú trường dùng typography nhỏ, ô subscriber lấp đầy cột và trạng thái/thời điểm đồng bộ YouTube nằm cùng một hàng với khoảng cách dưới rõ ràng. TikTok có thêm trường tổng lượt thích nhưng hiện dùng dữ liệu nhập thủ công; nút kết nối OAuth tạm ẩn. Mô tả cho phép tối đa 5.000 ký tự.
+- Social link YouTube được xác minh và lấy subscriber count ngay trước lần tạo/đổi URL; request provider lỗi không được ghi bản ghi pending. Cron mỗi ngày một lần chỉ làm mới YouTube. Mã OAuth/token TikTok được giữ làm nền cho giai đoạn production sau này nhưng route kết nối, callback và job TikTok đều bị chặn khi cờ tính năng tắt.
 - R2 Media Library, upload, picker và xóa có kiểm tra đang được sử dụng. Mọi `AdminMediaPicker` cho thumbnail, cover, banner, avatar và Gallery đều cho phép chọn asset có sẵn hoặc tải ảnh từ máy; ảnh tải mới dùng đúng purpose, được confirm vào Media Library rồi tự động chọn vào form hiện tại.
 - Mux direct upload và external video.
 - Submission status workflow và CSV export tối đa 5.000 dòng.
@@ -365,7 +366,7 @@ Không silently fallback sang mock khi database mode lỗi. Server Actions dùng
 | Auth | `profiles` |
 | Content | `categories`, `tags`, `posts`, `post_tags` |
 | Media/video | `media_assets`, `videos`, `video_webhook_events`, `gallery_items` |
-| Site | `site_settings`, `social_links` |
+| Site | `site_settings`, `social_links`, `social_oauth_connections` |
 | Activity | `events`, `campaigns` |
 | Forms | `contact_submissions`, `newsletter_subscriptions`, `campaign_submissions` |
 | Analytics | `analytics_events`, `daily_analytics` |
@@ -498,6 +499,9 @@ Anonymous session là UUID trong `sessionStorage`; server lưu SHA-256 hash. Das
 | `GET /api/admin/events` | Trang sự kiện có order, yêu cầu `content:view` |
 | `GET /api/admin/campaigns` | Trang chiến dịch có order, yêu cầu `content:view` |
 | `GET /api/admin/social-links` | Trang social links có search/order, yêu cầu `settings:manage` |
+| `GET /api/cron/social-audience-sync` | Đồng bộ YouTube subscriber; Bearer `CRON_SECRET`, không dùng Admin session |
+| `GET /api/auth/tiktok/start` | Route dự phòng đang tắt; redirect về Admin với trạng thái `tiktok=disabled` |
+| `GET /api/auth/tiktok/callback` | Route dự phòng đang tắt; không đổi code hoặc ghi token TikTok |
 | `GET /api/admin/taxonomies` | Trang category/tag có order, yêu cầu `content:view` |
 
 Mọi GET collection ở trên dùng `Cache-Control: private, no-store` và cùng hợp đồng `page/pageSize/sortBy/sortOrder`. CSV export là ngoại lệ có chủ đích, giới hạn tối đa 5.000 dòng và không dùng response JSON phân trang.
@@ -509,6 +513,9 @@ Mọi GET collection ở trên dùng `Cache-Control: private, no-store` và cùn
 - `NEXT_PUBLIC_SITE_URL`: canonical origin.
 - `USE_DATABASE_CONTENT`: `false` dùng mock, `true` dùng PostgreSQL; production bắt buộc `true`.
 - `NEXT_PUBLIC_ANALYTICS_ENABLED`: `true` bật consent/collection, `false` tắt cả client và server analytics. Không khai báo hiện tương đương `true`; nên đặt rõ ràng theo environment.
+- `YOUTUBE_DATA_API_KEY`: server-only key dùng đọc channel statistics từ YouTube Data API.
+- `TIKTOK_CLIENT_KEY`, `TIKTOK_CLIENT_SECRET`, `TIKTOK_REDIRECT_URI`, `SOCIAL_OAUTH_ENCRYPTION_KEY`: cấu hình dự phòng cho TikTok OAuth; hiện không bắt buộc vì tự động hóa TikTok đang tắt.
+- `CRON_SECRET`: server-only Bearer secret bảo vệ cron social audience.
 
 ### Database/Auth
 
@@ -560,6 +567,7 @@ Chỉ biến có prefix `NEXT_PUBLIC_` được phép vào client bundle. Không
 - Zod validate ở server boundary.
 - R2 kiểm tra extension, MIME, size, metadata và magic bytes.
 - Mux verify raw-body signature và event idempotency.
+- OAuth TikTok đang bị chặn bằng cờ tính năng dùng chung. Phần nền được giữ cho giai đoạn sau: state cookie HttpOnly/SameSite=Lax, so khớp constant-time và token AES-256-GCM không xuất qua DTO/Data API.
 - CSV escape công thức để giảm spreadsheet injection.
 - Không tin permission hoặc status gửi từ client.
 - RLS là lớp phòng thủ database bổ sung, không thay authorization trong service.
@@ -660,6 +668,8 @@ Trước khi hoàn tất:
 - Legal text và dữ liệu/hình ảnh mẫu cần review/thay thế trước phát hành chính thức.
 - Chưa có Dockerfile production.
 - Backup/PITR, monitoring/alerting và scheduler retention là cấu hình hạ tầng ngoài repository.
+- YouTube subscriber được đồng bộ một lần/ngày lúc 00:00 UTC qua Vercel Cron, tương thích giới hạn lịch hằng ngày của Vercel Hobby.
+- TikTok tự động đang tạm tắt; follower/tổng lượt thích TikTok cùng Facebook/Instagram/X/Threads/Zalo vẫn dùng số công khai nhập thủ công cho đến giai đoạn tích hợp production.
 - Một số copy cũ trong `README.md`/`homepage.config.ts` vẫn nhắc “demo/không lưu”, nhưng implementation forms/settings hiện ghi Backend thật.
 - Test hiện chủ yếu là script integration/security; chưa có bộ browser E2E/accessibility hoàn chỉnh.
 

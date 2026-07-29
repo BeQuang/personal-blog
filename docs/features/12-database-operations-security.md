@@ -26,6 +26,13 @@ Không import `database/client.ts` từ UI, page, action hoặc mapper; reposito
 
 Admin/private reads và mutations vẫn cần database dù cờ này là `false`.
 
+### Social audience sync
+
+- `YOUTUBE_DATA_API_KEY`: server-only API key cho YouTube Data API v3; giới hạn key theo API và quota trong Google Cloud.
+- `CRON_SECRET`: secret dài/ngẫu nhiên để Vercel gửi qua Bearer authorization tới route đồng bộ; route từ chối cả khi biến bị thiếu.
+- Không đưa hai biến này vào tên `NEXT_PUBLIC_*`, response, audit payload hoặc log.
+- TikTok OAuth hiện bị chặn ở UI, service và Route Handler; các secret TikTok/encryption không bắt buộc cho runtime hiện tại và cron không đọc chúng.
+
 ### `BOOTSTRAP_ADMIN_ENABLED`
 
 - `true`: `predev`/`prestart` có thể tạo Admin đầu tiên, nhưng chỉ khi Supabase Auth chưa có user.
@@ -47,7 +54,7 @@ Không bật lại trên environment đã có người dùng.
 
 Schema, migration và generated metadata phải thay đổi cùng nhau. Không sửa migration đã chạy trên shared environment; tạo migration mới.
 
-Migration `0010_hot_gravity.sql` bổ sung index cho các thứ tự Admin được dùng thường xuyên: `posts.updated_at`, `videos.updated_at`, `gallery_items.sort_order`, `social_links.sort_order`, `categories.name` và `tags.name`. Khi thêm `sortBy` mới cho list API có dữ liệu tăng trưởng, phải kiểm tra execution plan/index và tạo migration tiếp theo nếu cần.
+Migration `0010_hot_gravity.sql` bổ sung index cho các thứ tự Admin được dùng thường xuyên: `posts.updated_at`, `videos.updated_at`, `gallery_items.sort_order`, `social_links.sort_order`, `categories.name` và `tags.name`. Migration `0011_shocking_war_machine.sql` bổ sung index `social_links.follower_count` cho sort Followers phía server. Migration `0012_milky_taskmaster.sql` bổ sung metadata nguồn/trạng thái đồng bộ social audience, chuyển YouTube sang `pending` và xóa count không áp dụng cho Email/Website. Khi thêm `sortBy` mới cho list API có dữ liệu tăng trưởng, phải kiểm tra execution plan/index và tạo migration tiếp theo nếu cần.
 
 ## Setup local
 

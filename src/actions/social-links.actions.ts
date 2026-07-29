@@ -17,7 +17,9 @@ export async function createSocialLinkAction(input: SocialLinkMutationInput): Pr
   try {
     await socialLinksService.createSocialLink(input);
     revalidateSocialRoutes();
-    return actionSucceeded("Đã tạo social link.");
+    return actionSucceeded(input.platform === "youtube"
+      ? "Đã tạo kênh YouTube và đồng bộ số người đăng ký."
+      : "Đã tạo social link.");
   } catch (error) {
     return actionFailed(error);
   }
@@ -54,6 +56,18 @@ export async function setSocialLinkEnabledAction(
     await socialLinksService.setSocialLinkEnabled(id, enabled);
     revalidateSocialRoutes();
     return actionSucceeded(enabled ? "Đã bật social link." : "Đã tắt social link.");
+  } catch (error) {
+    return actionFailed(error);
+  }
+}
+
+export async function disconnectTikTokSocialLinkAction(
+  id: string,
+): Promise<AdminActionResult> {
+  try {
+    await socialLinksService.disconnectTikTokSocialLink(id);
+    revalidateSocialRoutes();
+    return actionSucceeded("Đã ngắt kết nối TikTok. Bạn có thể nhập số liệu thủ công.");
   } catch (error) {
     return actionFailed(error);
   }

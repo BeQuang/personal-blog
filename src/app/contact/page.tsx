@@ -67,7 +67,17 @@ export default async function ContactPage() {
                   <li key={link.id}>
                     <a href={link.url} target="_blank" rel="noopener noreferrer" className="flex min-h-11 items-center gap-3 rounded-[var(--radius-md)] px-2 text-sm outline-none transition hover:bg-[var(--surface-hover)] focus-visible:ring-2 focus-visible:ring-[var(--primary)]">
                       <SocialIcon platform={link.platform} size={18} />
-                      <span className="min-w-0 flex-1"><strong className="block">{link.label}</strong>{link.followerCount ? <small className="text-[var(--text-muted)]">{formatViewCount(link.followerCount)} người theo dõi</small> : null}</span>
+                      <span className="min-w-0 flex-1">
+                        <strong className="block">{link.label}</strong>
+                        {link.followerCount !== undefined ? (
+                          <small className="text-[var(--text-muted)]">
+                            {formatViewCount(link.followerCount)} người theo dõi
+                            {link.platform === "tiktok" && link.likesCount !== undefined
+                              ? ` · ${formatViewCount(link.likesCount)} lượt thích`
+                              : ""}
+                          </small>
+                        ) : null}
+                      </span>
                       <ExternalLink size={15} className="text-[var(--text-muted)]" aria-hidden="true" />
                     </a>
                   </li>

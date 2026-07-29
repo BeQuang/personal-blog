@@ -8,7 +8,8 @@ async function main() {
   const { postgresClient } = await import("../src/server/database/client");
   try {
   const requiredTables = [
-    "profiles", "site_settings", "social_links", "categories", "tags", "posts",
+    "profiles", "site_settings", "social_links", "social_oauth_connections",
+    "categories", "tags", "posts",
     "post_tags", "media_assets", "videos", "gallery_items", "events", "campaigns",
     "campaign_submissions", "contact_submissions", "newsletter_subscriptions",
     "analytics_events", "daily_analytics", "audit_logs", "video_webhook_events",
@@ -29,6 +30,16 @@ async function main() {
   assert.equal(policies.some((row) => row.policyname === "media_assets_content_roles_all"), false);
   assert.equal(policies.some((row) => row.policyname === "media_assets_admin_all" && row.cmd === "ALL"), true);
   assert.equal(policies.some((row) => row.policyname === "media_assets_editor_select" && row.cmd === "SELECT"), true);
+
+  const socialOauthPolicies = await postgresClient<{ policyname: string }[]>`
+    select policyname from pg_policies
+    where schemaname = 'public' and tablename = 'social_oauth_connections'
+  `;
+  assert.equal(
+    socialOauthPolicies.length,
+    0,
+    "OAuth token table must not be readable through anon/authenticated Data API policies",
+  );
 
   const indexes = await postgresClient<{ indexname: string }[]>`
     select indexname from pg_indexes

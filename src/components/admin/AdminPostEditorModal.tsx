@@ -179,7 +179,11 @@ export function AdminPostEditorModal({
       >
         <div className="admin-form-grid">
           <Form.Item name="title" label="Tiêu đề" rules={[{ required: true, message: "Vui lòng nhập tiêu đề." }]}>
-            <Input maxLength={180} showCount />
+            <Input
+              maxLength={180}
+              showCount
+              placeholder="Nhập tiêu đề chính của bài viết..."
+            />
           </Form.Item>
           <Form.Item name="slug" label="Slug" extra="Để trống để tự tạo từ tiêu đề.">
             <Input maxLength={180} placeholder="ten-bai-viet" />
@@ -187,7 +191,12 @@ export function AdminPostEditorModal({
         </div>
 
         <Form.Item name="excerpt" label="Mô tả ngắn" rules={[{ required: true, message: "Vui lòng nhập mô tả." }]}>
-          <Input.TextArea rows={3} maxLength={500} showCount />
+          <Input.TextArea
+            rows={3}
+            maxLength={500}
+            showCount
+            placeholder="Tóm tắt ngắn nội dung để người đọc biết bài viết nói về điều gì..."
+          />
         </Form.Item>
 
         <Form.Item
@@ -211,10 +220,18 @@ export function AdminPostEditorModal({
 
         <div className="admin-form-grid">
           <Form.Item name="categoryId" label="Danh mục" rules={[{ required: true, message: "Vui lòng chọn danh mục." }]}>
-            <Select options={categories.map((item) => ({ value: item.id, label: item.name }))} />
+            <Select
+              placeholder="Chọn danh mục cho bài viết"
+              options={categories.map((item) => ({ value: item.id, label: item.name }))}
+            />
           </Form.Item>
           <Form.Item name="tagIds" label="Thẻ">
-            <Select mode="multiple" allowClear options={tags.map((item) => ({ value: item.id, label: item.name }))} />
+            <Select
+              mode="multiple"
+              allowClear
+              placeholder="Chọn một hoặc nhiều thẻ liên quan"
+              options={tags.map((item) => ({ value: item.id, label: item.name }))}
+            />
           </Form.Item>
         </div>
 
@@ -248,6 +265,7 @@ export function AdminPostEditorModal({
         <div className="admin-form-grid">
           <Form.Item name="status" label="Trạng thái" rules={[{ required: true }]}>
             <Select
+              placeholder="Chọn trạng thái bài viết"
               options={[
                 { value: "draft", label: "Bản nháp" },
                 ...(canPublish ? [
@@ -258,18 +276,23 @@ export function AdminPostEditorModal({
             />
           </Form.Item>
           <Form.Item name="readingTime" label="Thời gian đọc (phút)" rules={[{ required: true }]}>
-            <InputNumber min={1} max={999} className="w-full" />
+            <InputNumber
+              min={1}
+              max={999}
+              className="w-full"
+              placeholder="Ví dụ: 5"
+            />
           </Form.Item>
         </div>
 
         {status === "scheduled" ? (
           <Form.Item name="scheduledAt" label="Thời gian lên lịch" rules={[{ required: true, message: "Vui lòng chọn thời gian lên lịch." }]}>
-            <AdminDateTimePicker />
+            <AdminDateTimePicker placeholder="Chọn ngày và giờ lên lịch" />
           </Form.Item>
         ) : null}
         {status === "published" ? (
           <Form.Item name="publishedAt" label="Thời gian xuất bản" extra="Để trống để dùng thời điểm lưu.">
-            <AdminDateTimePicker />
+            <AdminDateTimePicker placeholder="Chọn ngày và giờ xuất bản (không bắt buộc)" />
           </Form.Item>
         ) : null}
 
@@ -279,10 +302,19 @@ export function AdminPostEditorModal({
 
         <div className="admin-form-grid">
           <Form.Item name="seoTitle" label="SEO title">
-            <Input maxLength={70} showCount />
+            <Input
+              maxLength={70}
+              showCount
+              placeholder="Tiêu đề hiển thị trên kết quả tìm kiếm..."
+            />
           </Form.Item>
           <Form.Item name="seoDescription" label="SEO description">
-            <Input.TextArea rows={3} maxLength={180} showCount />
+            <Input.TextArea
+              rows={3}
+              maxLength={180}
+              showCount
+              placeholder="Mô tả ngắn giúp người dùng hiểu nội dung trước khi truy cập..."
+            />
           </Form.Item>
         </div>
       </Form>

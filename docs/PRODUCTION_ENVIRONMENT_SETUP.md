@@ -165,10 +165,29 @@ Không bật bootstrap thường trực trên serverless instances.
 - `DATABASE_URL`.
 - `DATABASE_POOL_MAX=2`.
 - `BOOTSTRAP_ADMIN_ENABLED=false`.
+- `YOUTUBE_DATA_API_KEY`.
+- `CRON_SECRET`.
 
 `R2_PUBLIC_BASE_URL` phải có ngay lúc build vì `next.config.ts` dùng nó để tạo remote image pattern.
 
 Các biến `NEXT_PUBLIC_*` được đóng gói vào client bundle lúc build, nên mọi thay đổi đều cần redeploy.
+
+### YouTube social audience cron
+
+Tạo YouTube Data API v3 key chỉ dùng phía server, giới hạn key theo API/quota, rồi đặt:
+
+```env
+YOUTUBE_DATA_API_KEY=...
+CRON_SECRET=...
+```
+
+`vercel.json` gọi `/api/cron/social-audience-sync` theo lịch `0 0 * * *`: một lần mỗi ngày lúc 00:00 UTC, khoảng 07:00 giờ Việt Nam. Vercel tự gửi `CRON_SECRET` trong Bearer Authorization; không thêm secret vào URL. Lịch hằng ngày này dùng được trên Vercel Hobby.
+
+### TikTok automation đang tạm hoãn
+
+TikTok hiện dùng follower và tổng lượt thích nhập thủ công. UI không hiển thị nút kết nối, OAuth start/callback không gọi provider và cron không đọc token TikTok. Vì vậy runtime hiện tại không cần `TIKTOK_CLIENT_KEY`, `TIKTOK_CLIENT_SECRET`, `TIKTOK_REDIRECT_URI` hoặc `SOCIAL_OAUTH_ENCRYPTION_KEY`.
+
+Provider, crypto và schema kết nối vẫn được giữ trong source để triển khai lại sau khi ứng dụng TikTok cùng scope production được duyệt. Khi bật lại phải cập nhật đồng thời cờ tính năng, secret manager, redirect URI, tài liệu và test; không chỉ thêm biến môi trường.
 
 ### Migration CI/secure runner
 
@@ -401,7 +420,7 @@ Khuyến nghị chạy mỗi ngày một lần. Theo dõi lỗi và không xóa 
 4. Tạo Mux token/webhook.
 5. Verify Resend domain.
 6. Tạo Turnstile widget và Upstash Redis.
-7. Nhập production variables vào Vercel/secret manager.
+7. Nhập production variables, gồm YouTube API key và cron secret, vào Vercel/secret manager; chưa cần TikTok OAuth/encryption khi tính năng còn tắt.
 8. Chạy `db:check` và migration từ secure runner.
 9. Bootstrap Admin một lần rồi tắt/xóa bootstrap secret.
 10. Seed chỉ khi cần nhập fixture ban đầu.

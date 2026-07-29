@@ -1,6 +1,6 @@
 # Environment map
 
-> Generated artifact — source fingerprint: `09305027bd2217dec714b6281b0ef07e98308b1880b3e95593ee56ffd35fb888`
+> Generated artifact — source fingerprint: `55ceb5b157e9b21b46be3e9fa9ef7e3a55eabc32423a6bbbc4fd73c104f01fb8`
 
 Không ghi giá trị secret vào tài liệu hoặc log. “Có trong .env.example” chỉ nói biến đã được tài liệu hóa, không có nghĩa là biến luôn bắt buộc trong mọi chế độ.
 
@@ -13,6 +13,7 @@ Không ghi giá trị secret vào tài liệu hoặc log. “Có trong .env.exam
 | `BOOTSTRAP_ADMIN_ENABLED` | Server only | Có | `scripts/bootstrap-admin.mjs` |
 | `BOOTSTRAP_ADMIN_PASSWORD` | Server only | Có | `scripts/bootstrap-admin.mjs`<br>`scripts/test-auth-flow.mjs` |
 | `CONTACT_NOTIFICATION_EMAIL` | Server only | Có | `src/server/email/resend-provider.ts` |
+| `CRON_SECRET` | Server only | Có | `src/app/api/cron/social-audience-sync/route.ts` |
 | `DATABASE_POOL_MAX` | Server only | Có | `src/server/database/client.ts` |
 | `DATABASE_URL` | Server only | Có | `scripts/migrate-with-runtime-pooler.mjs`<br>`scripts/test-content-services.ts`<br>`scripts/test-stage19-database.mjs`<br>`src/server/database/client.ts` |
 | `DIRECT_DATABASE_URL` | Server only | Có | `drizzle.config.ts` |
@@ -26,7 +27,7 @@ Không ghi giá trị secret vào tài liệu hoặc log. “Có trong .env.exam
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Client + server | Có | `scripts/test-editor-rls.mjs`<br>`scripts/test-stage15-authorization.mjs`<br>`scripts/test-stage15-content.mjs`<br>`src/server/supabase/browser.ts`<br>`src/server/supabase/middleware.ts`<br>`src/server/supabase/server.ts` |
 | `NEXT_PUBLIC_SUPABASE_URL` | Client + server | Có | `scripts/bootstrap-admin.mjs`<br>`scripts/test-editor-rls.mjs`<br>`scripts/test-stage15-authorization.mjs`<br>`scripts/test-stage15-content.mjs`<br>`src/server/supabase/admin.ts`<br>`src/server/supabase/browser.ts`<br>`src/server/supabase/middleware.ts`<br>`src/server/supabase/server.ts` |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Client + server | Có | `src/components/common/TurnstileWidget.tsx` |
-| `NODE_ENV` | Server only | Không | `next.config.ts`<br>`src/components/providers/ThemeProvider.tsx`<br>`src/server/database/client.ts`<br>`src/server/rate-limit/upstash-rate-limiter.ts` |
+| `NODE_ENV` | Server only | Không | `next.config.ts`<br>`src/app/api/auth/tiktok/callback/route.ts`<br>`src/app/api/auth/tiktok/start/route.ts`<br>`src/components/providers/ThemeProvider.tsx`<br>`src/server/database/client.ts`<br>`src/server/rate-limit/upstash-rate-limiter.ts` |
 | `R2_ACCESS_KEY_ID` | Server only | Có | `src/server/storage/r2-storage.ts` |
 | `R2_ACCOUNT_ID` | Server only | Có | `src/server/storage/r2-storage.ts` |
 | `R2_BUCKET_NAME` | Server only | Có | `src/server/storage/r2-storage.ts` |
@@ -34,9 +35,14 @@ Không ghi giá trị secret vào tài liệu hoặc log. “Có trong .env.exam
 | `R2_SECRET_ACCESS_KEY` | Server only | Có | `src/server/storage/r2-storage.ts`<br>`src/server/storage/upload-ticket.ts` |
 | `RESEND_API_KEY` | Server only | Có | `src/server/email/resend-provider.ts` |
 | `RESEND_FROM_EMAIL` | Server only | Có | `src/server/email/resend-provider.ts` |
+| `SOCIAL_OAUTH_ENCRYPTION_KEY` | Server only | Không | `src/server/social/social-token-crypto.ts` |
 | `SUPABASE_SECRET_KEY` | Server only | Có | `scripts/bootstrap-admin.mjs`<br>`scripts/test-editor-rls.mjs`<br>`scripts/test-stage15-authorization.mjs`<br>`scripts/test-stage15-content.mjs`<br>`src/server/supabase/admin.ts` |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server only | Có | `scripts/bootstrap-admin.mjs`<br>`scripts/test-editor-rls.mjs`<br>`scripts/test-stage15-authorization.mjs`<br>`scripts/test-stage15-content.mjs`<br>`src/server/supabase/admin.ts` |
+| `TIKTOK_CLIENT_KEY` | Server only | Không | `scripts/test-social-audience.ts`<br>`src/server/social/tiktok-audience.provider.ts` |
+| `TIKTOK_CLIENT_SECRET` | Server only | Không | `scripts/test-social-audience.ts`<br>`src/server/social/tiktok-audience.provider.ts` |
+| `TIKTOK_REDIRECT_URI` | Server only | Không | `scripts/test-social-audience.ts`<br>`src/server/social/tiktok-audience.provider.ts` |
 | `TURNSTILE_SECRET_KEY` | Server only | Có | `scripts/test-stage19-security.ts`<br>`src/server/anti-spam/turnstile.ts` |
 | `UPSTASH_REDIS_REST_TOKEN` | Server only | Có | `src/server/rate-limit/upstash-rate-limiter.ts` |
 | `UPSTASH_REDIS_REST_URL` | Server only | Có | `src/server/rate-limit/upstash-rate-limiter.ts` |
 | `USE_DATABASE_CONTENT` | Server only | Có | `scripts/test-content-services.ts`<br>`src/server/services/content-source.ts` |
+| `YOUTUBE_DATA_API_KEY` | Server only | Có | `scripts/test-social-audience.ts`<br>`src/server/social/youtube-audience.provider.ts` |

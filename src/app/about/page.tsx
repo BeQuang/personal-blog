@@ -153,7 +153,15 @@ export default async function AboutPage() {
                     className="flex min-h-24 items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] p-4 outline-none transition hover:border-[var(--primary)] focus-visible:ring-2 focus-visible:ring-[var(--primary)]"
                   >
                     <span className="grid size-11 shrink-0 place-items-center rounded-[var(--radius-md)] bg-[var(--primary-soft)] text-[var(--primary)]"><SocialIcon platform={link.platform} /></span>
-                    <span className="min-w-0"><strong className="block">{link.label}</strong><small className="text-[var(--text-muted)]">{formatViewCount(link.followerCount)} người theo dõi</small></span>
+                    <span className="min-w-0">
+                      <strong className="block">{link.label}</strong>
+                      <small className="text-[var(--text-muted)]">
+                        {formatViewCount(link.followerCount)} người theo dõi
+                        {link.platform === "tiktok" && link.likesCount !== undefined
+                          ? ` · ${formatViewCount(link.likesCount)} lượt thích`
+                          : ""}
+                      </small>
+                    </span>
                   </AnalyticsLink>
                 </li>
               ))}

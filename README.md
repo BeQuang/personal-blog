@@ -298,9 +298,10 @@ Các smoke test Backend nội dung:
 1. Push repository lên Git provider và import project vào Vercel.
 2. Giữ framework preset là Next.js và dùng build command mặc định `npm run build`.
 3. Trong Project Settings → Environment Variables, đặt `NEXT_PUBLIC_SITE_URL` bằng domain production chính thức, không dùng URL localhost.
-4. Deploy project. Khi đổi domain canonical, cập nhật biến trên rồi redeploy.
-5. Sau deploy, kiểm tra trang chủ, các route động, `/robots.txt`, `/sitemap.xml` và một route không tồn tại.
-6. Bật bootstrap duy nhất cho lần deploy đầu khi Auth còn trống, xác nhận profile `super_admin` đã được tạo, sau đó tắt `BOOTSTRAP_ADMIN_ENABLED` và xoay mật khẩu ban đầu.
+4. Đặt `YOUTUBE_DATA_API_KEY` và `CRON_SECRET`; lịch trong `vercel.json` đồng bộ YouTube mỗi ngày một lần lúc 00:00 UTC. TikTok OAuth đang tạm tắt nên chưa cần nhóm biến TikTok/encryption.
+5. Deploy project. Khi đổi domain canonical, cập nhật biến trên rồi redeploy.
+6. Sau deploy, kiểm tra trang chủ, các route động, `/robots.txt`, `/sitemap.xml` và một route không tồn tại.
+7. Bật bootstrap duy nhất cho lần deploy đầu khi Auth còn trống, xác nhận profile `super_admin` đã được tạo, sau đó tắt `BOOTSTRAP_ADMIN_ENABLED` và xoay mật khẩu ban đầu.
 
 ## Giới hạn của MVP
 
@@ -310,7 +311,7 @@ Các smoke test Backend nội dung:
 - File đính kèm chỉ được kiểm tra trên UI, không upload.
 - Analytics nội bộ phụ thuộc consent và scheduler production cần chạy `analytics:retention` định kỳ.
 - Một số dữ liệu mock vẫn được giữ làm development fallback khi `USE_DATABASE_CONTENT=false`; không nên bật chế độ này ở production.
-- Không đồng bộ dữ liệu với YouTube, TikTok, Instagram, Facebook hoặc social API khác.
+- YouTube tự đồng bộ subscriber count; TikTok cùng Facebook, Instagram, X và các provider khác hiện dùng số công khai nhập thủ công. Nền OAuth TikTok được giữ lại nhưng đang bị chặn cho đến giai đoạn production.
 - Nội dung Privacy và Terms là nội dung mẫu, cần được chuyên gia pháp lý kiểm tra trước production.
 - Dữ liệu, hình ảnh, địa chỉ liên hệ và external URL hiện là dữ liệu minh họa cần được thay trước khi phát hành chính thức.
 
@@ -321,7 +322,7 @@ Các smoke test Backend nội dung:
 - Database, object storage và upload có kiểm soát.
 - Email transactional cho form và newsletter.
 - Mở rộng consent theo khu vực pháp lý và bổ sung cơ chế quản lý/xóa dữ liệu production.
-- Tích hợp social API, lịch xuất bản và cập nhật số liệu tự động.
+- Mở rộng OAuth/app review để tự đồng bộ Facebook, Instagram, X, TikTok và các provider còn lại.
 - Bộ kiểm thử tự động cho unit, integration, accessibility và end-to-end.
 
 ## Checklist trước production

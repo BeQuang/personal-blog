@@ -17,6 +17,7 @@ import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminPostEditorModal } from "@/components/admin/AdminPostEditorModal";
 import { AdminTaxonomyManager } from "@/components/admin/AdminTaxonomyManager";
 import { useAdminListPage } from "@/components/admin/useAdminListPage";
+import { useAdminViewportTable } from "@/components/admin/useAdminViewportTable";
 import {
   adminStatusColors,
   adminStatusLabels,
@@ -61,9 +62,7 @@ export function AdminPostsManager({
   const [sortOrder, setSortOrder] = useState(initialPage.sortOrder);
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<AdminPost | null>(null);
-  const [tableBodyHeight, setTableBodyHeight] = useState(240);
   const [pending, startTransition] = useTransition();
-  const tablePanelRef = useRef<HTMLElement>(null);
   const initialFilterRender = useRef(true);
   const reportListError = useCallback((error: string) => {
     void message.error(error);
@@ -74,6 +73,7 @@ export function AdminPostsManager({
     loading: postsLoading,
     reload: reloadPosts,
   } = useAdminListPage("/api/admin/posts", initialPage, reportListError);
+  const { tableBodyHeight, tablePanelRef } = useAdminViewportTable(postsPage.items.length);
   const requestPage = useCallback((
     page: number,
     nextPageSize = pageSize,
@@ -104,58 +104,6 @@ export function AdminPostsManager({
     }, 300);
     return () => window.clearTimeout(timeout);
   }, [query, showArchived, status]);
-
-  useEffect(() => {
-    const panel = tablePanelRef.current;
-    const page = panel?.parentElement;
-    if (!panel || !page) return;
-
-    const getOuterHeight = (element: HTMLElement | null) => {
-      if (!element) return 0;
-      const styles = window.getComputedStyle(element);
-      return (
-        element.getBoundingClientRect().height +
-        Number.parseFloat(styles.marginTop || "0") +
-        Number.parseFloat(styles.marginBottom || "0")
-      );
-    };
-
-    const measureTableBody = () => {
-      const tableHeader = panel.querySelector<HTMLElement>(".ant-table-header");
-      const pagination = panel.querySelector<HTMLElement>(".ant-pagination");
-      const pageBounds = page.getBoundingClientRect();
-      const panelBounds = panel.getBoundingClientRect();
-      const availablePanelHeight = Math.max(
-        0,
-        pageBounds.bottom - panelBounds.top,
-      );
-      const reservedHeight =
-        getOuterHeight(tableHeader) +
-        getOuterHeight(pagination);
-      const nextHeight = Math.max(
-        48,
-        Math.floor(availablePanelHeight - reservedHeight - 2),
-      );
-
-      setTableBodyHeight((currentHeight) =>
-        currentHeight === nextHeight ? currentHeight : nextHeight,
-      );
-    };
-
-    const observer = new ResizeObserver(measureTableBody);
-    const tableHeader = panel.querySelector<HTMLElement>(".ant-table-header");
-    const pagination = panel.querySelector<HTMLElement>(".ant-pagination");
-
-    observer.observe(page);
-    if (tableHeader) observer.observe(tableHeader);
-    if (pagination) observer.observe(pagination);
-    const frame = window.requestAnimationFrame(measureTableBody);
-
-    return () => {
-      window.cancelAnimationFrame(frame);
-      observer.disconnect();
-    };
-  }, [postsPage.items.length]);
 
   const runResult = async (operation: () => Promise<{ success: boolean; message: string }>) => {
     const result = await operation();
@@ -359,7 +307,7 @@ export function AdminPostsManager({
     });
 
   return (
-    <div className="admin-posts-page">
+    <div className="admin-viewport-list-page">
       <AdminPageHeader
         title="Bài viết"
         description="Quản lý nội dung, lịch xuất bản, phân loại và tối ưu SEO cho bài viết."
@@ -386,7 +334,7 @@ export function AdminPostsManager({
         <p className="admin-access-denied">Hãy tạo ít nhất một danh mục trước khi tạo bài viết.</p>
       ) : null}
 
-      <section className="admin-posts-filter-panel" aria-label="Bộ lọc bài viết">
+      <section className="admin-viewport-filter-panel admin-posts-filter-panel" aria-label="Bộ lọc bài viết">
         <Flex className="admin-table-toolbar" gap={12} justify="space-between" wrap>
           <Flex className="admin-posts-filter-left" gap={12} wrap>
             <Input
@@ -437,7 +385,7 @@ export function AdminPostsManager({
 
       <section
         ref={tablePanelRef}
-        className="admin-panel admin-table-panel admin-posts-table-panel"
+        className="admin-panel admin-table-panel admin-viewport-table-panel"
         aria-label="Danh sách bài viết"
       >
         <Table<AdminPost>

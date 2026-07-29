@@ -1,6 +1,6 @@
 # Data model map
 
-> Generated artifact — source fingerprint: `09305027bd2217dec714b6281b0ef07e98308b1880b3e95593ee56ffd35fb888`
+> Generated artifact — source fingerprint: `55ceb5b157e9b21b46be3e9fa9ef7e3a55eabc32423a6bbbc4fd73c104f01fb8`
 
 ## PostgreSQL tables
 
@@ -22,6 +22,7 @@
 | `profiles` | `profiles` | `src/server/database/schema/profiles.ts` |
 | `site_settings` | `siteSettings` | `src/server/database/schema/site-settings.ts` |
 | `social_links` | `socialLinks` | `src/server/database/schema/social-links.ts` |
+| `social_oauth_connections` | `socialOauthConnections` | `src/server/database/schema/social-links.ts` |
 | `tags` | `tags` | `src/server/database/schema/posts.ts` |
 | `video_webhook_events` | `videoWebhookEvents` | `src/server/database/schema/videos.ts` |
 | `videos` | `videos` | `src/server/database/schema/videos.ts` |
@@ -59,6 +60,9 @@
 - `src/server/database/migrations/0008_illegal_ezekiel.sql`
 - `src/server/database/migrations/0009_stage21-production-hardening.sql`
 - `src/server/database/migrations/0010_hot_gravity.sql`
+- `src/server/database/migrations/0011_shocking_war_machine.sql`
+- `src/server/database/migrations/0012_milky_taskmaster.sql`
+- `src/server/database/migrations/0013_boring_firelord.sql`
 - `src/server/database/migrations/meta/_journal.json`
 - `src/server/database/migrations/meta/0000_snapshot.json`
 - `src/server/database/migrations/meta/0001_snapshot.json`
@@ -71,3 +75,6 @@
 - `src/server/database/migrations/meta/0008_snapshot.json`
 - `src/server/database/migrations/meta/0009_snapshot.json`
 - `src/server/database/migrations/meta/0010_snapshot.json`
+- `src/server/database/migrations/meta/0011_snapshot.json`
+- `src/server/database/migrations/meta/0012_snapshot.json`
+- `src/server/database/migrations/meta/0013_snapshot.json`

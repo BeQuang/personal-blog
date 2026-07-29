@@ -257,7 +257,10 @@ export function AdminShell({
             <Content
               className={cn(
                 "admin-content",
-                pathname.startsWith("/admin/posts") &&
+                (
+                  pathname.startsWith("/admin/posts") ||
+                  pathname.startsWith("/admin/social-links")
+                ) &&
                   "admin-content-posts",
               )}
             >

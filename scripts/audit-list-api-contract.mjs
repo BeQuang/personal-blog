@@ -5,6 +5,12 @@ const apiRoot = join(process.cwd(), "src", "app", "api");
 const allowedUnpagedGetRoutes = new Set([
   "src\\app\\api\\admin\\submissions\\export\\route.ts",
   "src/app/api/admin/submissions/export/route.ts",
+  "src\\app\\api\\cron\\social-audience-sync\\route.ts",
+  "src/app/api/cron/social-audience-sync/route.ts",
+  "src\\app\\api\\auth\\tiktok\\start\\route.ts",
+  "src/app/api/auth/tiktok/start/route.ts",
+  "src\\app\\api\\auth\\tiktok\\callback\\route.ts",
+  "src/app/api/auth/tiktok/callback/route.ts",
 ]);
 const failures = [];
 

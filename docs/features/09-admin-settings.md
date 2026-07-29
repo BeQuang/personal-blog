@@ -88,12 +88,32 @@ Cả hai form merge phần contract không hiển thị để tránh ghi mất s
 
 ## Social links
 
-`/admin/social-links` quản lý platform, label, username, URL, follower count, description, enabled và sort order. Public chỉ đọc enabled links theo order.
+`/admin/social-links` quản lý platform, label, username, URL, chỉ số cộng đồng, description, enabled và sort order. Form tạo/sửa đổi nhãn, placeholder và helper theo platform:
+
+- YouTube dùng “Người đăng ký”, khóa nhập tay và lấy từ YouTube Data API.
+- Discord/Telegram dùng chỉ số thành viên.
+- TikTok dùng follower/tổng lượt thích nhập thủ công. Tự động hóa Login Kit đang tạm tắt nên form không hiển thị nút kết nối và không khóa URL/username/chỉ số.
+- Facebook/Instagram/X/Threads/Zalo dùng người theo dõi nhập thủ công từ số công khai gần nhất.
+- Email/Website không có chỉ số cộng đồng nên form ẩn trường và service luôn ghi `NULL`.
+
+Modal social link rộng 760px trên desktop và vẫn co theo viewport trên màn hình nhỏ. Các hướng dẫn URL và số người đăng ký dùng cỡ chữ ghi chú; ô subscriber chiếm hết cột còn lại. Khối trạng thái đồng bộ YouTube hiển thị trạng thái và thời điểm gần nhất trên cùng một hàng ở desktop, có khoảng cách dưới trước nhóm Thứ tự/Hiển thị public và được phép xuống dòng trên màn hình nhỏ. Mô tả social link cho phép tối đa 5.000 ký tự ở cả client và service; PostgreSQL dùng cột `text` nên không cần migration schema.
+
+YouTube được cron `GET /api/cron/social-audience-sync` đồng bộ mỗi ngày một lần theo lịch `0 0 * * *` (00:00 UTC, khoảng 07:00 giờ Việt Nam), xác thực fail-closed bằng `Authorization: Bearer $CRON_SECRET`. Job lưu channel ID, thời điểm/trạng thái/lỗi; lỗi provider giữ nguyên số thành công gần nhất, kênh ẩn subscriber count hiển thị không có dữ liệu. Truy vấn job giới hạn tối đa 100 social link YouTube mỗi lần vì tập cấu hình này có chủ đích là bounded.
+Route cron trả summary của một tác vụ, không phải collection resource, nên là ngoại lệ có chủ đích của audit list API/pagination.
+
+Khi tạo social link YouTube, đổi sang URL kênh YouTube khác, hoặc lưu lại bản ghi đang `pending/error`, service gọi provider trước khi ghi database. Kết quả thành công được lưu ngay cùng `channelId`, subscriber count, `synced` và timestamp; kênh ẩn count được lưu ở trạng thái `unavailable`. Nếu API key, URL hoặc provider lỗi, service trả field error cho `url`, form giữ nguyên và không tạo/cập nhật bản ghi YouTube trống. Chỉnh các trường khác trên bản ghi đã `synced/unavailable` mà URL YouTube không đổi sẽ giữ số liệu đã đồng bộ và không phát sinh request provider không cần thiết.
+
+`TIKTOK_AUTOMATION_ENABLED=false` là cờ mã nguồn dùng chung cho UI/service/Route Handler. Khi tắt, form chỉ hiện ghi chú nhập thủ công, `GET /api/auth/tiktok/start` và callback vẫn kiểm tra session/quyền `settings:manage` trước khi redirect về Admin với trạng thái `disabled`, service từ chối đổi code/lưu token, còn cron trả summary TikTok bằng 0 mà không gọi provider hay đọc token.
+
+Provider, crypto, bảng `social_oauth_connections` và các biến `TIKTOK_CLIENT_KEY`, `TIKTOK_CLIENT_SECRET`, `TIKTOK_REDIRECT_URI`, `SOCIAL_OAUTH_ENCRYPTION_KEY` được giữ làm nền để bật lại ở giai đoạn production nhưng hiện không bắt buộc. Token/dữ liệu cũ không bị xóa tự động chỉ vì tắt tính năng; TikTok vẫn hiển thị follower/tổng lượt thích nhập thủ công trên Admin và public.
+
+Màn hình giữ heading, bộ lọc và pagination trong viewport; chỉ phần row của bảng cuộn khi danh sách dài. Bộ lọc search và platform nằm trong panel riêng, tách khỏi bảng. Cột Chỉ số cộng đồng cho phép sort tăng/giảm trên toàn bộ tập dữ liệu qua Route Handler → service → repository; public chỉ đọc enabled links theo order.
 
 ## Server contract
 
 - Pool database mặc định production là 2. Admin page có từ ba nguồn DB độc lập trở lên phải gom vào page-data service hoặc await tuần tự; audit hiện tại đã áp dụng cho Posts và Gallery.
 - Settings/social mutation cần `settings:manage`.
+- Cron sync không dùng session Admin; Route Handler kiểm tra `CRON_SECRET`, sau đó service chỉ gọi YouTube provider và repository khi TikTok automation đang tắt. API key YouTube chỉ đọc từ server environment.
 - Media picker cần `media:manage`; settings page hiện gọi picker nên role thực tế cần thỏa cả luồng dữ liệu. Admin/super admin có cả hai.
 - Settings là singleton `settingsKey=default`.
 - Save revalidate root layout, homepage, related admin pages và sitemap.
@@ -133,6 +153,12 @@ Không:
 - Pagination table: mọi bảng có selector 10/20/50 và tổng kể cả chỉ có một trang; đổi page size phải cập nhật row count, STT và `pageSize` của server query nếu có, không chỉ cắt response đã tải từ API.
 - Cuộn dashboard dài: sidebar/header vẫn bám viewport, không xuất hiện khoảng đen, tràn ngang hoặc khoảng trắng do card bảng bị kéo cao hơn nội dung.
 - `/admin/posts`: document không có thanh cuộn dọc; danh sách row cuộn trong table, header cột sticky, toolbar và pagination vẫn thấy trong viewport.
+- `/admin/social-links`: document không có thanh cuộn dọc; search/platform tách khỏi bảng, row cuộn trong table, header/pagination luôn thấy và click Chỉ số cộng đồng đổi sort tăng/giảm trên dữ liệu server.
+- Form social link đổi trường theo platform; YouTube không cho sửa subscriber, TikTok cho nhập follower/tổng lượt thích thủ công và báo tự động hóa đang tắt, Email/Website không gửi count, Discord dùng thành viên.
+- Truy cập trực tiếp OAuth TikTok khi cờ tắt phải redirect an toàn về Admin với `tiktok=disabled`, không gọi TikTok và không ghi token/dữ liệu.
+- Tạo mới YouTube hợp lệ phải trả count ngay trong lần lưu đầu tiên; URL/API lỗi phải giữ modal mở, hiển thị field error và không ghi bản ghi pending.
+- Cron sai/mất secret trả `401`; thiếu API key hoặc provider lỗi ghi trạng thái lỗi nhưng không xóa số YouTube thành công gần nhất.
+- `npm run social:test` kiểm tra lịch cron hằng ngày, cờ TikTok automation đang tắt, giới hạn mô tả 5.000 ký tự, parser/response YouTube, provider TikTok dự phòng và round-trip/tamper detection của token AES-256-GCM.
 - Chuyển từng tab trên mạng chậm: NProgress/skeleton xuất hiện và tab mới được selected sau khi route hoàn tất.
 - Upload R2/Mux: progress toàn cục kết thúc cả khi request thành công lẫn lỗi; phần trăm upload video vẫn hoạt động.
 - Media picker tại mọi admin form: tab thư viện tìm/chọn được ảnh cũ; tab tải từ máy validate MIME/size, tự chọn ảnh mới sau confirm và giữ đúng purpose của thumbnail/cover/banner/avatar/Gallery.

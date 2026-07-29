@@ -1,6 +1,6 @@
 # Route map
 
-> Generated artifact — source fingerprint: `09305027bd2217dec714b6281b0ef07e98308b1880b3e95593ee56ffd35fb888`
+> Generated artifact — source fingerprint: `55ceb5b157e9b21b46be3e9fa9ef7e3a55eabc32423a6bbbc4fd73c104f01fb8`
 
 Route group như `(protected)` không tạo URL segment. Route Handler của Next.js 16 dùng Web Request/Response API và không cache mặc định.
 
@@ -28,6 +28,9 @@ Route group như `(protected)` không tạo URL segment. Route Handler của Nex
 | `/api/admin/taxonomies` | Route Handler | GET | `src/app/api/admin/taxonomies/route.ts` | `src/server/http/admin-list-route.ts`<br>`src/server/services/taxonomies.service.ts` |
 | `/api/admin/videos` | Route Handler | GET | `src/app/api/admin/videos/route.ts` | `src/server/http/admin-list-route.ts`<br>`src/server/services/videos.service.ts` |
 | `/api/analytics/events` | Route Handler | POST | `src/app/api/analytics/events/route.ts` | `src/config/analytics.config.ts`<br>`src/server/anti-spam/request-context.ts`<br>`src/server/errors/index.ts`<br>`src/server/services/analytics.service.ts` |
+| `/api/auth/tiktok/callback` | Route Handler | GET | `src/app/api/auth/tiktok/callback/route.ts` | `src/server/services/social-links.service.ts`<br>`src/utils/social-audience.ts` |
+| `/api/auth/tiktok/start` | Route Handler | GET | `src/app/api/auth/tiktok/start/route.ts` | `src/server/services/social-links.service.ts`<br>`src/utils/social-audience.ts` |
+| `/api/cron/social-audience-sync` | Route Handler | GET | `src/app/api/cron/social-audience-sync/route.ts` | `src/server/services/social-links.service.ts` |
 | `/api/uploads/video-url` | Route Handler | POST | `src/app/api/uploads/video-url/route.ts` | `src/server/errors/index.ts`<br>`src/server/services/videos.service.ts` |
 | `/api/webhooks/mux` | Route Handler | POST | `src/app/api/webhooks/mux/route.ts` | `src/server/services/videos.service.ts` |
 | `/auth/callback` | Route Handler | GET | `src/app/auth/callback/route.ts` | `src/server/auth/profile-sync.ts`<br>`src/server/auth/safe-redirect.ts`<br>`src/server/supabase/server.ts` |

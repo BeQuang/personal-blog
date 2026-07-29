@@ -381,42 +381,42 @@ body:has(.admin-route-root) {
   overflow: hidden;
 }
 
-.admin-posts-page {
+.admin-viewport-list-page {
   display: flex;
   min-height: 0;
   flex: 1 1 auto;
   flex-direction: column;
 }
 
-.admin-posts-page > .admin-page-heading,
-.admin-posts-page > .admin-access-denied {
+.admin-viewport-list-page > .admin-page-heading,
+.admin-viewport-list-page > .admin-access-denied {
   flex: 0 0 auto;
 }
 
-.admin-posts-table-panel {
+.admin-viewport-table-panel {
   display: flex;
   min-height: 0;
   flex: 0 1 auto;
   flex-direction: column;
 }
 
-.admin-posts-filter-panel {
+.admin-viewport-filter-panel {
   flex: 0 0 auto;
   margin-bottom: 12px;
 }
 
-.admin-posts-table-panel > .ant-table-wrapper {
+.admin-viewport-table-panel > .ant-table-wrapper {
   min-height: 0;
   flex: 0 1 auto;
   overflow: hidden;
 }
 
-.admin-posts-table-panel .ant-table-body {
+.admin-viewport-table-panel .ant-table-body {
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
 }
 
-.admin-posts-table-panel .ant-pagination {
+.admin-viewport-table-panel .ant-pagination {
   flex: 0 0 auto;
 }
 
@@ -482,6 +482,23 @@ body:has(.admin-route-root) {
   flex-wrap: nowrap;
   padding: 0;
   border-bottom: 0;
+}
+
+.admin-social-links-filter-panel .admin-table-toolbar {
+  align-items: center;
+  padding: 0;
+  border-bottom: 0;
+}
+
+.admin-social-links-filter-panel .ant-input-affix-wrapper {
+  width: 420px;
+  min-width: 240px;
+  flex: 0 1 420px;
+}
+
+.admin-social-links-filter-panel .ant-select {
+  width: 190px;
+  flex: 0 0 190px;
 }
 
 .admin-posts-filter-left {
@@ -1642,6 +1659,37 @@ body:has(.admin-route-root) {
   gap: 16px;
 }
 
+.admin-social-link-field-note {
+  color: #8a8f9c;
+  font-size: 11px;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.admin-social-link-sync-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.admin-social-tiktok-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.admin-social-metric-cell {
+  display: grid;
+  gap: 2px;
+  line-height: 1.35;
+}
+
+.admin-social-metric-cell small {
+  color: #7c8494;
+  font-size: 10px;
+}
+
 .admin-video-upload-panel {
   display: grid;
   grid-template-columns: minmax(220px, .55fr) minmax(0, 1.45fr);
@@ -1860,6 +1908,11 @@ body:has(.admin-route-root) {
   .admin-section-switches { grid-template-columns: 1fr; }
   .admin-preview-mini-grid { grid-template-columns: 1fr; }
   .admin-form-grid { grid-template-columns: 1fr; gap: 0; }
+  .admin-social-tiktok-stats-grid { grid-template-columns: 1fr; gap: 0; }
+  .admin-social-link-field-note,
+  .admin-social-link-sync-line {
+    white-space: normal;
+  }
   .admin-posts-filter-panel .admin-table-toolbar {
     align-items: stretch;
     flex-direction: column;
@@ -1880,6 +1933,16 @@ body:has(.admin-route-root) {
     flex-basis: auto;
   }
   .admin-posts-filter-panel .admin-archive-filter { margin-inline-start: 0; }
+  .admin-social-links-filter-panel .admin-table-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .admin-social-links-filter-panel .ant-input-affix-wrapper,
+  .admin-social-links-filter-panel .ant-select {
+    width: 100%;
+    min-width: 0;
+    flex-basis: auto;
+  }
   .admin-content-field-grid,
   .admin-content-field-grid-heading { grid-template-columns: 1fr; gap: 0; }
   .admin-post-content-editor > .ant-tabs > .ant-tabs-nav { padding-inline: 10px; }

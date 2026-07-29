@@ -11,6 +11,9 @@ export type SocialPlatform =
   | "website"
   | "email";
 
+export type SocialAudienceSource = "manual" | "youtube_api" | "tiktok_api" | "none";
+export type SocialAudienceSyncStatus = "manual" | "pending" | "synced" | "error" | "unavailable";
+
 export interface SocialLink {
   id: string;
   platform: SocialPlatform;
@@ -18,6 +21,11 @@ export interface SocialLink {
   username?: string;
   url: string;
   followerCount?: number;
+  likesCount?: number;
+  audienceSource: SocialAudienceSource;
+  audienceSyncStatus: SocialAudienceSyncStatus;
+  audienceLastSyncedAt?: string;
+  audienceSyncError?: string;
   description?: string;
   enabled: boolean;
   order: number;

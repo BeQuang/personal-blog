@@ -1,0 +1,1 @@
+CREATE INDEX "social_links_follower_count_idx" ON "social_links" USING btree ("follower_count");

@@ -249,6 +249,7 @@ export function AdminPostContentEditor({
               <Select
                 value={block.level}
                 disabled={disabled}
+                placeholder="Chọn cấp tiêu đề"
                 options={[
                   { value: 2, label: "Tiêu đề lớn (H2)" },
                   { value: 3, label: "Tiêu đề nhỏ (H3)" },
@@ -654,6 +655,7 @@ export function AdminPostContentEditor({
         aria-label="Content blocks JSON nâng cao"
         aria-invalid={jsonHasError}
         aria-describedby="admin-content-json-validation"
+        placeholder='[{"type":"paragraph","text":"Nhập nội dung bài viết..."}]'
         onChange={(event) => updateJsonDraft(event.target.value)}
       />
       <div className="admin-content-json-footer">

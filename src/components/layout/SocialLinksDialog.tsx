@@ -93,6 +93,9 @@ export function SocialLinksDialog({
                       {link.followerCount
                         ? ` · ${formatViewCount(link.followerCount)} người theo dõi`
                         : ""}
+                      {link.platform === "tiktok" && link.likesCount !== undefined
+                        ? ` · ${formatViewCount(link.likesCount)} lượt thích`
+                        : ""}
                     </span>
                   </span>
                 </a>
