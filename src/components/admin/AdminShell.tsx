@@ -241,9 +241,17 @@ export function AdminShell({
                 className="admin-menu-button"
                 onClick={() => setDrawerOpen(true)}
               />
-              <div>
+              <div className="admin-header-context">
                 <span className="admin-header-eyebrow">Khu vực quản trị</span>
-                <strong>{selectedItem.label}</strong>
+                <Breadcrumb
+                  className="admin-header-breadcrumb"
+                  items={[
+                    { title: "Admin", href: "/admin" },
+                    ...(selectedItem.href === "/admin"
+                      ? []
+                      : [{ title: selectedItem.label }]),
+                  ]}
+                />
               </div>
               <Tag color="purple" className="admin-header-tag">
                 Admin MVP
@@ -259,19 +267,12 @@ export function AdminShell({
                 "admin-content",
                 (
                   pathname.startsWith("/admin/posts") ||
-                  pathname.startsWith("/admin/social-links")
+                  pathname.startsWith("/admin/social-links") ||
+                  pathname.startsWith("/admin/gallery")
                 ) &&
-                  "admin-content-posts",
+                  "admin-content-viewport",
               )}
             >
-              <Breadcrumb
-                items={[
-                  { title: "Admin", href: "/admin" },
-                  ...(selectedItem.href === "/admin"
-                    ? []
-                    : [{ title: selectedItem.label }]),
-                ]}
-              />
               {children}
             </Content>
           </Layout>

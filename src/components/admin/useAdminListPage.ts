@@ -58,7 +58,9 @@ export function useAdminListPage<Item, SortField extends string>(
       }
       if (!isAdminListPage(payload)) throw new Error("Response danh sách không đúng cấu trúc.");
       if (currentRequest === requestId.current) {
-        setData(payload as AdminListPage<Item, SortField>);
+        const nextPage = payload as AdminListPage<Item, SortField>;
+        setData(nextPage);
+        return nextPage;
       }
     } catch (error) {
       if (currentRequest === requestId.current) {
@@ -67,6 +69,7 @@ export function useAdminListPage<Item, SortField extends string>(
     } finally {
       if (currentRequest === requestId.current) setLoading(false);
     }
+    return null;
   }, [endpoint, onError]);
 
   const reload = useCallback(

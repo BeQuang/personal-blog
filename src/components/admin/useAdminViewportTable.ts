@@ -2,14 +2,19 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export function useAdminViewportTable(itemCount: number) {
+export function useAdminViewportTable(
+  itemCount: number,
+  boundarySelector?: string,
+) {
   const [tableBodyHeight, setTableBodyHeight] = useState(240);
   const tablePanelRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const panel = tablePanelRef.current;
-    const page = panel?.parentElement;
-    if (!panel || !page) return;
+    const boundary = boundarySelector
+      ? panel?.closest<HTMLElement>(boundarySelector)
+      : panel?.parentElement;
+    if (!panel || !boundary) return;
 
     const getOuterHeight = (element: HTMLElement | null) => {
       if (!element) return 0;
@@ -24,9 +29,15 @@ export function useAdminViewportTable(itemCount: number) {
     const measureTableBody = () => {
       const tableHeader = panel.querySelector<HTMLElement>(".ant-table-header");
       const pagination = panel.querySelector<HTMLElement>(".ant-pagination");
-      const pageBounds = page.getBoundingClientRect();
+      const boundaryBounds = boundary.getBoundingClientRect();
       const panelBounds = panel.getBoundingClientRect();
-      const availablePanelHeight = Math.max(0, pageBounds.bottom - panelBounds.top);
+      const boundaryStyles = window.getComputedStyle(boundary);
+      const boundaryBottomPadding =
+        Number.parseFloat(boundaryStyles.paddingBottom) || 0;
+      const availablePanelHeight = Math.max(
+        0,
+        boundaryBounds.bottom - panelBounds.top - boundaryBottomPadding,
+      );
       const reservedHeight = getOuterHeight(tableHeader) + getOuterHeight(pagination);
       const nextHeight = Math.max(
         48,
@@ -42,7 +53,7 @@ export function useAdminViewportTable(itemCount: number) {
     const tableHeader = panel.querySelector<HTMLElement>(".ant-table-header");
     const pagination = panel.querySelector<HTMLElement>(".ant-pagination");
 
-    observer.observe(page);
+    observer.observe(boundary);
     if (tableHeader) observer.observe(tableHeader);
     if (pagination) observer.observe(pagination);
     const frame = window.requestAnimationFrame(measureTableBody);
@@ -51,7 +62,7 @@ export function useAdminViewportTable(itemCount: number) {
       window.cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [itemCount]);
+  }, [boundarySelector, itemCount]);
 
   return { tableBodyHeight, tablePanelRef };
 }

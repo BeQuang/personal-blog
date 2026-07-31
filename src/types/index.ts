@@ -72,6 +72,7 @@ export type {
   MediaAssetItem,
   MediaLibraryPage,
   MediaLibraryQuery,
+  MediaLibrarySortBy,
   MediaMimeType,
   MediaPurpose,
 } from "./media-admin";

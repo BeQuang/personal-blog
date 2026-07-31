@@ -275,7 +275,7 @@ Contact attachment hiện chưa đi vào server contract; không được mô t�
 | `/admin/posts` | Posts, categories, tags | `content:view` |
 | `/admin/social-links` | Social links | `settings:manage` |
 | `/admin/videos` | External/Mux videos | `media:manage` |
-| `/admin/gallery` | Gallery và Media Library | `media:manage` |
+| `/admin/gallery` | Workspace Hình ảnh với tab Gallery công khai và Thư viện ảnh | `media:manage` |
 | `/admin/events` | Events | `content:view` |
 | `/admin/campaigns` | Campaigns | `content:view` |
 | `/admin/submissions` | Contact/newsletter/campaign inbox | `submissions:view` |
@@ -284,7 +284,7 @@ Contact attachment hiện chưa đi vào server contract; không được mô t�
 
 Protected layout yêu cầu `dashboard:view`; từng page tiếp tục kiểm tra permission chuyên biệt.
 
-`/admin/posts` dùng `admin-posts-page.service.ts`: kiểm tra `content:view` một lần, đọc trang post đầu tiên bằng `COUNT + items`, rồi đọc categories, tags và media tuần tự để không làm nghẽn pool serverless. Gallery cũng tải trang Gallery, picker và Media Library theo thứ tự. Video/Event/Campaign tải trang chính trước rồi mới tải media picker; không chạy lookup phụ song song với một paged query vốn đã dùng hai connection trong giới hạn pool production mặc định 2.
+`/admin/posts` dùng `admin-posts-page.service.ts`: kiểm tra `content:view` một lần, đọc trang post đầu tiên bằng `COUNT + items`, rồi đọc categories, tags và media tuần tự để không làm nghẽn pool serverless. Workspace Hình ảnh chỉ tải dữ liệu của tab đang hoạt động; tab Gallery tải trang Gallery, lookup category bounded và media picker tuần tự, còn tab Thư viện ảnh chỉ tải trang media tương ứng. Video/Event/Campaign tải trang chính trước rồi mới tải media picker; không chạy lookup phụ song song với một paged query vốn đã dùng hai connection trong giới hạn pool production mặc định 2.
 
 ### 7.2. Khả năng quản trị
 
@@ -297,7 +297,8 @@ Protected layout yêu cầu `dashboard:view`; từng page tiếp tục kiểm tr
 - Category/tag CRUD dùng modal table rộng; UI quản lý đọc lười qua API phân trang thay vì nhúng toàn bộ danh sách vào popup. Mặc định người dùng chọn 10, 20 hoặc 50 dòng mỗi trang; footer tách thành cụm bộ chọn số dòng + tổng bản ghi bám trái và cụm nút chuyển trang bám phải; component cho phép truyền mảng lựa chọn khác và server giới hạn `pageSize` tối đa 100.
 - Social link CRUD, enable/disable và sort order; danh sách Admin có search, lọc platform, sort Followers phía server và vùng row cuộn nội bộ để giữ toàn màn hình trong viewport. Modal social link rộng 760px trên desktop; ghi chú trường dùng typography nhỏ, ô subscriber lấp đầy cột và trạng thái/thời điểm đồng bộ YouTube nằm cùng một hàng với khoảng cách dưới rõ ràng. TikTok có thêm trường tổng lượt thích nhưng hiện dùng dữ liệu nhập thủ công; nút kết nối OAuth tạm ẩn. Mô tả cho phép tối đa 5.000 ký tự.
 - Social link YouTube được xác minh và lấy subscriber count ngay trước lần tạo/đổi URL; request provider lỗi không được ghi bản ghi pending. Cron mỗi ngày một lần chỉ làm mới YouTube. Mã OAuth/token TikTok được giữ làm nền cho giai đoạn production sau này nhưng route kết nối, callback và job TikTok đều bị chặn khi cờ tính năng tắt.
-- R2 Media Library, upload, picker và xóa có kiểm tra đang được sử dụng. Mọi `AdminMediaPicker` cho thumbnail, cover, banner, avatar và Gallery đều cho phép chọn asset có sẵn hoặc tải ảnh từ máy; ảnh tải mới dùng đúng purpose, được confirm vào Media Library rồi tự động chọn vào form hiện tại.
+- Workspace Hình ảnh đặt tab và nội dung đang mở trong một panel chung, tách Gallery công khai và Thư viện ảnh thành hai tab riêng. Workspace nằm gọn trong viewport dưới Admin header và giữ padding quanh nội dung: Gallery chỉ cuộn body row của table và dùng chiều cao body cố định `70vh`; Media Library cuộn vùng lưới/chi tiết và tích lũy từng batch khi gần đáy, dừng khi đạt `total`, không hiển thị pagination UI. Modal tạo Gallery hỗ trợ chọn/tải nhiều ảnh, title/alt riêng cho từng ảnh và tạo tuần tự nhiều Gallery item; modal sửa vẫn chọn một ảnh. Search/filter/sort Media Library reset về batch đầu và vẫn chạy phía server trên toàn bộ dữ liệu. Bảng Gallery có cột category, search và filter category phía server; danh sách category distinct được giới hạn 100 giá trị. Bảng Gallery và API Media Library đều phân trang tại database bằng `COUNT + LIMIT + OFFSET + ORDER BY`; client không tải collection không giới hạn trong một request.
+- R2 Media Library, upload, picker và xóa có kiểm tra đang được sử dụng. Màn hình Media Library cho phép tạo một batch nhiều ảnh với purpose dùng chung và alt riêng cho từng preview; presign và direct PUT R2 chỉ bắt đầu khi người dùng xác nhận, sau đó client tải tuần tự từng ảnh và giữ ảnh lỗi trong hàng chờ để thử lại. Tab Thư viện ảnh chia hai panel 50/50 trên desktop: Upload ở trái, toolbar/lưới media ở phải; preview nằm trong panel Upload và hai panel xếp dọc dưới 1.200 px. Mọi `AdminMediaPicker` cho thumbnail, cover, banner, avatar và Gallery đều cho phép chọn asset có sẵn hoặc tải ảnh từ máy. Nhánh tải từ máy của picker ở cả chế độ single/multiple chỉ validate và tạo Object URL preview cục bộ, cho nhập alt và bỏ ảnh; presign/direct PUT chỉ bắt đầu sau nút xác nhận. Preview của picker dùng chung card CSS, toolbar và vùng cuộn giới hạn chiều cao với Media Library để không phủ modal. Ảnh tải mới dùng đúng purpose, được confirm vào Media Library rồi tự động chọn vào form hiện tại.
 - Mux direct upload và external video.
 - Submission status workflow và CSV export tối đa 5.000 dòng.
 - Analytics date range, metrics và breakdown tổng hợp trên trang Tổng quan.
@@ -308,6 +309,11 @@ Protected layout yêu cầu `dashboard:view`; từng page tiếp tục kiểm tr
 Client chỉ dùng `canWrite/canPublish/canManage` để ẩn/vô hiệu UI; service vẫn kiểm tra lại permission.
 
 Admin desktop giữ sidebar cố định theo viewport và content chừa chiều rộng tương ứng; sidebar có vùng cuộn riêng. Toàn bộ route admin có nền sáng độc lập với public theme, chart/card bị giới hạn overflow nên dashboard dài hoặc resize không làm lộ nền dark hay phá layout.
+
+Breadcrumb route nằm trong header Admin để content bắt đầu trực tiếp bằng nội dung
+chính. Ant Design Tabs dùng style Admin toàn cục với vạch dọc phân cách; hover dùng
+nền tím rất nhạt, active dùng toàn bộ nền tím nhạt và không có border tím; các màn
+hình không lặp lại CSS tab riêng.
 
 ## 8. Authentication và authorization
 
@@ -496,6 +502,7 @@ Anonymous session là UUID trong `sessionStorage`; server lưu SHA-256 hash. Das
 | `GET /api/admin/posts` | Trang bài viết có search/status/archive/order, yêu cầu `content:view` |
 | `GET /api/admin/videos` | Trang video có search/status/order, yêu cầu `media:manage` |
 | `GET /api/admin/gallery` | Trang Gallery có order, yêu cầu `media:manage` |
+| `GET /api/admin/media` | Trang Media Library có search/filter/order, yêu cầu `media:manage` |
 | `GET /api/admin/events` | Trang sự kiện có order, yêu cầu `content:view` |
 | `GET /api/admin/campaigns` | Trang chiến dịch có order, yêu cầu `content:view` |
 | `GET /api/admin/social-links` | Trang social links có search/order, yêu cầu `settings:manage` |

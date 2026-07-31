@@ -76,7 +76,7 @@ export async function createMediaAsset(values: NewMediaAssetRow, actorProfileId:
 }
 
 export async function findMediaLibrary(
-  input: Required<Pick<MediaLibraryQuery, "page" | "pageSize">> & MediaLibraryQuery,
+  input: Required<MediaLibraryQuery>,
 ) {
   const conditions = and(
     eq(mediaAssets.type, "image"),
@@ -99,12 +99,18 @@ export async function findMediaLibrary(
       : undefined,
   );
   const offset = (input.page - 1) * input.pageSize;
+  const sortColumn = {
+    createdAt: mediaAssets.createdAt,
+    originalFilename: mediaAssets.originalFilename,
+    sizeBytes: mediaAssets.sizeBytes,
+  }[input.sortBy];
+  const direction = input.sortOrder === "asc" ? asc : desc;
   const [items, totals] = await Promise.all([
     database
       .select()
       .from(mediaAssets)
       .where(conditions)
-      .orderBy(desc(mediaAssets.createdAt))
+      .orderBy(direction(sortColumn), asc(mediaAssets.id))
       .limit(input.pageSize)
       .offset(offset),
     database.select({ value: count() }).from(mediaAssets).where(conditions),

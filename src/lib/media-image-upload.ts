@@ -24,7 +24,7 @@ const allowedMimeTypes: readonly MediaMimeType[] = [
   "image/avif",
 ];
 
-function validateImageFile(file: File, purpose: MediaPurpose) {
+export function validateMediaImageFile(file: File, purpose: MediaPurpose) {
   if (!allowedMimeTypes.includes(file.type as MediaMimeType)) {
     throw new Error("Chỉ chấp nhận ảnh JPEG, PNG, WebP hoặc AVIF.");
   }
@@ -61,7 +61,7 @@ export async function uploadMediaImage({
   purpose,
   alt,
 }: UploadMediaImageInput): Promise<MediaAssetItem> {
-  validateImageFile(file, purpose);
+  validateMediaImageFile(file, purpose);
 
   const upload = await createMediaUploadAction({
     originalFilename: file.name,

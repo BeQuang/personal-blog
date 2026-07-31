@@ -37,8 +37,11 @@ export interface AdminVideoListQuery
     | "deleted";
 }
 
-export type AdminGalleryListQuery =
-  AdminListQuery<"createdAt" | "publishedAt" | "sortOrder" | "status" | "title" | "updatedAt">;
+export interface AdminGalleryListQuery
+  extends AdminListQuery<"createdAt" | "publishedAt" | "sortOrder" | "status" | "title" | "updatedAt"> {
+  query: string;
+  category: string;
+}
 
 export type AdminEventListQuery =
   AdminListQuery<"contentStatus" | "createdAt" | "startAt" | "title" | "updatedAt">;

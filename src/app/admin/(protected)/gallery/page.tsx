@@ -1,35 +1,90 @@
 import type { Metadata } from "next";
 
-import { AdminGalleryManager } from "@/components/admin/AdminGalleryManager";
-import { AdminMediaLibrary } from "@/components/admin/AdminMediaLibrary";
+import { AdminGalleryWorkspace } from "@/components/admin/AdminGalleryWorkspace";
+import { parseAdminTablePageSize } from "@/components/admin/admin-table.config";
 import { hasPermission, requireAdminPagePermission } from "@/server/auth";
-import { getAdminGalleryItemPage } from "@/server/services/gallery.service";
+import {
+  getAdminGalleryCategories,
+  getAdminGalleryItemPage,
+} from "@/server/services/gallery.service";
 import { getMediaLibrary, getMediaPickerItems } from "@/server/services/media.service";
-import type { MediaMimeType, MediaPurpose } from "@/types";
+import type {
+  AdminSortOrder,
+  MediaLibrarySortBy,
+  MediaMimeType,
+  MediaPurpose,
+} from "@/types";
 
 export const metadata: Metadata = { title: "Hình ảnh" };
 
 interface Props { searchParams: Promise<Record<string, string | string[] | undefined>>; }
 const mimeTypes = new Set<MediaMimeType>(["image/jpeg", "image/png", "image/webp", "image/avif"]);
 const purposes = new Set<MediaPurpose>(["avatar", "campaign_banner", "event_banner", "gallery", "post_cover", "post_thumbnail", "site_banner"]);
+const mediaSortFields = new Set<MediaLibrarySortBy>(["createdAt", "originalFilename", "sizeBytes"]);
 const single = (value: string | string[] | undefined) => Array.isArray(value) ? value[0] : value;
 
 export default async function AdminGalleryPage({ searchParams }: Props) {
   const currentUser = await requireAdminPagePermission("media:manage");
   const parameters = await searchParams;
-  const rawMime = single(parameters.mime); const rawPurpose = single(parameters.purpose); const rawPage = Number(single(parameters.page) ?? "1");
-  const filters = { query: single(parameters.q)?.trim() ?? "", mimeType: rawMime && mimeTypes.has(rawMime as MediaMimeType) ? rawMime as MediaMimeType : "all" as const, purpose: rawPurpose && purposes.has(rawPurpose as MediaPurpose) ? rawPurpose as MediaPurpose : "all" as const };
-  // This route has three independent database reads. Keep them sequential so a
-  // small serverless pool cannot be exhausted by one page render.
-  const initialPage = await getAdminGalleryItemPage({});
-  const mediaRows = await getMediaPickerItems();
+  const activeTab = single(parameters.tab) === "library" ? "library" : "gallery";
+
+  if (activeTab === "gallery") {
+    // The paged Gallery query already uses COUNT + items. Keep the bounded
+    // category/picker lookups sequential so one render respects the pool.
+    const initialPage = await getAdminGalleryItemPage({});
+    const categories = await getAdminGalleryCategories();
+    const mediaRows = await getMediaPickerItems();
+    const mediaOptions = mediaRows.map((item) => ({
+      id: item.id,
+      label: item.alt || item.originalFilename,
+      publicUrl: item.publicUrl,
+    }));
+
+    return (
+      <AdminGalleryWorkspace
+        activeTab="gallery"
+        gallery={{
+          initialPage,
+          categories,
+          mediaOptions,
+          canWrite: true,
+          canPublish: hasPermission(currentUser.role, "content:publish"),
+        }}
+      />
+    );
+  }
+
+  const rawMime = single(parameters.mime);
+  const rawPurpose = single(parameters.purpose);
+  const rawSortBy = single(parameters.sortBy);
+  const rawSortOrder = single(parameters.sortOrder);
+  const filters = {
+    query: single(parameters.q)?.trim() ?? "",
+    mimeType: rawMime && mimeTypes.has(rawMime as MediaMimeType)
+      ? rawMime as MediaMimeType
+      : "all" as const,
+    purpose: rawPurpose && purposes.has(rawPurpose as MediaPurpose)
+      ? rawPurpose as MediaPurpose
+      : "all" as const,
+  };
   const mediaLibrary = await getMediaLibrary({
-    page: Number.isSafeInteger(rawPage) && rawPage > 0 ? rawPage : 1,
-    pageSize: 20,
+    page: 1,
+    pageSize: parseAdminTablePageSize(undefined),
+    sortBy: rawSortBy && mediaSortFields.has(rawSortBy as MediaLibrarySortBy)
+      ? rawSortBy as MediaLibrarySortBy
+      : "createdAt",
+    sortOrder: (rawSortOrder === "asc" || rawSortOrder === "desc"
+      ? rawSortOrder
+      : "desc") as AdminSortOrder,
     query: filters.query,
     mimeType: filters.mimeType,
     purpose: filters.purpose,
   });
-  const mediaOptions = mediaRows.map((item) => ({ id: item.id, label: item.alt || item.originalFilename, publicUrl: item.publicUrl }));
-  return <><AdminGalleryManager initialPage={initialPage} mediaOptions={mediaOptions} canWrite canPublish={hasPermission(currentUser.role, "content:publish")} /><AdminMediaLibrary data={mediaLibrary} filters={filters} showHeader={false} /></>;
+
+  return (
+    <AdminGalleryWorkspace
+      activeTab="library"
+      library={{ data: mediaLibrary, filters }}
+    />
+  );
 }

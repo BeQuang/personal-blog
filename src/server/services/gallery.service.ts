@@ -24,6 +24,8 @@ const adminGalleryListQuerySchema = adminListPageSchema.extend({
     .enum(["createdAt", "publishedAt", "sortOrder", "status", "title", "updatedAt"])
     .default("sortOrder"),
   sortOrder: z.enum(["asc", "desc"]).default("asc"),
+  query: z.string().trim().max(100).default(""),
+  category: z.string().trim().max(100).default("all"),
 });
 const galleryMutationSchema = z.object({
   mediaAssetId: z.uuid("Hãy chọn ảnh từ Media Library"),
@@ -113,7 +115,7 @@ export async function getAdminGalleryItemPage(
   const query = parseAdminListQuery(
     adminGalleryListQuerySchema,
     input,
-    "Bộ lọc thư viện ảnh chưa hợp lệ",
+    "Bộ lọc Gallery chưa hợp lệ",
   ) as AdminGalleryListQuery;
   const repository = await import("@/server/repositories/gallery.repository");
   const result = await executeRepository(() => repository.findGalleryItemPage(query));
@@ -125,6 +127,13 @@ export async function getAdminGalleryItemPage(
     sortBy: query.sortBy,
     sortOrder: query.sortOrder,
   };
+}
+
+export async function getAdminGalleryCategories() {
+  await requirePermission("media:manage");
+  const repository = await import("@/server/repositories/gallery.repository");
+  return executeRepository(async () =>
+    (await repository.findGalleryCategories()).map((row) => row.category));
 }
 
 export async function createGalleryItem(input: unknown) {

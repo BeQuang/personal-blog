@@ -13,6 +13,10 @@ import {
   parseConfirmUpload,
   parseUploadRequest,
 } from "@/server/validation/media.validation";
+import {
+  adminListPageSchema,
+  parseAdminListQuery,
+} from "@/server/validation/admin-list.validation";
 import type {
   ConfirmMediaUploadInput,
   CreateMediaUploadInput,
@@ -25,9 +29,8 @@ import type {
 import { executeRepository } from "./service-helpers";
 
 const idSchema = z.uuid("ID media không hợp lệ");
-const listQuerySchema = z.object({
-  page: z.number().int().positive().default(1),
-  pageSize: z.number().int().min(1).max(60).default(20),
+const listQuerySchema = adminListPageSchema.extend({
+  sortBy: z.enum(["createdAt", "originalFilename", "sizeBytes"]).default("createdAt"),
   query: z.string().trim().max(100).optional(),
   mimeType: z.union([z.enum(mediaMimeTypes), z.literal("all")]).default("all"),
   purpose: z.union([z.enum(mediaPurposes), z.literal("all")]).default("all"),
@@ -74,9 +77,13 @@ async function requireMediaPermission() {
   return requireServicePermission("media:manage");
 }
 
-export async function getMediaLibrary(input: MediaLibraryQuery = {}) {
+export async function getMediaLibrary(input: unknown = {}) {
   await requireMediaPermission();
-  const parsed = listQuerySchema.parse(input);
+  const parsed = parseAdminListQuery(
+    listQuerySchema,
+    input,
+    "Bộ lọc Media Library chưa hợp lệ",
+  ) as Required<MediaLibraryQuery>;
   const repository = await import("@/server/repositories/media.repository");
   const result = await executeRepository(() => repository.findMediaLibrary(parsed));
   return {
@@ -84,6 +91,8 @@ export async function getMediaLibrary(input: MediaLibraryQuery = {}) {
     page: parsed.page,
     pageSize: parsed.pageSize,
     total: result.total,
+    sortBy: parsed.sortBy,
+    sortOrder: parsed.sortOrder,
   };
 }
 

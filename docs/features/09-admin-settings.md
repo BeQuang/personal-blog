@@ -4,6 +4,12 @@
 
 `AdminShell` cung cấp sidebar/navigation, current user, responsive behavior và logout. Nút logout trong header dùng hộp xác nhận Ant Design, ưu tiên focus vào **Ở lại** và chỉ gọi Server Action khi người dùng xác nhận **Đăng xuất**. Ant Design được đăng ký trong admin layout để SSR style đúng, dùng locale `vi_VN`; uPlot stylesheet chỉ được nạp ở admin.
 
+Breadcrumb route được đặt trực tiếp trong header Admin thay vì chiếm một hàng riêng
+trong vùng content. Mọi Ant Design Tabs trong Admin dùng cùng style toàn cục:
+các tab có vạch dọc phân cách, tab active dùng toàn bộ nền tím nhạt nhưng không có
+border tím, còn hover dùng nền nhạt hơn. Không tạo override theo từng màn hình nếu
+không có khác biệt nghiệp vụ bắt buộc.
+
 Sidebar desktop dùng vị trí cố định theo viewport, có vùng cuộn riêng và phần content chừa đúng 252 px. `admin-route-root`, shell và content cùng dùng nền admin sáng nên khi dashboard dài hơn viewport không lộ nền dark của website public. Mọi vùng cuộn trong Admin, kể cả body trang, sidebar, table, modal/confirm, drawer và popup Ant Design, dùng chung track trắng xám nhẹ cùng thumb xám trung tính thay cho scrollbar tối của hệ điều hành. Card trong lưới dashboard được cân chiều cao theo hàng, còn card bảng độc lập phải giữ chiều cao tự nhiên theo nội dung để không tạo khoảng trắng và vùng cuộn giả. Dưới 992 px, sidebar desktop được thay bằng Drawer và content trở về toàn chiều rộng.
 
 Mọi `.admin-table-panel` dùng header cột và vùng pagination tím nhạt theo bảng màu badge **Admin MVP**; trang active dùng nền tím đậm và chữ trắng để dễ nhận biết. Pagination bỏ margin mặc định của Ant Design để bám sát nội dung và viền đáy panel.
@@ -12,7 +18,7 @@ Mọi Ant Design `Table` trong Admin phải dùng `adminTablePaginationDefaults`
 
 `npm run table:audit` quét toàn bộ TSX trong `src`; `npm run api:list-audit` kiểm tra GET collection Route Handler dùng boundary phân trang chung. `npm run ai:check` gọi cả hai audit để từ chối Table thiếu pagination hoặc list API mới không có contract phân trang/sắp xếp.
 
-Riêng `/admin/posts`, content được giới hạn theo chiều cao còn lại dưới header để document không cuộn dọc; page heading, toolbar lọc và pagination ở ngoài vùng cuộn. Manager đo khoảng tối đa từ đầu table panel đến đáy page rồi truyền phần dành cho row vào `Table.scroll.y`; panel co theo số row thực tế, chỉ body row cuộn khi vượt giới hạn, còn header cột và pagination luôn hiển thị.
+Các route `/admin/posts`, `/admin/social-links` và `/admin/gallery` giới hạn content theo chiều cao còn lại dưới header để document không cuộn dọc. Posts và Social Links đo khoảng tối đa từ đầu table panel đến đáy page rồi truyền phần dành cho row vào `Table.scroll.y`; riêng Gallery dùng body table cao cố định `70vh`. Chỉ body row cuộn khi vượt giới hạn, còn heading, toolbar, header cột và pagination luôn hiển thị. Tab Thư viện ảnh chỉ vùng lưới/chi tiết media cuộn nội bộ; heading, upload và toolbar đứng yên, danh sách tự tải batch tiếp theo khi gần đáy và không hiển thị pagination. Nội dung mỗi tab Gallery có padding 8 px trong panel chung để không chạm sát đường viền; bộ lọc Gallery không có thêm card border bọc ngoài và workspace giữ khoảng hở 16 px với đáy `.admin-content`.
 
 Điều hướng menu gọi `startNavigationProgress` trước `router.push`; `app/admin/(protected)/loading.tsx` hiển thị skeleton trong content nhưng giữ nguyên sidebar/header tương tác được. Filter/pagination dùng router theo cùng quy ước. Upload R2/Mux kéo dài cũng tham gia NProgress, đồng thời vẫn giữ progress/nút pending chuyên biệt.
 
@@ -154,6 +160,8 @@ Không:
 - Cuộn dashboard dài: sidebar/header vẫn bám viewport, không xuất hiện khoảng đen, tràn ngang hoặc khoảng trắng do card bảng bị kéo cao hơn nội dung.
 - `/admin/posts`: document không có thanh cuộn dọc; danh sách row cuộn trong table, header cột sticky, toolbar và pagination vẫn thấy trong viewport.
 - `/admin/social-links`: document không có thanh cuộn dọc; search/platform tách khỏi bảng, row cuộn trong table, header/pagination luôn thấy và click Chỉ số cộng đồng đổi sort tăng/giảm trên dữ liệu server.
+- `/admin/gallery`: document không có thanh cuộn dọc; Gallery chỉ cuộn body row, còn Thư viện ảnh chỉ cuộn vùng lưới/chi tiết và tự tải batch kế tiếp; tab, heading và upload/filter luôn nằm trong viewport, nội dung không chạm sát viền panel.
+- Upload Media Library: chọn file chỉ hiện preview cục bộ; không có presign/PUT R2 trước khi bấm **Xác nhận upload**. Trên desktop, panel Upload nằm bên trái và panel toolbar/lưới ảnh nằm bên phải theo tỷ lệ 50/50; preview nằm trong panel Upload. Dưới 1.200 px, hai panel xếp thành hai hàng có vùng cuộn riêng.
 - Form social link đổi trường theo platform; YouTube không cho sửa subscriber, TikTok cho nhập follower/tổng lượt thích thủ công và báo tự động hóa đang tắt, Email/Website không gửi count, Discord dùng thành viên.
 - Truy cập trực tiếp OAuth TikTok khi cờ tắt phải redirect an toàn về Admin với `tiktok=disabled`, không gọi TikTok và không ghi token/dữ liệu.
 - Tạo mới YouTube hợp lệ phải trả count ngay trong lần lưu đầu tiên; URL/API lỗi phải giữ modal mở, hiển thị field error và không ghi bản ghi pending.

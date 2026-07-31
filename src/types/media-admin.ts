@@ -1,3 +1,5 @@
+import type { AdminListPage, AdminSortOrder } from "./admin-list";
+
 export type MediaPurpose =
   | "avatar"
   | "campaign_banner"
@@ -8,6 +10,7 @@ export type MediaPurpose =
   | "site_banner";
 
 export type MediaMimeType = "image/jpeg" | "image/png" | "image/webp" | "image/avif";
+export type MediaLibrarySortBy = "createdAt" | "originalFilename" | "sizeBytes";
 
 export interface MediaAssetItem {
   id: string;
@@ -23,16 +26,13 @@ export interface MediaAssetItem {
   createdAt: string;
 }
 
-export interface MediaLibraryPage {
-  items: readonly MediaAssetItem[];
-  page: number;
-  pageSize: number;
-  total: number;
-}
+export type MediaLibraryPage = AdminListPage<MediaAssetItem, MediaLibrarySortBy>;
 
 export interface MediaLibraryQuery {
   page?: number;
   pageSize?: number;
+  sortBy?: MediaLibrarySortBy;
+  sortOrder?: AdminSortOrder;
   query?: string;
   mimeType?: MediaMimeType | "all";
   purpose?: MediaPurpose | "all";

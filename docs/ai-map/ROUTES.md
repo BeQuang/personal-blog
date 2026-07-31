@@ -1,6 +1,6 @@
 # Route map
 
-> Generated artifact — source fingerprint: `55ceb5b157e9b21b46be3e9fa9ef7e3a55eabc32423a6bbbc4fd73c104f01fb8`
+> Generated artifact — source fingerprint: `018a2c0d701b44d01e3a36d50e2ad2417b864edb8a80297c470440a369c5f0e8`
 
 Route group như `(protected)` không tạo URL segment. Route Handler của Next.js 16 dùng Web Request/Response API và không cache mặc định.
 
@@ -12,7 +12,7 @@ Route group như `(protected)` không tạo URL segment. Route Handler của Nex
 | `/admin/appearance` | Admin page | PAGE | `src/app/admin/(protected)/appearance/page.tsx` | `src/components/admin/AdminAppearanceEditor.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/settings.service.ts` |
 | `/admin/campaigns` | Admin page | PAGE | `src/app/admin/(protected)/campaigns/page.tsx` | `src/components/admin/AdminCampaignsManager.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/campaigns.service.ts`<br>`src/server/services/media.service.ts` |
 | `/admin/events` | Admin page | PAGE | `src/app/admin/(protected)/events/page.tsx` | `src/components/admin/AdminEventsManager.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/events.service.ts`<br>`src/server/services/media.service.ts` |
-| `/admin/gallery` | Admin page | PAGE | `src/app/admin/(protected)/gallery/page.tsx` | `src/components/admin/AdminGalleryManager.tsx`<br>`src/components/admin/AdminMediaLibrary.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/gallery.service.ts`<br>`src/server/services/media.service.ts`<br>`src/types/index.ts` |
+| `/admin/gallery` | Admin page | PAGE | `src/app/admin/(protected)/gallery/page.tsx` | `src/components/admin/admin-table.config.ts`<br>`src/components/admin/AdminGalleryWorkspace.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/gallery.service.ts`<br>`src/server/services/media.service.ts`<br>`src/types/index.ts` |
 | `/admin/login` | Admin page | PAGE | `src/app/admin/login/page.tsx` | `src/actions/auth.actions.ts`<br>`src/components/admin/AdminLoginForm.tsx`<br>`src/server/auth/index.ts` |
 | `/admin/posts` | Admin page | PAGE | `src/app/admin/(protected)/posts/page.tsx` | `src/components/admin/AdminPostsManager.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/admin-posts-page.service.ts` |
 | `/admin/settings` | Admin page | PAGE | `src/app/admin/(protected)/settings/page.tsx` | `src/components/admin/AdminSettingsForm.tsx`<br>`src/server/auth/index.ts`<br>`src/server/services/media.service.ts`<br>`src/server/services/settings.service.ts` |
@@ -22,6 +22,7 @@ Route group như `(protected)` không tạo URL segment. Route Handler của Nex
 | `/api/admin/campaigns` | Route Handler | GET | `src/app/api/admin/campaigns/route.ts` | `src/server/http/admin-list-route.ts`<br>`src/server/services/campaigns.service.ts` |
 | `/api/admin/events` | Route Handler | GET | `src/app/api/admin/events/route.ts` | `src/server/http/admin-list-route.ts`<br>`src/server/services/events.service.ts` |
 | `/api/admin/gallery` | Route Handler | GET | `src/app/api/admin/gallery/route.ts` | `src/server/http/admin-list-route.ts`<br>`src/server/services/gallery.service.ts` |
+| `/api/admin/media` | Route Handler | GET | `src/app/api/admin/media/route.ts` | `src/server/http/admin-list-route.ts`<br>`src/server/services/media.service.ts` |
 | `/api/admin/posts` | Route Handler | GET | `src/app/api/admin/posts/route.ts` | `src/server/http/admin-list-route.ts`<br>`src/server/services/posts.service.ts` |
 | `/api/admin/social-links` | Route Handler | GET | `src/app/api/admin/social-links/route.ts` | `src/server/http/admin-list-route.ts`<br>`src/server/services/social-links.service.ts` |
 | `/api/admin/submissions/export` | Route Handler | GET | `src/app/api/admin/submissions/export/route.ts` | `src/server/export/safe-csv.ts`<br>`src/server/services/submissions.service.ts` |

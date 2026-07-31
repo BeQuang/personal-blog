@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, count, desc, eq, isNull, lte, or } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, isNull, lte, or } from "drizzle-orm";
 
 import { database } from "@/server/database/client";
 import { auditLogs, galleryItems } from "@/server/database/schema";
@@ -34,7 +34,20 @@ export function findGalleryItems() {
 
 export async function findGalleryItemPage(query: AdminGalleryListQuery) {
   const offset = (query.page - 1) * query.pageSize;
-  const where = isNull(galleryItems.deletedAt);
+  const where = and(
+    isNull(galleryItems.deletedAt),
+    query.category !== "all"
+      ? eq(galleryItems.category, query.category)
+      : undefined,
+    query.query
+      ? or(
+          ilike(galleryItems.title, `%${query.query}%`),
+          ilike(galleryItems.description, `%${query.query}%`),
+          ilike(galleryItems.alt, `%${query.query}%`),
+          ilike(galleryItems.category, `%${query.query}%`),
+        )
+      : undefined,
+  );
   const sortColumn = {
     createdAt: galleryItems.createdAt,
     publishedAt: galleryItems.publishedAt,
@@ -55,6 +68,15 @@ export async function findGalleryItemPage(query: AdminGalleryListQuery) {
     database.select({ value: count() }).from(galleryItems).where(where),
   ]);
   return { items, total: totals[0]?.value ?? 0 };
+}
+
+export function findGalleryCategories(limit = 100) {
+  return database
+    .selectDistinct({ category: galleryItems.category })
+    .from(galleryItems)
+    .where(isNull(galleryItems.deletedAt))
+    .orderBy(asc(galleryItems.category))
+    .limit(limit);
 }
 
 export async function findGalleryItemById(id: string) {
